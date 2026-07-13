@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><title>Passing prototype</title><link rel="icon" href="data:,"></head>
+  <body>
+    <button id="open">Open panel</button>
+    <section id="panel" hidden>Ready for review</section>
+    <script>
+      document.querySelector('#open').addEventListener('click', () => {
+        document.querySelector('#panel').hidden = false;
+      });
+    </script>
+  </body>
+</html>

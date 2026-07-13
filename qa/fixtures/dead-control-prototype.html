@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><title>Dead control prototype</title><link rel="icon" href="data:,"></head>
+  <body>
+    <button id="dead">Open missing panel</button>
+    <script>
+      setTimeout(() => { throw new Error('fixture page failure'); }, 20);
+    </script>
+  </body>
+</html>
