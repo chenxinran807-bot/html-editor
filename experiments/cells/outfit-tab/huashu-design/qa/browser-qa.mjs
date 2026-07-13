@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-const port=9334, base=`http://127.0.0.1:${port}`;
+const port=Number(process.env.CDP_PORT||9335), base=`http://127.0.0.1:${port}`;
+const entry=new URL('../artifact/index.html',import.meta.url).href;
 const out=new URL('./screenshots/',import.meta.url); await mkdir(out,{recursive:true});
 const tabs=await fetch(`${base}/json`).then(r=>r.json()); const page=tabs.find(x=>x.type==='page');
 if(!page) throw new Error('No Chrome page target');
@@ -10,17 +11,18 @@ const send=(method,params={})=>new Promise((ok,fail)=>{const id=++seq;pending.se
 const evalJs=async expression=>(await send('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true})).result.value;
 const shot=async name=>{const r=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile(new URL(name,out),Buffer.from(r.data,'base64'))};
 await send('Page.enable');await send('Runtime.enable');await send('Log.enable');await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1100,deviceScaleFactor:1,mobile:false});
-await send('Page.navigate',{url:'file:///Users/bytedance/Documents/prd-demo/.worktrees/native-skill-experiment/experiments/cells/outfit-tab/huashu-design/artifact/index.html'});
+await send('Page.navigate',{url:entry});
 await new Promise(r=>setTimeout(r,700)); await shot('01-entry.png');
 const checks=[];
-await evalJs(`document.querySelector('[data-cat="通勤"]').click()`); await new Promise(r=>setTimeout(r,1000));
-checks.push(['switch-category',await evalJs(`document.querySelector('.chip.active')?.textContent==='通勤' && document.querySelector('.reason-kicker')?.textContent.includes('通勤')`)]);
-await evalJs(`document.querySelector('#reason-card').click()`); await new Promise(r=>setTimeout(r,250)); await shot('02-detail.png');
+await evalJs(`document.querySelector('[data-cat="出游"]').click()`); await new Promise(r=>setTimeout(r,300));
+checks.push(['switch-category',await evalJs(`document.querySelector('.cats .on')?.textContent==='出游' && document.querySelector('.card .k')?.textContent.includes('出游')`)]);
+await evalJs(`document.querySelector('.card').click()`); await new Promise(r=>setTimeout(r,250)); await shot('02-detail.png');
 checks.push(['open-reason-card',await evalJs(`!!document.querySelector('#guidance')`)]);
 checks.push(['read-guidance',await evalJs(`document.body.innerText.includes('适合人群')&&document.body.innerText.includes('配色公式')&&document.body.innerText.includes('避雷提醒')`)]);
-await evalJs(`document.querySelector('[data-product="相似风格平替"]').click()`); await new Promise(r=>setTimeout(r,250));
-checks.push(['open-product-or-alternative',await evalJs(`document.querySelector('.sheet-card')?.innerText.includes('商品信息')&&document.querySelector('.sheet-card')?.innerText.includes('¥189')`)]); await new Promise(r=>setTimeout(r,500)); await shot('03-product.png');
-await evalJs(`document.querySelector('#close-sheet').click()`);await evalJs(`document.querySelector('[data-ai="tryon"]').click()`); await new Promise(r=>setTimeout(r,250));
-checks.push(['enter-ai-styling-or-try-on',await evalJs(`document.querySelector('.sheet-card')?.innerText.includes('AI 试穿准备')`)]); await new Promise(r=>setTimeout(r,700)); await shot('04-ai-entry.png');
-const result={url:await evalJs('location.href'),viewport:'1440x1100',checks:Object.fromEntries(checks),pageErrors:exceptions,consoleErrors:logs,allPassed:checks.every(([,v])=>v)&&!exceptions.length&&!logs.length,screenshots:['01-entry.png','02-detail.png','03-product.png','04-ai-entry.png']};
+await evalJs(`document.querySelector('[data-action="product"]').click()`); await new Promise(r=>setTimeout(r,250));
+checks.push(['open-product-or-alternative',await evalJs(`document.querySelector('.sheet')?.innerText.includes('商品信息')&&document.querySelector('.sheet')?.innerText.includes('Mock ¥189')`)]); await new Promise(r=>setTimeout(r,500)); await shot('03-product.png');
+await evalJs(`document.querySelector('[data-action="close"]').click()`);await evalJs(`document.querySelector('[data-action="tryon"]').click()`); await new Promise(r=>setTimeout(r,250));
+checks.push(['enter-ai-styling-or-try-on',await evalJs(`document.querySelector('.sheet')?.innerText.includes('AI 试穿准备')`)]); await new Promise(r=>setTimeout(r,700)); await shot('04-ai-entry.png');
+for(const [i,n] of ['direction-1-roulette.html','direction-2-benchmark.html','direction-3-designer.html'].entries()){await send('Page.navigate',{url:new URL('../artifact/'+n,import.meta.url).href});await new Promise(r=>setTimeout(r,350));await shot(`direction-${i+1}.png`)}
+const result={entry:'../artifact/index.html',viewport:'1440x1100',checks:Object.fromEntries(checks),pageErrors:exceptions,consoleErrors:logs,allPassed:checks.every(([,v])=>v)&&!exceptions.length&&!logs.length,screenshots:['01-entry.png','02-detail.png','03-product.png','04-ai-entry.png','direction-1.png','direction-2.png','direction-3.png']};
 await writeFile(new URL('../browser-report.json',out),JSON.stringify(result,null,2)); console.log(JSON.stringify(result,null,2)); ws.close();

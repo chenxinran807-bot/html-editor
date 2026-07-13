@@ -1,5 +1,5 @@
 {
-  "url": "file:///Users/bytedance/Documents/prd-demo/.worktrees/native-skill-experiment/experiments/cells/outfit-tab/huashu-design/artifact/index.html",
+  "entry": "../artifact/index.html",
   "viewport": "1440x1100",
   "checks": {
     "switch-category": true,
@@ -15,6 +15,9 @@
     "01-entry.png",
     "02-detail.png",
     "03-product.png",
-    "04-ai-entry.png"
+    "04-ai-entry.png",
+    "direction-1.png",
+    "direction-2.png",
+    "direction-3.png"
   ]
 }

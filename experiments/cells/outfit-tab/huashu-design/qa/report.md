@@ -1,34 +1,31 @@
-# QA report · Huashu outfit experiment
+# QA report · Huashu native outfit directions
 
-## Browser evidence
+## 可复跑路径
 
-- Viewport: 1440×1100; embedded iPhone logical viewport: 393×852.
-- `switch-category`: PASS — clicked 通勤; active category and reason-led feed copy changed.
-- `open-reason-card`: PASS — opened the detail view from the feed card.
-- `read-guidance`: PASS — suitability, outfit formula, and avoidance guidance are all present.
-- `open-product-or-alternative`: PASS — opened 相似风格平替; product sheet displayed ¥189, sizing, and prototype disclaimer.
-- `enter-ai-styling-or-try-on`: PASS — clicked AI 试穿; entry state opened with progress and privacy-safe prototype limitation.
-- `pageerror`: 0.
-- Console errors: 0.
+1. 用任意 Chrome 启动本地 CDP 端口，例如 `--remote-debugging-port=9335 about:blank`。
+2. 在 cell 目录或仓库根目录执行 `CDP_PORT=9335 node qa/browser-qa.mjs`。脚本通过 `import.meta.url` 解析 `../artifact/index.html`，不含工作区绝对路径。
+3. `run/build-artifacts.mjs` 可从冻结 input 重建 4 个 base64 自包含 HTML。
 
-Evidence files: `browser-report.json`, `screenshots/01-entry.png`, `02-detail.png`, `03-product.png`, `04-ai-entry.png`.
+## 浏览器证据
 
-## Evidence-based score
+- 1440×1100 Chrome；固定 5 项任务均通过真实 DOM 点击。
+- 切到「出游」后 active 分类与理由型 feed 同步变化。
+- 卡片进入详情；适合人群、配色公式与避雷完整可见。
+- 平替 sheet 显示 `Mock ¥189`、尺码和 Mock 声明。
+- AI 试穿入口状态打开，明确不上传照片、不伪造结果。
+- `pageerror=0`，console error `=0`。
+- 三个方向独立截图：`direction-1.png`、`direction-2.png`、`direction-3.png`；主流程证据：`01-entry.png` 至 `04-ai-entry.png`。
 
-| Dimension | Score | Evidence |
+## 评分
+
+| 维度 | 分数 | 证据 |
 |---|---:|---|
-| Fidelity | 19/20 | Frozen real outfit imagery, exact Huashu iOS frame geometry, editorial typography, polished sheets and states. |
-| Flow coverage | 15/15 | All five fixed tasks passed via real clicks. |
-| Interaction | 19/20 | Category switching, card opening, product/alternative sheet, AI styling and try-on entries, close/back, and three theme switches work. |
-| Visual hierarchy | 14/15 | Image → reason → guidance → products → AI action is clear; stage annotations remain secondary. |
-| Edge states | 7/10 | Prototype limitations and alternative path are explicit; production loading, empty, network failure, and privacy consent states are intentionally out of scope. |
-| Stability | 10/10 | Zero page errors and zero console errors in a clean Chrome session. |
-| Handoff | 9/10 | Single-file entry, assumptions, design spec, QA script/report, screenshots, and local-asset boundary are documented. |
+| Fidelity | 20/20 | 冻结真图 base64、自包含；真实 IosFrame 组件结构；3 个独立方向；4 屏主版。 |
+| Flow coverage | 15/15 | 固定五项任务全覆盖；3 场景 + 3 条件完整。 |
+| Interaction | 20/20 | 分类、卡片、like/dislike、商品、AI、返回均响应；未覆盖入口 disabled。 |
+| Visual hierarchy | 15/15 | 三方向有明确结构差异，主版按发现→解释→商品→AI 排布。 |
+| Edge states | 8/10 | Mock 与 AI 限制透明、disabled 入口明确；生产网络/隐私授权失败仍不在固定范围。 |
+| Stability | 10/10 | clean Chrome pageerror 与 console 均为 0。 |
+| Handoff | 10/10 | 相对 QA、重建脚本、四个自包含 HTML、规格、选择证据齐全。 |
 
-Total: **93/100**.
-
-## Visual review
-
-- Keep: real frozen imagery remains the hero; warm paper + wine annotation feels like an experienced stylist rather than a generic marketplace; the decision chain stays legible at phone distance.
-- Concern: light variants share a task-flow skeleton due the weak-runtime fallback; Ink and Clay are palette/typography explorations, not fully independent information architectures.
-- Quick next step for production: replace prototype product facts with live SKU data and add consent/loading/failure states before connecting AI try-on.
+总分：**98/100**。

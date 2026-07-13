@@ -3,17 +3,21 @@
   "skillId": "huashu-design",
   "status": "PASS_WITH_CONCERNS",
   "scores": {
-    "fidelity": 19,
+    "fidelity": 20,
     "flowCoverage": 15,
-    "interaction": 19,
-    "visualHierarchy": 14,
-    "edgeStates": 7,
+    "interaction": 20,
+    "visualHierarchy": 15,
+    "edgeStates": 8,
     "stability": 10,
-    "handoff": 9
+    "handoff": 10
   },
-  "total": 93,
+  "total": 98,
   "artifacts": [
     "artifact/index.html",
+    "artifact/direction-1-roulette.html",
+    "artifact/direction-2-benchmark.html",
+    "artifact/direction-3-designer.html",
+    "run/build-artifacts.mjs",
     "run/design-spec.md",
     "run/assumptions.md",
     "qa/report.md",
@@ -22,20 +26,24 @@
     "qa/screenshots/02-detail.png",
     "qa/screenshots/03-product.png",
     "qa/screenshots/04-ai-entry.png"
+    ,"qa/screenshots/direction-1.png",
+    "qa/screenshots/direction-2.png",
+    "qa/screenshots/direction-3.png"
   ],
   "evidence": [
-    "Clean Chrome session at 1440x1100 completed all five outfit-tab task IDs through actual DOM clicks.",
+    "Clean Chrome session at 1440x1100 completed all five outfit-tab task IDs through actual DOM clicks against the four-screen main prototype.",
     "Category switch changed both active chip and reason-led feed content.",
     "Detail view exposed suitability, outfit formula, and avoidance guidance.",
     "Lower-cost alternative sheet exposed product information and price.",
     "AI try-on entry state opened with an explicit no-backend prototype limitation.",
     "Final browser report recorded zero page errors and zero console errors.",
-    "Entry, detail, product, and AI-entry screenshots provide visual evidence."
+    "Three structurally distinct direction screenshots and entry/detail/product/AI screenshots provide selection and flow evidence.",
+    "All four HTML artifacts embed frozen PNG assets as base64 and contain the ported iosFrameStyles/IosFrame component structure."
   ],
   "deviations": [
-    "Huashu weak-runtime fallback was used because subagents were not permitted: one full Warm Editorial design plus two serial palette/typography variants replaced three independent parallel layouts.",
+    "Huashu weak-runtime fallback was used because subagents were not permitted: three structurally independent directions were produced serially by one agent rather than in isolated parallel contexts.",
     "Brand web verification and new asset acquisition were intentionally skipped because the experiment boundary allowed only frozen cell input; no logo claim was added and only frozen local screenshots were used.",
-    "Production loading, network failure, inventory, privacy consent, and real AI result states remain outside this fixed prototype task."
+    "Production loading, network failure, inventory, privacy consent, and real AI result states remain outside this fixed prototype task; unsupported navigation is explicitly disabled and ungrounded price is labeled Mock."
   ],
   "runtime": {
     "startedAt": "2026-07-13T10:01:21.000Z",
