@@ -1,0 +1,41 @@
+{
+  "inputId": "camera-upload",
+  "skillId": "prd-generator",
+  "status": "PASS",
+  "scores": {
+    "fidelity": 17,
+    "flowCoverage": 15,
+    "interaction": 20,
+    "visualHierarchy": 14,
+    "edgeStates": 10,
+    "stability": 10,
+    "handoff": 9
+  },
+  "total": 95,
+  "artifacts": [
+    "artifact/index.html",
+    "artifact/assets/create.png",
+    "artifact/assets/camera.png",
+    "artifact/assets/captured.png",
+    "artifact/assets/review-failed.png",
+    "README.md"
+  ],
+  "evidence": [
+    "qa/task-results.json",
+    "qa/01-entry.png",
+    "qa/02-upload-choices.png",
+    "qa/03-camera.png",
+    "qa/04-album.png",
+    "qa/05-confirm.png",
+    "qa/06-review-failure.png",
+    "run/evidence/browser-qa.json"
+  ],
+  "deviations": [
+    "Camera capture and remote review are deterministic simulations using the supplied local fixture assets."
+  ],
+  "runtime": {
+    "startedAt": "2026-07-13T11:51:16.300Z",
+    "finishedAt": "2026-07-13T11:57:35.300Z",
+    "durationMs": 379000
+  }
+}
