@@ -1,6 +1,7 @@
 .DS_Store
 node_modules/
 .superpowers/
+.worktrees/
 
 # Local authentication and transient runtime state
 lark-auth-qr.png
@@ -17,4 +18,3 @@ test-results/
 vendor/downloads/
 *.tar.gz
 *.zip
-
