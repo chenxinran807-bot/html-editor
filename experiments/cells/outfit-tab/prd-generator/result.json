@@ -1,0 +1,37 @@
+{
+  "inputId": "outfit-tab",
+  "skillId": "prd-generator",
+  "status": "PASS_WITH_CONCERNS",
+  "scores": {
+    "fidelity": 18,
+    "flowCoverage": 15,
+    "interaction": 18,
+    "visualHierarchy": 13,
+    "edgeStates": 8,
+    "stability": 9,
+    "handoff": 10
+  },
+  "total": 91,
+  "artifacts": [
+    "artifact/index.html",
+    "artifact/prd.md",
+    "artifact/pages/01-outfit.html",
+    "run/decisions.md"
+  ],
+  "evidence": [
+    "qa/browser-qa.md records all five fixed task results and real-browser screenshots.",
+    "qa/audit.md records zero prototype hard failures.",
+    "qa/screenshots/category.png proves category selection and feed change.",
+    "qa/screenshots/detail.png proves the reason card, suitability, formula and avoidance guidance.",
+    "qa/screenshots/product.png proves lower-cost alternative product information.",
+    "qa/screenshots/ai.png proves the AI try-on destination state."
+  ],
+  "deviations": [
+    "Playwright was unavailable in the worktree; real Google Chrome headless rendering was used for fixed-state browser verification instead of Playwright-driven clicks."
+  ],
+  "runtime": {
+    "startedAt": "2026-07-13T09:57:00.000Z",
+    "finishedAt": "2026-07-13T10:07:39.000Z",
+    "durationMs": 639000
+  }
+}
