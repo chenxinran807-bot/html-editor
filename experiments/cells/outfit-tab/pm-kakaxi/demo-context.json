@@ -1,0 +1,41 @@
+{
+  "mode": "high-fidelity",
+  "completeness": { "visual": "high", "interaction": "medium", "state": "medium", "semantic": "high" },
+  "page_units": [
+    { "id": "P-01", "name": "穿搭二级分类与理由型 Feed", "type": "card-feed", "source": "截图+PRD", "confidence": "high" },
+    { "id": "P-02", "name": "穿搭详情", "type": "detail", "source": "截图+PRD", "confidence": "high" },
+    { "id": "P-03", "name": "商品与平替承接", "type": "product-sheet", "source": "截图+PRD", "confidence": "high" },
+    { "id": "P-04", "name": "AI 搭配与试穿入口", "type": "ai-entry", "source": "截图+PRD", "confidence": "high" }
+  ],
+  "visual_inventory": [
+    { "id": "V-01", "target": "页面框架", "property": "layout", "value": "393px 移动端白底双列卡片流", "source": "截图 image-013", "confidence": "high" },
+    { "id": "V-02", "target": "分类选中态", "property": "color/radius", "value": "#11141c / 999px", "source": "截图 image-013", "confidence": "high" },
+    { "id": "V-03", "target": "适配标签", "property": "background", "value": "#d9ff82", "source": "截图 image-009/013", "confidence": "medium", "note": "⚠️ 截图取近似值" },
+    { "id": "V-04", "target": "详情信息块", "property": "background/radius", "value": "#f5f7fa / 14px", "source": "截图 image-009/011", "confidence": "high" }
+  ],
+  "interaction_inventory": [
+    { "id": "I-01", "trigger": "点击二级分类", "behavior": "切换推荐 Feed 与理由标签", "source": "截图+PRD", "confidence": "high" },
+    { "id": "I-02", "trigger": "点击理由型卡片", "behavior": "进入搭配详情", "source": "任务契约+PRD", "confidence": "high" },
+    { "id": "I-03", "trigger": "点击商品或平替", "behavior": "打开商品信息承接层", "source": "任务契约+PRD", "confidence": "high" },
+    { "id": "I-04", "trigger": "点击 AI 继续帮你搭", "behavior": "打开同款延展与相似风格入口", "source": "截图 image-010+PRD", "confidence": "high" },
+    { "id": "I-05", "trigger": "点击穿上试试", "behavior": "打开 AI 试穿准备态", "source": "截图 image-009/012+PRD", "confidence": "high" },
+    { "id": "I-06", "trigger": "点击喜欢/不喜欢", "behavior": "记录反馈并呈现即时状态", "source": "PRD", "confidence": "high" }
+  ],
+  "state_matrix": [
+    { "key": "normal", "label": "正常态", "must_have": ["分类可切换", "卡片可进入详情"] },
+    { "key": "empty", "label": "空态", "must_have": ["空态说明", "返回推荐入口"] },
+    { "key": "loading", "label": "加载态", "must_have": ["骨架卡片"] },
+    { "key": "error", "label": "错误态", "must_have": ["重试入口"] },
+    { "key": "boundary", "label": "边界态", "must_have": ["长标签与长标题不溢出"] }
+  ],
+  "open_questions": [
+    { "id": "Q-01", "question": "异常、加载与空态没有原始视觉稿", "impact": "场景视觉仅为原型默认方案", "blocking_level": "soft" },
+    { "id": "Q-02", "question": "商品页和 AI 试穿完整下游流程未提供", "impact": "原型在可确认的入口/承接态止步", "blocking_level": "soft" }
+  ],
+  "do_not_infer": ["不扩写真实支付、下单或履约流程", "不声称未提供的 AI 试穿结果已生成", "不把异常态默认样式称为设计定稿"],
+  "evidence_sources": [
+    { "id": "E-01", "type": "截图", "scope": "image-009~013 的 Feed、详情、商品与 AI 承接视觉" },
+    { "id": "E-02", "type": "PRD", "scope": "分类、理由卡、适配/公式/避雷、商品/平替、AI 入口" },
+    { "id": "E-03", "type": "默认推断", "scope": "空态、加载态、错误态与边界态呈现" }
+  ]
+}

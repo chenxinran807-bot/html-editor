@@ -1,0 +1,23 @@
+{
+  "inputId": "outfit-tab", "skillId": "pm-kakaxi", "status": "PASS_WITH_CONCERNS",
+  "scores": { "fidelity": 15, "flowCoverage": 15, "interaction": 18, "visualHierarchy": 13, "edgeStates": 9, "stability": 10, "handoff": 9 },
+  "total": 89,
+  "artifacts": ["experiments/cells/outfit-tab/pm-kakaxi/index.html", "experiments/cells/outfit-tab/pm-kakaxi/demo-context.json", "experiments/cells/outfit-tab/pm-kakaxi/qa/feed.png", "experiments/cells/outfit-tab/pm-kakaxi/qa/detail.png", "experiments/cells/outfit-tab/pm-kakaxi/qa/ai-entry.png", "experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json"],
+  "evidence": [
+    "Native input completeness scored visual=high, interaction=medium, state=medium, semantic=high; high-fidelity mode selected with two soft gates documented in demo-context.json.",
+    "Playwright ran 6 tests in isolated Chromium: all 6 passed, including the five fixed outfit tasks plus visual screenshots and four edge scenarios.",
+    "switch-category changed the feed and exposed '西装 + 长裤，办公友好'.",
+    "open-reason-card opened the detail view; read-guidance verified suitability, outfit formula, and avoidance guidance headings.",
+    "open-product-or-alternative opened a scoped alternative-product sheet with product title, size, material, shipping, and price information.",
+    "enter-ai-styling-or-try-on opened the AI continuation sheet and verified both same-item extension and similar-style routes.",
+    "Every test captured console.error and pageerror; the passing run observed zero browser errors.",
+    "Screenshots were manually reviewed at 430x932: feed hierarchy, detail guidance, product CTAs, and AI sheet are visible and usable."
+  ],
+  "deviations": [
+    "Skill usage tracking was not sent to external Lark Base because experiment scope permits writes only inside this cell.",
+    "Loading, empty, error, and boundary visuals are explicitly default prototype inferences because the source provides no designs for those states.",
+    "Product checkout and generated AI try-on results stop at their confirmed entry/hand-off states; absent downstream business flows were not invented.",
+    "Feed cards reuse supplied design screenshots as grounded imagery, reducing visual polish versus source-native cropped fashion assets; no external or invented assets were introduced."
+  ],
+  "runtime": { "startedAt": "2026-07-13T10:32:00.000Z", "finishedAt": "2026-07-13T10:43:38.000Z", "durationMs": 698000 }
+}

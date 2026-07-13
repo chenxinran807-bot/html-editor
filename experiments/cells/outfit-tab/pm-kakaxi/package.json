@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "qa": "PLAYWRIGHT_BROWSERS_PATH=.browsers playwright test",
+    "validate": "node validate-result.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.1",
+    "ajv": "^8.20.0"
+  }
+}
