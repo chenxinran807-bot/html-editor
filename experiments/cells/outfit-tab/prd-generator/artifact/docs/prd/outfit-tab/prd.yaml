@@ -1,0 +1,23 @@
+feature: 穿搭 Tab 决策型内容升级
+slug: outfit-tab
+status: review
+stage: 3
+review_mode: off
+design_posture: preserve
+journey_summary: 用户切换二级分类后从理由型卡片进入详情，理解适配、公式和避雷，再查看同款或平替，并携带当前搭配进入 AI 搭配或试穿。
+tracking:
+  needed: true
+  reason: 核心目标是改善浏览、详情、商品和 AI 各段转化，必须观测漏斗。
+iterations:
+  - date: 2026-07-13
+    trigger: frozen-input-native-run
+    summary: 完成需求理解、旅程走查、PRD、伴生画布、高保真与 QA。
+canvas:
+  enabled: true
+  entry: canvas/pages/01-outfit.html
+  deployed_url: null
+  last_pushed: 2026-07-13T10:20:00Z
+open_questions: []
+user_style_prefs: []
+review_comments: []
+

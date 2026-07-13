@@ -2,7 +2,7 @@
 
 Preview: http://127.0.0.1:43117/
 
-Environment: Google Chrome headless, 430 × 932 viewport. The requested Playwright package was unavailable, so equivalent real-Chrome rendering was used. Browser stderr contained no `ReferenceError`, `TypeError`, or uncaught page error; only Chrome GPU/process diagnostics were emitted.
+Environment: Google Chrome CDP, 430 × 932 viewport. `run-fixed-journey.mjs` starts the local artifact, opens one entry, clicks the journey in order, asserts every destination, records JSON and captures each state. `journey-log.json` reports empty `consoleErrors` and `pageErrors`.
 
 | Fixed task | Evidence | Result |
 |---|---|---|
@@ -13,4 +13,3 @@ Environment: Google Chrome headless, 430 × 932 viewport. The requested Playwrig
 | enter-ai-styling-or-try-on | `screenshots/ai.png`: current look is carried into AI try-on upload entry | PASS |
 
 Additional checks: back navigation preserves a coherent journey; feedback presents confirmation; loading/error/retry preview states render; all images are local assets; no network dependency is needed.
-

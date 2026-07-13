@@ -1,0 +1,44 @@
+{
+  "browser": "Google Chrome CDP",
+  "entry": "http://127.0.0.1:43119/",
+  "tasks": [
+    {
+      "name": "switch-category",
+      "pass": true,
+      "assertion": "document.querySelector('#feedTitle').textContent==='场景适配'"
+    },
+    {
+      "name": "open-reason-card",
+      "pass": true,
+      "assertion": "document.querySelector('#detail').classList.contains('active')"
+    },
+    {
+      "name": "read-guidance",
+      "pass": true,
+      "assertion": "['适合人群','搭配公式','避雷提醒'].every(x=>document.body.innerText.includes(x))"
+    },
+    {
+      "name": "open-product-or-alternative",
+      "pass": true,
+      "assertion": "document.querySelector('#product').classList.contains('active')&&document.body.innerText.includes('相似平替')&&document.body.innerText.includes('¥199')"
+    },
+    {
+      "name": "return-detail",
+      "pass": true,
+      "assertion": "document.querySelector('#detail').classList.contains('active')"
+    },
+    {
+      "name": "enter-ai-try-on",
+      "pass": true,
+      "assertion": "document.querySelector('#aiModal').classList.contains('on')"
+    },
+    {
+      "name": "upload-visible-state",
+      "pass": true,
+      "assertion": "document.body.innerText.includes('照片审核准备中')"
+    }
+  ],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "status": "PASS"
+}
