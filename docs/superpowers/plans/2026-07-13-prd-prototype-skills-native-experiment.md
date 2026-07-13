@@ -13,8 +13,10 @@
 ## File map
 
 - `experiments/manifest.json`: canonical list of inputs, skills, cells and status values.
-- `experiments/inputs/<input-id>/source.md`: immutable fetched document body.
-- `experiments/inputs/<input-id>/metadata.json`: URL, document ID, revision, fetch time and SHA-256.
+- `experiments/inputs/<input-id>/source.md`: immutable safe fixture whose image references point to local assets; all other text and structure match the fetched body.
+- `experiments/inputs/<input-id>/assets/`: fetched document images named with their actual MIME extension.
+- `experiments/inputs/<input-id>/assets-manifest.json`: local asset integrity and source-reference metadata without original authorized URLs.
+- `experiments/inputs/<input-id>/metadata.json`: document identity, revision, fetch time, original-content hash, fixture hash, transformation description and asset count.
 - `experiments/cells/<input-id>/<skill-id>/`: isolated `input/`, `run/`, `artifact/`, `qa/` and `result.json`.
 - `experiments/contracts/result.schema.json`: normalized result contract.
 - `experiments/contracts/tasks.json`: fixed browser tasks for each input.
@@ -30,8 +32,12 @@
 
 **Files:**
 - Create: `experiments/inputs/outfit-tab/source.md`
+- Create: `experiments/inputs/outfit-tab/assets/*`
+- Create: `experiments/inputs/outfit-tab/assets-manifest.json`
 - Create: `experiments/inputs/outfit-tab/metadata.json`
 - Create: `experiments/inputs/camera-upload/source.md`
+- Create: `experiments/inputs/camera-upload/assets/*`
+- Create: `experiments/inputs/camera-upload/assets-manifest.json`
 - Create: `experiments/inputs/camera-upload/metadata.json`
 - Create: `experiments/manifest.json`
 
@@ -44,11 +50,13 @@ lark-cli docs +fetch --as user --doc 'https://bytedance.larkoffice.com/wiki/HxxG
 lark-cli docs +fetch --as user --doc 'https://bytedance.larkoffice.com/docx/G2S7dXD5Boj5FSxOQYJcuCxJnDd' --doc-format markdown
 ```
 
-Expected: both responses have `ok: true`, a non-empty `content`, `document_id`, and `revision_id`.
+Expected: both responses have `ok: true`, a non-empty `content`, `document_id`, and `revision_id`. Keep the fetched response only in an untracked temporary location while constructing the fixture; it must not be committed.
 
-- [ ] **Step 2: Save content without rewriting it**
+- [ ] **Step 2: Build a safe, equivalent and reproducible fixture**
 
-Store only the returned `content` values as `source.md`. Store URL, document ID, revision ID, ISO fetch time, and the output of `shasum -a 256 source.md` in `metadata.json`.
+Calculate `originalContentSha256` from the exact returned `content` before transformation. Enumerate image references in source order; for every image URL carrying a temporary authorization query, download the bytes into the input's local `assets/` directory, detect the actual MIME type from the response/body, select the corresponding filename extension, and calculate its byte length and SHA-256. Create `source.md` by replacing only those image URLs with relative local asset paths; preserve all other text, whitespace-significant Markdown structure and reference order, then calculate `fixtureSha256` from the resulting file.
+
+Store document URL without temporary authorization parameters, document ID, revision ID, ISO fetch time, `originalContentSha256`, `fixtureSha256`, a precise `transformation` description, and `assetCount` in `metadata.json`. Store one ordered record per downloaded image in `assets-manifest.json` with exactly the local `file`, `mime`, `bytes`, `sha256`, `sourceReferenceIndex`, and `sourceAltTextSha256`; never store the original authorized image URL or its query parameters in any tracked file.
 
 - [ ] **Step 3: Create the canonical manifest**
 
@@ -58,7 +66,14 @@ Use this status enum in `experiments/manifest.json`:
 {
   "statusValues": ["PENDING", "RUNNING", "PASS", "PASS_WITH_CONCERNS", "BLOCKED", "NOT_APPLICABLE"],
   "inputs": ["outfit-tab", "camera-upload"],
-  "skills": ["open-design", "huashu-design", "prd-generator", "pm-kakaxi", "vne-prototype", "inspire-prototype"]
+  "skills": [
+    {"id": "open-design", "capabilityName": "Open Design"},
+    {"id": "huashu-design", "capabilityName": "huashu-design"},
+    {"id": "prd-generator", "capabilityName": "prd-generator"},
+    {"id": "pm-kakaxi", "capabilityName": "pm-kakaxi-skills"},
+    {"id": "vne-prototype", "capabilityName": "vne-prototype"},
+    {"id": "inspire-prototype", "capabilityName": "inspire-prototype"}
+  ]
 }
 ```
 
@@ -69,10 +84,13 @@ Run:
 ```bash
 test -s experiments/inputs/outfit-tab/source.md
 test -s experiments/inputs/camera-upload/source.md
-shasum -a 256 experiments/inputs/*/source.md
+test -s experiments/inputs/outfit-tab/assets-manifest.json
+test -s experiments/inputs/camera-upload/assets-manifest.json
+shasum -a 256 experiments/inputs/*/source.md experiments/inputs/*/assets/*
+! git grep -nEi '([?&](authcode|code)=)' -- .
 ```
 
-Expected: two hashes, each matching its metadata record.
+Expected: each `source.md` hash matches `metadata.fixtureSha256`; each asset's MIME, bytes and hash match its `assets-manifest.json` record; `assetCount` matches the manifest length; and the tracked-file scan finds no `authcode` or `code` query. During fixture construction, while the exact fetched body and authorized URLs exist only in the untracked temporary location, verify that the fetched body matches `metadata.originalContentSha256` and that reversing only the in-memory URL-to-local-path substitutions reconstructs that exact body. Delete the temporary response and substitution map after verification; neither may be committed.
 
 - [ ] **Step 5: Commit**
 
@@ -124,7 +142,7 @@ For `BLOCKED` and `NOT_APPLICABLE`, require `scores: null`, a non-empty `deviati
 
 - [ ] **Step 5: Implement cell initialization**
 
-`init-cells.mjs` must create all twelve paths and copy only the matching `source.md` and `metadata.json` into each cell's `input/`. It must fail if a destination cell already contains an artifact, preventing accidental overwrites.
+`init-cells.mjs` must create all twelve paths and copy only the matching safe `source.md`, `metadata.json`, `assets-manifest.json`, and `assets/` into each cell's `input/`. It must validate fixture and asset hashes before copying and fail if a destination cell already contains an artifact, preventing accidental overwrites.
 
 - [ ] **Step 6: Run tests and initialize cells**
 
@@ -464,4 +482,3 @@ Expected: no uncommitted experiment changes; commits correspond to the tasks abo
 git add experiments/final-verification.json comparison/native-experiment/report.md
 git commit -m "test: finalize native prototype experiment evidence"
 ```
-
