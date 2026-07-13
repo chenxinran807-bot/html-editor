@@ -1,0 +1,18 @@
+{
+  "generated": "2026-07-13T10:00:00.000Z",
+  "sections": [
+    {
+      "id": "mockups",
+      "label": "Mockups",
+      "groups": [
+        {
+          "slug": "outfit-tab",
+          "files": [
+            { "label": "Outfit Tab Interactive Prototype", "path": "mockups/outfit-tab/index.html" }
+          ]
+        }
+      ]
+    },
+    { "id": "design-systems", "label": "Design Systems", "groups": [] }
+  ]
+}
