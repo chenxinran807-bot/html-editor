@@ -140,6 +140,13 @@
         "effectZh": "核心浏览与 AI 入口完整，整体最均衡；视觉套娃和重试终态仍影响真实感。",
         "capabilityName": "Open Design",
         "resultHref": "../../experiments/cells/outfit-tab/open-design/result.json",
+        "prototype": {
+          "value": "artifact/opendesign/index.html",
+          "repoPath": "experiments/cells/outfit-tab/open-design/artifact/opendesign/index.html",
+          "href": "../../experiments/cells/outfit-tab/open-design/artifact/opendesign/index.html",
+          "external": false,
+          "exists": true
+        },
         "rank": 1
       },
       {
@@ -351,6 +358,13 @@
         "effectZh": "能快速给出多套方向，信息层级清楚；分类内容和深层交互覆盖不够完整。",
         "capabilityName": "huashu-design",
         "resultHref": "../../experiments/cells/outfit-tab/huashu-design/result.json",
+        "prototype": {
+          "value": "artifact/index.html",
+          "repoPath": "experiments/cells/outfit-tab/huashu-design/artifact/index.html",
+          "href": "../../experiments/cells/outfit-tab/huashu-design/artifact/index.html",
+          "external": false,
+          "exists": true
+        },
         "rank": 2
       },
       {
@@ -493,6 +507,13 @@
         "effectZh": "原型与 PRD、画布和交付记录结合紧密；运行质感与部分控件完成度一般。",
         "capabilityName": "prd-generator",
         "resultHref": "../../experiments/cells/outfit-tab/prd-generator/result.json",
+        "prototype": {
+          "value": "artifact/index.html",
+          "repoPath": "experiments/cells/outfit-tab/prd-generator/artifact/index.html",
+          "href": "../../experiments/cells/outfit-tab/prd-generator/artifact/index.html",
+          "external": false,
+          "exists": true
+        },
         "rank": 3
       },
       {
@@ -636,6 +657,13 @@
         "effectZh": "主流程可演示且页面完成度较高；无来源商品信息和死控件削弱可信度。",
         "capabilityName": "pm-kakaxi-skills",
         "resultHref": "../../experiments/cells/outfit-tab/pm-kakaxi/result.json",
+        "prototype": {
+          "value": "index.html",
+          "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/index.html",
+          "href": "../../experiments/cells/outfit-tab/pm-kakaxi/index.html",
+          "external": false,
+          "exists": true
+        },
         "rank": 4
       },
       {
@@ -779,6 +807,12 @@
         "effectZh": "可以快速获得在线预览，但核心购买与 AI 操作不可用，图片也偏离服装主题。",
         "capabilityName": "inspire-prototype",
         "resultHref": "../../experiments/cells/outfit-tab/inspire-prototype/result.json",
+        "prototype": {
+          "value": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
+          "href": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
+          "external": true,
+          "exists": true
+        },
         "rank": 5
       }
     ],
@@ -926,6 +960,13 @@
         "effectZh": "固定任务覆盖最完整，交互和视觉表现最均衡，是该输入下效果最佳的方案。",
         "capabilityName": "pm-kakaxi-skills",
         "resultHref": "../../experiments/cells/camera-upload/pm-kakaxi/result.json",
+        "prototype": {
+          "value": "experiments/cells/camera-upload/pm-kakaxi/artifact/index.html",
+          "repoPath": "experiments/cells/camera-upload/pm-kakaxi/artifact/index.html",
+          "href": "../../experiments/cells/camera-upload/pm-kakaxi/artifact/index.html",
+          "external": false,
+          "exists": true
+        },
         "rank": 1
       },
       {
@@ -1097,6 +1138,13 @@
         "effectZh": "相机、失败重试和成功支路覆盖完整，整体效果优秀；素材套娃和部分边界态仍需改进。",
         "capabilityName": "Open Design",
         "resultHref": "../../experiments/cells/camera-upload/open-design/result.json",
+        "prototype": {
+          "value": "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
+          "repoPath": "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
+          "href": "../../experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
+          "external": false,
+          "exists": true
+        },
         "rank": 2
       },
       {
@@ -1220,6 +1268,13 @@
         "effectZh": "三个方向差异明显且主路径完整；画面拉伸、模拟按钮和浅层断言影响成品质感。",
         "capabilityName": "huashu-design",
         "resultHref": "../../experiments/cells/camera-upload/huashu-design/result.json",
+        "prototype": {
+          "value": "artifact/design-demos/a-system-sheet.html",
+          "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/design-demos/a-system-sheet.html",
+          "href": "../../experiments/cells/camera-upload/huashu-design/artifact/design-demos/a-system-sheet.html",
+          "external": false,
+          "exists": true
+        },
         "rank": 3
       },
       {
@@ -1459,6 +1514,13 @@
         "effectZh": "流程恢复和配套文档较强；整屏截图复用造成明显双重界面，视觉效果一般。",
         "capabilityName": "prd-generator",
         "resultHref": "../../experiments/cells/camera-upload/prd-generator/result.json",
+        "prototype": {
+          "value": "artifact/index.html",
+          "repoPath": "experiments/cells/camera-upload/prd-generator/artifact/index.html",
+          "href": "../../experiments/cells/camera-upload/prd-generator/artifact/index.html",
+          "external": false,
+          "exists": true
+        },
         "rank": 4
       },
       {
@@ -1653,6 +1715,13 @@
         "effectZh": "能够真实构建并跑通流程；控制台外壳与移动相机界面冲突，视觉还原度有限。",
         "capabilityName": "vne-prototype",
         "resultHref": "../../experiments/cells/camera-upload/vne-prototype/result.json",
+        "prototype": {
+          "value": "artifact/camera-upload/dist/index.html",
+          "repoPath": "experiments/cells/camera-upload/vne-prototype/artifact/camera-upload/dist/index.html",
+          "href": "../../experiments/cells/camera-upload/vne-prototype/artifact/camera-upload/dist/index.html",
+          "external": false,
+          "exists": true
+        },
         "rank": 5
       },
       {
@@ -1805,6 +1874,12 @@
         "effectZh": "在线原型主流程可体验，但两个重新上传入口失效，人物素材也不符合正脸目标。",
         "capabilityName": "inspire-prototype",
         "resultHref": "../../experiments/cells/camera-upload/inspire-prototype/result.json",
+        "prototype": {
+          "value": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
+          "href": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
+          "external": true,
+          "exists": true
+        },
         "rank": 6
       }
     ]
@@ -1933,7 +2008,14 @@
       ],
       "effectZh": "核心浏览与 AI 入口完整，整体最均衡；视觉套娃和重试终态仍影响真实感。",
       "capabilityName": "Open Design",
-      "resultHref": "../../experiments/cells/outfit-tab/open-design/result.json"
+      "resultHref": "../../experiments/cells/outfit-tab/open-design/result.json",
+      "prototype": {
+        "value": "artifact/opendesign/index.html",
+        "repoPath": "experiments/cells/outfit-tab/open-design/artifact/opendesign/index.html",
+        "href": "../../experiments/cells/outfit-tab/open-design/artifact/opendesign/index.html",
+        "external": false,
+        "exists": true
+      }
     },
     {
       "inputId": "outfit-tab",
@@ -2143,7 +2225,14 @@
       ],
       "effectZh": "能快速给出多套方向，信息层级清楚；分类内容和深层交互覆盖不够完整。",
       "capabilityName": "huashu-design",
-      "resultHref": "../../experiments/cells/outfit-tab/huashu-design/result.json"
+      "resultHref": "../../experiments/cells/outfit-tab/huashu-design/result.json",
+      "prototype": {
+        "value": "artifact/index.html",
+        "repoPath": "experiments/cells/outfit-tab/huashu-design/artifact/index.html",
+        "href": "../../experiments/cells/outfit-tab/huashu-design/artifact/index.html",
+        "external": false,
+        "exists": true
+      }
     },
     {
       "inputId": "outfit-tab",
@@ -2284,7 +2373,14 @@
       ],
       "effectZh": "原型与 PRD、画布和交付记录结合紧密；运行质感与部分控件完成度一般。",
       "capabilityName": "prd-generator",
-      "resultHref": "../../experiments/cells/outfit-tab/prd-generator/result.json"
+      "resultHref": "../../experiments/cells/outfit-tab/prd-generator/result.json",
+      "prototype": {
+        "value": "artifact/index.html",
+        "repoPath": "experiments/cells/outfit-tab/prd-generator/artifact/index.html",
+        "href": "../../experiments/cells/outfit-tab/prd-generator/artifact/index.html",
+        "external": false,
+        "exists": true
+      }
     },
     {
       "inputId": "outfit-tab",
@@ -2426,7 +2522,14 @@
       ],
       "effectZh": "主流程可演示且页面完成度较高；无来源商品信息和死控件削弱可信度。",
       "capabilityName": "pm-kakaxi-skills",
-      "resultHref": "../../experiments/cells/outfit-tab/pm-kakaxi/result.json"
+      "resultHref": "../../experiments/cells/outfit-tab/pm-kakaxi/result.json",
+      "prototype": {
+        "value": "index.html",
+        "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/index.html",
+        "href": "../../experiments/cells/outfit-tab/pm-kakaxi/index.html",
+        "external": false,
+        "exists": true
+      }
     },
     {
       "inputId": "outfit-tab",
@@ -2496,7 +2599,8 @@
       ],
       "effectZh": "未生成可评估原型：私有依赖和构建审批未通过。",
       "capabilityName": "vne-prototype",
-      "resultHref": "../../experiments/cells/outfit-tab/vne-prototype/result.json"
+      "resultHref": "../../experiments/cells/outfit-tab/vne-prototype/result.json",
+      "prototype": null
     },
     {
       "inputId": "outfit-tab",
@@ -2638,7 +2742,13 @@
       ],
       "effectZh": "可以快速获得在线预览，但核心购买与 AI 操作不可用，图片也偏离服装主题。",
       "capabilityName": "inspire-prototype",
-      "resultHref": "../../experiments/cells/outfit-tab/inspire-prototype/result.json"
+      "resultHref": "../../experiments/cells/outfit-tab/inspire-prototype/result.json",
+      "prototype": {
+        "value": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
+        "href": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
+        "external": true,
+        "exists": true
+      }
     },
     {
       "inputId": "camera-upload",
@@ -2808,7 +2918,14 @@
       ],
       "effectZh": "相机、失败重试和成功支路覆盖完整，整体效果优秀；素材套娃和部分边界态仍需改进。",
       "capabilityName": "Open Design",
-      "resultHref": "../../experiments/cells/camera-upload/open-design/result.json"
+      "resultHref": "../../experiments/cells/camera-upload/open-design/result.json",
+      "prototype": {
+        "value": "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
+        "repoPath": "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
+        "href": "../../experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
+        "external": false,
+        "exists": true
+      }
     },
     {
       "inputId": "camera-upload",
@@ -2930,7 +3047,14 @@
       ],
       "effectZh": "三个方向差异明显且主路径完整；画面拉伸、模拟按钮和浅层断言影响成品质感。",
       "capabilityName": "huashu-design",
-      "resultHref": "../../experiments/cells/camera-upload/huashu-design/result.json"
+      "resultHref": "../../experiments/cells/camera-upload/huashu-design/result.json",
+      "prototype": {
+        "value": "artifact/design-demos/a-system-sheet.html",
+        "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/design-demos/a-system-sheet.html",
+        "href": "../../experiments/cells/camera-upload/huashu-design/artifact/design-demos/a-system-sheet.html",
+        "external": false,
+        "exists": true
+      }
     },
     {
       "inputId": "camera-upload",
@@ -3168,7 +3292,14 @@
       ],
       "effectZh": "流程恢复和配套文档较强；整屏截图复用造成明显双重界面，视觉效果一般。",
       "capabilityName": "prd-generator",
-      "resultHref": "../../experiments/cells/camera-upload/prd-generator/result.json"
+      "resultHref": "../../experiments/cells/camera-upload/prd-generator/result.json",
+      "prototype": {
+        "value": "artifact/index.html",
+        "repoPath": "experiments/cells/camera-upload/prd-generator/artifact/index.html",
+        "href": "../../experiments/cells/camera-upload/prd-generator/artifact/index.html",
+        "external": false,
+        "exists": true
+      }
     },
     {
       "inputId": "camera-upload",
@@ -3312,7 +3443,14 @@
       ],
       "effectZh": "固定任务覆盖最完整，交互和视觉表现最均衡，是该输入下效果最佳的方案。",
       "capabilityName": "pm-kakaxi-skills",
-      "resultHref": "../../experiments/cells/camera-upload/pm-kakaxi/result.json"
+      "resultHref": "../../experiments/cells/camera-upload/pm-kakaxi/result.json",
+      "prototype": {
+        "value": "experiments/cells/camera-upload/pm-kakaxi/artifact/index.html",
+        "repoPath": "experiments/cells/camera-upload/pm-kakaxi/artifact/index.html",
+        "href": "../../experiments/cells/camera-upload/pm-kakaxi/artifact/index.html",
+        "external": false,
+        "exists": true
+      }
     },
     {
       "inputId": "camera-upload",
@@ -3505,7 +3643,14 @@
       ],
       "effectZh": "能够真实构建并跑通流程；控制台外壳与移动相机界面冲突，视觉还原度有限。",
       "capabilityName": "vne-prototype",
-      "resultHref": "../../experiments/cells/camera-upload/vne-prototype/result.json"
+      "resultHref": "../../experiments/cells/camera-upload/vne-prototype/result.json",
+      "prototype": {
+        "value": "artifact/camera-upload/dist/index.html",
+        "repoPath": "experiments/cells/camera-upload/vne-prototype/artifact/camera-upload/dist/index.html",
+        "href": "../../experiments/cells/camera-upload/vne-prototype/artifact/camera-upload/dist/index.html",
+        "external": false,
+        "exists": true
+      }
     },
     {
       "inputId": "camera-upload",
@@ -3656,7 +3801,13 @@
       ],
       "effectZh": "在线原型主流程可体验，但两个重新上传入口失效，人物素材也不符合正脸目标。",
       "capabilityName": "inspire-prototype",
-      "resultHref": "../../experiments/cells/camera-upload/inspire-prototype/result.json"
+      "resultHref": "../../experiments/cells/camera-upload/inspire-prototype/result.json",
+      "prototype": {
+        "value": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
+        "href": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
+        "external": true,
+        "exists": true
+      }
     }
   ],
   "crossInput": [

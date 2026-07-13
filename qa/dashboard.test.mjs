@@ -129,7 +129,7 @@ test('publishes the Chinese dashboard sections without an evidence gallery', asy
   const { output, data } = await buildFixture();
   const html = await readFile(path.join(output, 'index.html'), 'utf8');
 
-  for (const label of ['原型能力实验对比', '相机上传排名', '穿搭 Tab 排名', '原型产物', '未完全按 Skill 标准执行的部分', '跨输入比较', '适用性']) {
+  for (const label of ['原型能力实验对比', '相机上传排名', '穿搭 Tab 排名', '未完全按 Skill 标准执行的部分', '跨输入比较', '适用性']) {
     assert.match(html, new RegExp(label));
   }
   assert.doesNotMatch(html, /原生流程偏离/);
@@ -140,10 +140,11 @@ test('publishes the Chinese dashboard sections without an evidence gallery', asy
   assert.doesNotMatch(html, /\['排名','技能正式名称','总分','状态'\]/);
   assert.doesNotMatch(html, /id=["']gallery["']/);
   assert.doesNotMatch(html, /class=["']gallery["']/);
+  assert.doesNotMatch(html, /<h2>原型产物<\/h2>|id=["']artifacts["']/);
   assert.equal(Object.hasOwn(data, 'gallery'), false);
 });
 
-test('renders twelve identified artifact cards with per-result effect summaries and links', async (t) => {
+test('renders twelve effect cells with direct prototype links in the cross-input table', async (t) => {
   const { output, data } = await buildFixture();
   const pairs = data.results.map((result) => `${result.inputId}::${result.skillId}`);
   assert.equal(new Set(pairs).size, 12, 'each experiment must have a unique inputId × skillId pair');
@@ -155,16 +156,15 @@ test('renders twelve identified artifact cards with per-result effect summaries 
   const page = await browser.newPage();
   await page.goto(url, { waitUntil: 'networkidle' });
 
-  assert.equal(await page.locator('.artifact-result').count(), 12);
+  assert.equal(await page.locator('.prototype-effect').count(), 12);
   assert.equal(await page.locator('.deviation-result').count(), 12);
   for (const result of data.results) {
-    const card = page.locator(`.artifact-result[data-result-id="${result.inputId}::${result.skillId}"]`);
-    assert.equal(await card.count(), 1, `missing Artifact card for ${result.inputId}::${result.skillId}`);
+    const card = page.locator(`.prototype-effect[data-result-id="${result.inputId}::${result.skillId}"]`);
+    assert.equal(await card.count(), 1, `missing cross-input effect cell for ${result.inputId}::${result.skillId}`);
     assert.ok(result.effectZh, `missing effect summary for ${result.inputId}::${result.skillId}`);
-    assert.match(await card.innerText(), /原型生成效果/);
     assert.match(await card.innerText(), new RegExp(result.effectZh.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
     assert.doesNotMatch(await card.innerText(), /PASS_WITH_CONCERNS|BLOCKED/);
-    assert.deepEqual(await card.locator('a[href]').evaluateAll((links) => links.map((link) => link.getAttribute('href'))), result.artifacts.map((artifact) => artifact.href));
+    assert.deepEqual(await card.locator('a[href]').evaluateAll((links) => links.map((link) => link.getAttribute('href'))), result.prototype ? [result.prototype.href] : []);
 
     assert.ok(Array.isArray(result.deviationsZh) && result.deviationsZh.length > 0, `missing Chinese deviations for ${result.inputId}::${result.skillId}`);
     const deviationCard = page.locator(`.deviation-result[data-result-id="${result.inputId}::${result.skillId}"]`);
