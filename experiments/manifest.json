@@ -1,0 +1,40 @@
+{
+  "statusValues": [
+    "PENDING",
+    "RUNNING",
+    "PASS",
+    "PASS_WITH_CONCERNS",
+    "BLOCKED",
+    "NOT_APPLICABLE"
+  ],
+  "inputs": [
+    "outfit-tab",
+    "camera-upload"
+  ],
+  "skills": [
+    {
+      "id": "open-design",
+      "capabilityName": "Open Design"
+    },
+    {
+      "id": "huashu-design",
+      "capabilityName": "huashu-design"
+    },
+    {
+      "id": "prd-generator",
+      "capabilityName": "prd-generator"
+    },
+    {
+      "id": "pm-kakaxi",
+      "capabilityName": "pm-kakaxi-skills"
+    },
+    {
+      "id": "vne-prototype",
+      "capabilityName": "vne-prototype"
+    },
+    {
+      "id": "inspire-prototype",
+      "capabilityName": "inspire-prototype"
+    }
+  ]
+}
