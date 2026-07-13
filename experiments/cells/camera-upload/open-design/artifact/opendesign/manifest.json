@@ -1,0 +1,20 @@
+{
+  "generated": "2026-07-13T10:00:00.000Z",
+  "sections": [
+    {
+      "id": "mockups",
+      "label": "Mockups",
+      "groups": [{"slug":"camera-upload","files":[{"label":"index.html","path":"mockups/camera-upload/index.html"}]}]
+    },
+    {
+      "id": "design-systems",
+      "label": "Design Systems",
+      "groups": [{"slug":"camera-product","files":[
+        {"label":"README.md","path":"design-systems/camera-product/README.md"},
+        {"label":"SKILL.md","path":"design-systems/camera-product/SKILL.md"},
+        {"label":"colors_and_type.css","path":"design-systems/camera-product/tokens/colors_and_type.css"}
+      ]}]
+    }
+  ]
+}
+

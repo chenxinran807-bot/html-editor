@@ -1,0 +1,10 @@
+:root {
+  --fg-1:#11131c; --fg-2:#6f717b; --bg-1:#ffffff; --bg-lime:#f2ffe7;
+  --accent-1:#ff006b; --accent-2:#ff7a32; --success:#35c75a; --danger:#df7045;
+  --border-subtle:#e9e9ec; --surface-primary:var(--bg-1);
+  --font-display:"Avenir Next","PingFang SC",sans-serif;
+  --font-body:"Avenir Next","PingFang SC",sans-serif;
+  --h1:700 30px/1.2 var(--font-display); --h2:700 20px/1.25 var(--font-display);
+  --body:500 16px/1.5 var(--font-body); --caption:500 13px/1.4 var(--font-body);
+}
+

@@ -1,0 +1,21 @@
+{
+  "url": "http://127.0.0.1:8289/opendesign/mockups/camera-upload/index.html",
+  "tasks": {
+    "openUploadChoices": true,
+    "enterCamera": true,
+    "flipCamera": true,
+    "openAlbum": true,
+    "closeCamera": true,
+    "shutter": true,
+    "retake": true,
+    "usePhoto": true,
+    "reviewFailure": true,
+    "retry": true
+  },
+  "persistence": {
+    "facingAfterReturn": "rear"
+  },
+  "consoleErrors": [],
+  "pageErrors": [],
+  "finishedAt": "2026-07-13T11:59:04.737Z"
+}
