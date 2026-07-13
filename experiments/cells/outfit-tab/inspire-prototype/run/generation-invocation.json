@@ -36,7 +36,7 @@
   "skills": {
     "selected": ["built-in:mobile-shell", "built-in:tiktok-design-system"],
     "reason": "The fixture describes a Douyin mobile product UI. mobile-shell is mandatory for mobile surfaces and tiktok-design-system directly matches the product context.",
-    "selectionEvidence": "run/raw/skills-visible.json"
+    "selectionEvidence": "run/sanitized/skills-visible.json"
   },
   "fieldProvenance": {
     "assetIdAndInboxCanvasId": "original CLI started event",

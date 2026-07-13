@@ -1,0 +1,18 @@
+{
+  "capabilities": [
+    {"id":"better-gradient","source":"built-in","active":true},
+    {"id":"frontend-design","source":"built-in","active":false},
+    {"id":"life-design-system","source":"built-in","active":false},
+    {"id":"live-backstage-design-system","source":"built-in","active":false},
+    {"id":"live-campaign-generator","source":"built-in","active":false},
+    {"id":"marcom-web","source":"built-in","active":false},
+    {"id":"mobile-shell","source":"built-in","active":true},
+    {"id":"tiktok-design-system","source":"built-in","active":false},
+    {"id":"tns-design-system","source":"built-in","active":false},
+    {"id":"aurora-design-system","source":"public","active":false,"version":"15"},
+    {"id":"feige-prototype","source":"public","active":false,"version":"6"},
+    {"id":"daren-prototype","source":"public","active":false,"version":"4"},
+    {"id":"qianchuan-prototype","source":"public","active":false,"version":"4"}
+  ],
+  "sanitization": "Descriptions, preview URLs, package hashes, owner identities, and account fields removed. Capability identifiers, source, active state, and public versions retained."
+}

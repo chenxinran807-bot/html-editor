@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import crypto from 'node:crypto';
 
 export async function run(tab, outDir) {
+  const classify = (passed, partial = false) => passed ? 'PASS' : partial ? 'PARTIAL' : 'FAIL';
   const observe = async (label) => {
     const state = await tab.playwright.evaluate(() => ({
       url: location.href,
@@ -27,23 +28,34 @@ export async function run(tab, outDir) {
   };
 
   const category = await click(tab.playwright.getByRole('button', { name: '场景适配', exact: true }), { role: 'button', name: '场景适配' });
-  result.tasks.push({ id: 'switch-category', ...category, passed: category.stateChanged && category.after.domText.includes('西装+长裤，办公友好') });
+  const categoryPassed = category.locator.count === 1 && category.stateChanged;
+  result.tasks.push({ id: 'switch-category', ...category, passed: categoryPassed, partial: false, status: classify(categoryPassed) });
   await fs.writeFile(`${outDir}/02-category-scene.png`, await tab.screenshot({ fullPage: false }));
 
   const card = await click(tab.playwright.getByText('西装+长裤，办公友好', { exact: true }), { text: '西装+长裤，办公友好' });
-  result.tasks.push({ id: 'open-reason-card', ...card, passed: card.after.url.includes('/detail?id=5') });
+  const cardPassed = card.locator.count === 1 && card.stateChanged && card.after.url.includes('/detail');
+  result.tasks.push({ id: 'open-reason-card', ...card, passed: cardPassed, partial: false, status: classify(cardPassed) });
   const guidance = await observe('detail guidance');
-  result.tasks.push({ id: 'read-guidance', state: guidance, observed: {
+  const guidanceObserved = {
     suitability: guidance.domText.includes('适合人群'), formula: guidance.domText.includes('配色公式'),
     avoidance: /避雷|避免|不适合/.test(guidance.domText), size: /尺码/.test(guidance.domText), fabric: /面料/.test(guidance.domText),
-  }, partial: true, passed: false });
+  };
+  const guidancePassed = guidanceObserved.suitability && guidanceObserved.formula && guidanceObserved.avoidance;
+  const guidancePartial = !guidancePassed && Object.values(guidanceObserved).some(Boolean);
+  result.tasks.push({ id: 'read-guidance', state: guidance, observed: guidanceObserved,
+    partial: guidancePartial, passed: guidancePassed, status: classify(guidancePassed, guidancePartial) });
   await fs.writeFile(`${outDir}/03-detail-guidance.png`, await tab.screenshot({ fullPage: false }));
 
   const purchase = await click(tab.playwright.getByText('购买', { exact: true }), { text: '购买' });
-  result.tasks.push({ id: 'open-product-or-alternative', ...purchase, passed: false });
+  const productInfoVisible = /复古牛仔短外套/.test(purchase.after.domText) && /¥358/.test(purchase.after.domText);
+  const purchasePassed = purchase.locator.count === 1 && purchase.stateChanged && productInfoVisible;
+  result.tasks.push({ id: 'open-product-or-alternative', ...purchase, productInfoVisible,
+    passed: purchasePassed, partial: false, status: classify(purchasePassed) });
   const tryOn = await click(tab.playwright.getByText('试穿', { exact: true }), { text: '试穿' });
   const styling = await click(tab.playwright.getByText('保留牛仔外套，换一套更日常的搭法', { exact: true }), { text: '保留牛仔外套，换一套更日常的搭法' });
-  result.tasks.push({ id: 'enter-ai-styling-or-try-on', tryOn, styling, passed: false });
+  const aiPassed = (tryOn.locator.count === 1 && tryOn.stateChanged) || (styling.locator.count === 1 && styling.stateChanged);
+  result.tasks.push({ id: 'enter-ai-styling-or-try-on', tryOn, styling,
+    passed: aiPassed, partial: false, status: classify(aiPassed) });
   await fs.writeFile(`${outDir}/04-product-ai-actions.png`, await tab.screenshot({ fullPage: false }));
   result.console = await tab.dev.logs({ levels: ['error', 'warning', 'warn'], limit: 100 });
   result.pageErrors = { available: false, reason: 'Selected browser API exposes console logs but no separate pageerror stream.' };

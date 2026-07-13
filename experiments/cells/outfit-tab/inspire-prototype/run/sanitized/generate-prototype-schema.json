@@ -1,0 +1,10 @@
+{
+  "command": "generate prototype",
+  "summary": "Create a prototype in the user's inbox.",
+  "requiredOptions": ["prompt"],
+  "safeOptionIds": ["prompt", "name", "ref", "skill", "file", "type", "model", "dry-run", "wait", "follow", "report", "diagnostics", "include-code", "timeout", "poll-interval", "fail-on-generation-error", "json", "human", "quiet", "server", "web"],
+  "output": "JSON start result or NDJSON started/progress/done events",
+  "exitCodes": [0, 2, 3, 4, 5, 6, 7, 130, 141, 143],
+  "errorKinds": ["invalid_input", "not_found", "auth_required", "auth_expired", "forbidden", "conflict", "rate_limited", "network", "upstream_error", "timeout", "internal"],
+  "sanitization": "Credential override option names and descriptions removed; no credential values were present."
+}

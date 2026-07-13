@@ -4,7 +4,7 @@
   "event": "generation-attempt",
   "status": "rejected-before-asset-creation",
   "error": "Too many images: 13, max 10",
-  "note": "This file is not raw CLI stdout. Raw read-only CLI outputs are under run/raw/."
+  "note": "This file is not raw CLI stdout. Sanitized read-only CLI evidence is under run/sanitized/."
 }
 {
   "recordType": "normalized-audit-event",

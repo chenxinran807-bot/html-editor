@@ -5,7 +5,7 @@
 - Browser viewport wrapper: iPhone 12 Pro, 390 × 844
 - Platform compile/runtime report: compile success, 5/5 generated captures, no reported runtime errors
 - Live browser console warnings/errors: none
-- Raw task states: `browser-qa.raw.json`; replay implementation: `replay-browser-qa.mjs`
+- Observed task states: `browser-qa.raw.json`; replay implementation: `replay-browser-qa.mjs`
 - Separate `pageerror` capture is unavailable in the selected browser API. This is recorded as an evidence gap in the raw JSON; the original platform result reported `runtimeErrors=[]`.
 
 ## Fixed tasks

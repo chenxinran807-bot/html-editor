@@ -19,8 +19,9 @@
     "run/native.ndjson",
     "run/generation-invocation.json",
     "run/prompt.txt",
-    "run/raw/whoami.json",
-    "run/raw/skills-visible.json",
+    "run/sanitized/whoami.json",
+    "run/sanitized/generate-prototype-schema.json",
+    "run/sanitized/skills-visible.json",
     "qa/browser-qa.md",
     "qa/replay-browser-qa.mjs",
     "qa/01-entry.png",
@@ -29,7 +30,7 @@
     "qa/04-product-ai-actions.png"
   ],
   "deviations": [
-    "The original full generation stdout was not persisted byte-for-byte; native.ndjson is explicitly a normalized audit log reconstructed from the agent tool-call record and original started/done output, while only the recalibrated read-only CLI outputs are raw.",
+    "The original full generation stdout was not persisted byte-for-byte; native.ndjson is explicitly a normalized audit log reconstructed from the agent tool-call record and original started/done output. Read-only CLI evidence is sanitized and contains no account or owner identity fields.",
     "The platform maximum is 10 images, so the rejected 13-image attempt was recovered with the frozen PRD body unchanged and only this cell's five product-solution images attached.",
     "Live browser testing found dead purchase, AI styling, and AI try-on controls despite platform compile success and 5/5 generated captures.",
     "Generated feed/detail imagery is unrelated to clothing, and avoidance, size, and fabric guidance are absent."
