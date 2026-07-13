@@ -14,10 +14,22 @@ const exists = async (file) => access(file).then(() => true, () => false);
 const repoHref = (repoPath) => `../../${repoPath.split(path.sep).join('/')}`;
 const external = (value) => /^https?:\/\//.test(value);
 const cellPath = (inputId, skillId) => `experiments/cells/${inputId}/${skillId}`;
+
+export function resolveLocalEntry(value, inputId, skillId) {
+  const unsafe = () => new Error(`Unsafe local entry path: ${value}`);
+  if (path.isAbsolute(value) || value.startsWith('//') || /^[a-z][a-z\d+.-]*:/i.test(value) || value.includes('\\')) throw unsafe();
+  if (value.split('/').includes('..')) throw unsafe();
+  const repoPath = value.startsWith('experiments/') ? value : `${cellPath(inputId, skillId)}/${value}`;
+  const resolved = path.resolve(root, repoPath);
+  const relative = path.relative(root, resolved);
+  if (!relative || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) throw unsafe();
+  return { repoPath, href: repoHref(repoPath) };
+}
+
 const resolveEntry = async (value, inputId, skillId) => {
   if (external(value)) return { value, href: value, external: true, exists: true };
-  const repoPath = value.startsWith('experiments/') ? value : `${cellPath(inputId, skillId)}/${value}`;
-  return { value, repoPath, href: repoHref(repoPath), external: false, exists: await exists(path.join(root, repoPath)) };
+  const { repoPath, href } = resolveLocalEntry(value, inputId, skillId);
+  return { value, repoPath, href, external: false, exists: await exists(path.join(root, repoPath)) };
 };
 
 function rank(rows) {
@@ -113,7 +125,6 @@ async function build() {
     };
   });
   const data = {
-    generatedAt: new Date().toISOString(),
     summary: { resultCount: results.length, scoredCount: results.filter((row) => row.scores).length, blockedCount: results.filter((row) => row.status === 'BLOCKED').length },
     dimensions,
     rankings,
@@ -181,4 +192,4 @@ function reportMarkdown(data, skills) {
   return `${lines.join('\n')}\n`;
 }
 
-await build();
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await build();

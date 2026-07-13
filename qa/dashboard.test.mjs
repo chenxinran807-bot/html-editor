@@ -74,11 +74,28 @@ async function buildFixture() {
 
 test('validates and aggregates exactly twelve experiment results', async () => {
   const { data } = await buildFixture();
+  assert.equal(Object.hasOwn(data, 'generatedAt'), false);
   assert.equal(data.results.length, 12);
   assert.equal(data.summary.resultCount, 12);
   assert.equal(data.summary.scoredCount, 11);
   assert.equal(data.summary.blockedCount, 1);
   assert.deepEqual(data.dimensions, ['fidelity', 'flowCoverage', 'interaction', 'visualHierarchy', 'edgeStates', 'stability', 'handoff']);
+});
+
+test('production entry resolver rejects local paths that can escape the repository', async () => {
+  const { resolveLocalEntry } = await import('../scripts/experiment/build-dashboard.mjs');
+  for (const value of [
+    '../../../outside.html',
+    '/tmp/outside.html',
+    'file:///tmp/outside.html',
+    'experiments/cells/../../../../outside.html',
+  ]) {
+    assert.throws(
+      () => resolveLocalEntry(value, 'camera-upload', 'open-design'),
+      /unsafe local entry path/i,
+      value,
+    );
+  }
 });
 
 test('ranks each input by total then fidelity, interaction, and stability', async () => {
