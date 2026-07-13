@@ -13,6 +13,7 @@ export const SCORE_MAXIMA = Object.freeze({
 });
 
 const statuses = new Set(['PENDING', 'RUNNING', 'PASS', 'PASS_WITH_CONCERNS', 'BLOCKED', 'NOT_APPLICABLE']);
+const safeSlug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const baseKeys = new Set(['inputId', 'skillId', 'status', 'scores', 'total', 'artifacts', 'evidence', 'deviations', 'runtime']);
 const runtimeKeys = new Set(['startedAt', 'finishedAt', 'durationMs']);
 const isoDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/;
@@ -23,7 +24,7 @@ export function validateResult(value) {
   const allowed = new Set(baseKeys);
   if (value.status === 'BLOCKED' || value.status === 'NOT_APPLICABLE') allowed.add('reason');
   for (const key of Object.keys(value)) if (!allowed.has(key)) errors.push(`unknown result field: ${key}`);
-  for (const key of ['inputId', 'skillId']) if (typeof value[key] !== 'string' || !value[key].trim()) errors.push(`${key} must be non-empty`);
+  for (const key of ['inputId', 'skillId']) if (typeof value[key] !== 'string' || !safeSlug.test(value[key])) errors.push(`${key} must be a safe slug`);
   if (!statuses.has(value.status)) errors.push('status is invalid');
   for (const key of ['artifacts', 'evidence', 'deviations']) if (!Array.isArray(value[key]) || value[key].some((item) => typeof item !== 'string' || !item.trim())) errors.push(`${key} must be an array of non-empty strings`);
   if (!value.runtime || typeof value.runtime !== 'object' || Array.isArray(value.runtime)) errors.push('runtime must be an object');

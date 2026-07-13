@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "result.schema.json",
+  "$comment": "Structural contract only. Runtime semantic validation additionally requires total to equal the sum of all seven score dimensions; JSON Schema cannot express this arithmetic invariant.",
   "type": "object",
   "additionalProperties": false,
   "required": ["inputId", "skillId", "status", "scores", "total", "artifacts", "evidence", "deviations", "runtime"],

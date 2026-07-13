@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdir, mkdtemp, readFile, symlink, writeFile } from 'node:fs/promises';
+import { access, mkdir, mkdtemp, readFile, readdir, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -75,6 +75,19 @@ test('rejects unknown result fields and blank array entries', () => {
     { ...validResult, evidence: [42] },
     { ...validResult, runtime: { durationMs: -1 } },
   ]) assert.equal(validateResult(candidate).valid, false);
+});
+
+test('schema and validator agree on safe slug identifiers', async () => {
+  const schema = JSON.parse(await readFile(new URL('../experiments/contracts/result.schema.json', import.meta.url)));
+  const inputPattern = new RegExp(schema.properties.inputId.pattern);
+  const skillPattern = new RegExp(schema.properties.skillId.pattern);
+  const corpus = ['safe-id', 'a1', '../escape', 'bad/skill', ' white', 'white ', 'two words', '', 'UPPER'];
+  for (const id of corpus) {
+    const expected = inputPattern.test(id) && skillPattern.test(id);
+    const actual = validateResult({ ...validResult, inputId: id, skillId: id }).valid;
+    assert.equal(actual, expected, `schema/validator slug mismatch for ${JSON.stringify(id)}`);
+  }
+  assert.match(schema.$comment ?? schema['x-semanticRules']?.join(' ') ?? '', /total.*sum|sum.*total/i);
 });
 
 for (const status of ['BLOCKED', 'NOT_APPLICABLE']) {
@@ -171,4 +184,25 @@ test('initializer is exact-idempotent and rejects a mutated existing cell withou
   await writeFile(copied, 'mutated');
   await assert.rejects(initializeCells(root), /existing|differ|overwrite|hash/i);
   assert.equal(await readFile(copied, 'utf8'), 'mutated');
+});
+
+test('initializer rejects a symlinked cells root without writing outside experiments', async () => {
+  const { initializeCells } = await import('../scripts/experiment/init-cells.mjs');
+  const root = await makeHarnessRoot();
+  const outside = path.join(root, 'outside-cells');
+  await mkdir(outside);
+  await symlink(outside, path.join(root, 'experiments/cells'));
+  await assert.rejects(initializeCells(root), /symlink|contain/i);
+  assert.deepEqual(await readdir(outside), []);
+});
+
+test('initializer preflights all cells and performs zero partial writes', async () => {
+  const { initializeCells } = await import('../scripts/experiment/init-cells.mjs');
+  const root = await makeHarnessRoot();
+  const lastArtifact = path.join(root, 'experiments/cells/input-b/skill-6/artifact');
+  await mkdir(lastArtifact, { recursive: true });
+  await writeFile(path.join(lastArtifact, 'blocked.txt'), 'existing result');
+  await assert.rejects(initializeCells(root), /existing|artifact|overwrite/i);
+  await assert.rejects(access(path.join(root, 'experiments/cells/input-a/skill-1')), { code: 'ENOENT' });
+  assert.equal(await readFile(path.join(lastArtifact, 'blocked.txt'), 'utf8'), 'existing result');
 });

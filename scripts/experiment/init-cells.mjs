@@ -26,6 +26,16 @@ async function requireDirectory(directory, label) {
   if (info.isSymbolicLink() || !info.isDirectory()) throw new Error(`${label} must be a real directory, not a symlink`);
 }
 
+async function existingInfo(target) {
+  try { return await lstat(target); } catch (error) { if (error.code === 'ENOENT') return null; throw error; }
+}
+
+async function requireRealContainment(parentReal, target, label) {
+  const targetReal = await realpath(target);
+  if (targetReal !== parentReal && !targetReal.startsWith(`${parentReal}${path.sep}`)) throw new Error(`${label} is outside its real parent`);
+  return targetReal;
+}
+
 async function containedRegularFile(root, relative, label) {
   if (typeof relative !== 'string' || path.posix.normalize(relative) !== relative || !relative.startsWith('assets/') || relative.includes('\\')) throw new Error(`${label}: unsafe asset path ${relative}`);
   const rootReal = await realpath(root);
@@ -85,8 +95,9 @@ function validateManifest(manifest) {
   }
 }
 
-async function ensureExactExistingCell(cell, fixture) {
+async function ensureExactExistingCell(cell, fixture, cellsReal) {
   await requireDirectory(cell, `existing cell ${cell}`);
+  await requireRealContainment(cellsReal, cell, `existing cell ${cell}`);
   const entries = (await readdir(cell)).sort();
   if (entries.join('\0') !== ['artifact', 'input', 'qa', 'run'].sort().join('\0')) throw new Error(`Existing cell differs from isolated layout: ${cell}`);
   for (const empty of ['run', 'artifact', 'qa']) {
@@ -103,9 +114,13 @@ async function ensureExactExistingCell(cell, fixture) {
   }
 }
 
-async function createCellAtomically(cell, fixture) {
+async function createCellAtomically(cell, fixture, cellsRoot, cellsReal) {
   const parent = path.dirname(cell);
-  await mkdir(parent, { recursive: true });
+  const parentInfo = await existingInfo(parent);
+  if (parentInfo) await requireDirectory(parent, `cell parent ${parent}`);
+  else await mkdir(parent, { recursive: true });
+  await requireRealContainment(cellsReal, parent, `cell parent ${parent}`);
+  if (await existingInfo(cell)) throw new Error(`Cell appeared after preflight; refusing overwrite: ${cell}`);
   const temporary = path.join(parent, `.${path.basename(cell)}.tmp-${randomUUID()}`);
   try {
     for (const name of ['input/assets', 'run', 'artifact', 'qa']) await mkdir(path.join(temporary, name), { recursive: true });
@@ -116,6 +131,8 @@ async function createCellAtomically(cell, fixture) {
     }
     await validateFixtureDirectory(path.join(temporary, 'input'), `temporary cell ${cell}`);
     await rename(temporary, cell);
+    await requireDirectory(cell, `created cell ${cell}`);
+    await requireRealContainment(cellsReal, cell, `created cell ${cell}`);
   } catch (error) {
     await rm(temporary, { recursive: true, force: true });
     throw error;
@@ -123,28 +140,46 @@ async function createCellAtomically(cell, fixture) {
 }
 
 export async function initializeCells(root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')) {
-  const manifestFile = path.join(root, 'experiments', 'manifest.json');
+  await requireDirectory(root, 'experiment repository root');
+  const rootReal = await realpath(root);
+  const experimentsRoot = path.join(root, 'experiments');
+  await requireDirectory(experimentsRoot, 'experiments root');
+  const experimentsReal = await requireRealContainment(rootReal, experimentsRoot, 'experiments root');
+  const manifestFile = path.join(experimentsRoot, 'manifest.json');
   await requireRegular(manifestFile, 'experiments/manifest.json');
   const manifest = JSON.parse(await readFile(manifestFile, 'utf8'));
   validateManifest(manifest);
   const fixtures = new Map();
   for (const inputId of manifest.inputs) {
-    const inputRoot = path.resolve(root, 'experiments', 'inputs', inputId);
-    const expectedParent = path.resolve(root, 'experiments', 'inputs');
+    const inputRoot = path.resolve(experimentsRoot, 'inputs', inputId);
+    const expectedParent = path.resolve(experimentsRoot, 'inputs');
     if (!inputRoot.startsWith(`${expectedParent}${path.sep}`)) throw new Error(`Manifest input escapes inputs root: ${inputId}`);
     fixtures.set(inputId, await validateFixtureDirectory(inputRoot, inputId));
   }
+  const cellsRoot = path.join(experimentsRoot, 'cells');
+  const cellsInfo = await existingInfo(cellsRoot);
+  let cellsReal = null;
+  if (cellsInfo) {
+    await requireDirectory(cellsRoot, 'cells root');
+    cellsReal = await requireRealContainment(experimentsReal, cellsRoot, 'cells root');
+  }
+  const plan = [];
   for (const inputId of manifest.inputs) for (const { id: skillId } of manifest.skills) {
-    const cell = path.resolve(root, 'experiments', 'cells', inputId, skillId);
-    const cellsRoot = path.resolve(root, 'experiments', 'cells');
+    const cell = path.resolve(cellsRoot, inputId, skillId);
     if (!cell.startsWith(`${cellsRoot}${path.sep}`)) throw new Error('Cell path escapes cells root');
-    try {
-      await lstat(cell);
-      await ensureExactExistingCell(cell, fixtures.get(inputId));
-    } catch (error) {
-      if (error.code === 'ENOENT') await createCellAtomically(cell, fixtures.get(inputId));
-      else throw error;
+    const info = await existingInfo(cell);
+    if (info) {
+      if (!cellsReal) throw new Error('Existing cell found without a safe cells root');
+      await ensureExactExistingCell(cell, fixtures.get(inputId), cellsReal);
+    } else plan.push({ cell, fixture: fixtures.get(inputId) });
+  }
+  if (plan.length) {
+    if (!cellsInfo) {
+      await mkdir(cellsRoot);
+      await requireDirectory(cellsRoot, 'created cells root');
+      cellsReal = await requireRealContainment(experimentsReal, cellsRoot, 'created cells root');
     }
+    for (const item of plan) await createCellAtomically(item.cell, item.fixture, cellsRoot, cellsReal);
   }
   return { cells: 12 };
 }
