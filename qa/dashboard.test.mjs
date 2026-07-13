@@ -115,6 +115,8 @@ test('publishes the Chinese dashboard sections without an evidence gallery', asy
   for (const label of ['原型能力实验对比', '相机上传排名', '穿搭 Tab 排名', '原型产物', '原生流程偏离', '跨输入比较', '适用性']) {
     assert.match(html, new RegExp(label));
   }
+  assert.match(html, /技能正式名称/);
+  assert.doesNotMatch(html, /Skill 正式名称/);
   assert.doesNotMatch(html, /证据画廊/);
   assert.doesNotMatch(html, /id=["']gallery["']/);
   assert.doesNotMatch(html, /class=["']gallery["']/);
