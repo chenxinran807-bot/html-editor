@@ -1,0 +1,37 @@
+{
+  "inputId": "camera-upload",
+  "skillId": "huashu-design",
+  "status": "PASS_WITH_CONCERNS",
+  "scores": {
+    "fidelity": 15,
+    "flowCoverage": 15,
+    "interaction": 18,
+    "visualHierarchy": 12,
+    "edgeStates": 8,
+    "stability": 8,
+    "handoff": 6
+  },
+  "total": 82,
+  "artifacts": [
+    "artifact/camera-upload-directions.html",
+    "artifact/design-spec.md",
+    "artifact/brand-spec.md"
+  ],
+  "evidence": [
+    "qa/screenshots/direction-a.png",
+    "qa/screenshots/qa-run.png",
+    "qa/raw/interaction-results.json",
+    "qa/raw/qa-dom.html"
+  ],
+  "deviations": [
+    "Weak-runtime fallback was used: three directions were produced serially in one self-contained artifact rather than by isolated subagents.",
+    "The three directions share one complete state-machine implementation; their entry composition, capture guidance, progress treatment, typography and container geometry differ, but they are less structurally independent than three separately authored prototypes.",
+    "No official brand identity or design system was supplied; invented labels, colors, review timing and simulated failure controls are explicitly marked Mock.",
+    "Browser QA used headless Google Chrome with an in-page deterministic click harness because Playwright was unavailable in the worktree. Raw DOM, screenshots, consoleErrors and pageErrors were persisted."
+  ],
+  "runtime": {
+    "startedAt": "2026-07-13T11:45:00Z",
+    "finishedAt": "2026-07-13T11:58:02Z",
+    "durationMs": 782000
+  }
+}
