@@ -126,10 +126,10 @@ try {
   await selectOutcome('服务异常', '服务异常，请重试');
   await clickText('重新上传'); await sleep(300);
 
-  const report = { preview, viewport: { width: 390, height: 844, mobile: true }, status: tasks.every(t => t.status === 'PASS') ? 'PASS' : 'FAIL', tasks, branchChecks: { success: 'PASS', serviceErrorDisplayed: 'PASS', serviceErrorReupload: 'FAIL' }, consoleErrors, exceptions };
+  const report = { preview, viewport: { width: 390, height: 844, mobile: true }, status: tasks.every(t => t.status === 'PASS') ? 'PASS' : 'FAIL', tasks, branchChecks: { success: 'PASS', serviceErrorDisplayed: 'PASS', serviceErrorReupload: 'FAIL' }, consoleErrors, pageErrors: exceptions, exceptions };
   await fs.writeFile(path.join(rawDir, 'browser-qa.json'), `${JSON.stringify(report, null, 2)}\n`);
 } catch (error) {
-  const report = { preview, status: 'FAIL', tasks, fatal: error.message, consoleErrors, exceptions };
+  const report = { preview, status: 'FAIL', tasks, fatal: error.message, consoleErrors, pageErrors: exceptions, exceptions };
   await fs.writeFile(path.join(rawDir, 'browser-qa.json'), `${JSON.stringify(report, null, 2)}\n`);
   throw error;
 } finally {

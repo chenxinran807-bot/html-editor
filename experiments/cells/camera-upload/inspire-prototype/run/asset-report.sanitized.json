@@ -1,0 +1,47 @@
+{
+  "provenance": {
+    "command": "inspire-prototype asset <asset-id> --json",
+    "retrievedAt": "2026-07-13",
+    "fieldLevelSanitization": true
+  },
+  "asset": {
+    "assetId": "6a54dba21afe4f0267392504",
+    "canvasId": "6a1fbf72fc6413028e2870d7",
+    "name": "camera-upload-native-inspire-20260713",
+    "type": "prototype",
+    "status": "success",
+    "createdAt": "2026-07-13T12:35:46.367Z",
+    "updatedAt": "2026-07-13T12:39:38.002Z",
+    "previewUrl": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net"
+  },
+  "fileAssets": [
+    {"file":"input/assets/image-008.png","refAssetId":"6a54dba21afe4f02673924f4"},
+    {"file":"input/assets/image-009.png","refAssetId":"6a54dba11afe4f02673924f0"},
+    {"file":"input/assets/image-010.png","refAssetId":"6a54dba21afe4f02673924f6"},
+    {"file":"input/assets/image-011.png","refAssetId":"6a54dba11afe4f02673924f2"},
+    {"file":"input/assets/image-012.png","refAssetId":"6a54dba21afe4f02673924fa"},
+    {"file":"input/assets/image-013.png","refAssetId":"6a54dba21afe4f02673924f8"}
+  ],
+  "counts": {
+    "fileAssets": 6,
+    "captures": 16
+  },
+  "captures": [
+    {"stateUrl":"/"},
+    {"stateUrl":"/?modal=create"},
+    {"stateUrl":"/?modal=create&sheet=source"},
+    {"stateUrl":"/camera?facing=back"},
+    {"stateUrl":"/camera?facing=front"},
+    {"stateUrl":"/album"},
+    {"stateUrl":"/?modal=create&sheet=source"},
+    {"stateUrl":"/camera/confirm?facing=back"},
+    {"stateUrl":"/camera?facing=back"},
+    {"stateUrl":"/moderating?mock=success"},
+    {"stateUrl":"/?modal=result&status=success"},
+    {"stateUrl":"/moderating?mock=fail"},
+    {"stateUrl":"/?modal=result&status=fail"},
+    {"stateUrl":"/?modal=create&sheet=source"},
+    {"stateUrl":"/moderating?mock=error"},
+    {"stateUrl":"/?modal=result&status=error"}
+  ]
+}
