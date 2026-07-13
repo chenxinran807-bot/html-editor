@@ -14,7 +14,6 @@
   "total": 76,
   "artifacts": [
     "artifact/index.html",
-    "artifact/prd.md",
     "artifact/pages/01-outfit.html",
     "artifact/docs/prd/outfit-tab/prd.yaml",
     "artifact/docs/prd/outfit-tab/prd.md",

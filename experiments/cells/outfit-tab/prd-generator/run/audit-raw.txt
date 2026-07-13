@@ -1,4 +1,12 @@
+Command:
+node experiments/cells/outfit-tab/prd-generator/qa/audit-prototype.cjs experiments/cells/outfit-tab/prd-generator/artifact/docs/prd/outfit-tab/canvas
+
 原型体检 · 1 个页 · 入口=01-outfit
+————————————————————————————————————————————————
 ✅ 没有硬伤：从入口能一路点到每一个页，没有断链、没有死键。
-人工校准：启发式警告不能全部按事件委托误报消除。菜单、搜索、购买、继续搭及 toast-only 控件仍属于浅层或假 affordance；反馈和完整状态矩阵也未被 QA 覆盖。
-结论：入口结构可走通，但交互完整性存在明显缺陷。
+
+⚠ 需要人工扫一眼（启发式，可能误报）：
+  • 01-outfit：17 个元素看着能点却没接 handler，例如 <button class="iconbtn">  <button class="iconbtn">  <button class="tab active">  <button class="tab">
+    （若是用 JS 事件委托接了的不算；否则属于假 affordance。）
+————————————————————————————————————————————————
+结论：结构上走得通。人工校准仍保留菜单、搜索、购买、继续搭和 toast-only 交互完整性问题。

@@ -1,9 +1,9 @@
 # Prototype audit
 
-- Command: `audit-prototype.cjs artifact`
+- Reproducible command from repository root: `node experiments/cells/outfit-tab/prd-generator/qa/audit-prototype.cjs experiments/cells/outfit-tab/prd-generator/artifact/docs/prd/outfit-tab/canvas`
+- Auditor: locked copy at `qa/audit-prototype.cjs`
 - Pages: 1 (`01-outfit`)
 - Entry: `01-outfit`
 - Hard failures: 0
 - Result: entry reaches all states; no broken links, island pages, or dead-end entry.
-- Heuristic warning: 17 controls were flagged because handlers are attached through JavaScript/event delegation. Manual browser rendering confirmed category, card, product, back, AI, feedback, retry, and state-preview handlers. Menu/search/global shell labels are decorative shell controls and do not advertise an in-scope destination.
-
+- Heuristic warning: 17 controls were flagged. Some use JavaScript/event delegation, while the calibrated review retains concerns for shallow or fake affordances such as menu/search, purchase and continue-styling.
