@@ -1,0 +1,157 @@
+{
+  "previewUrl": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
+  "startedAt": "2026-07-13T11:45:08.369Z",
+  "tasks": [
+    {
+      "id": "switch-category",
+      "locator": {
+        "role": "button",
+        "name": "场景适配",
+        "count": 1
+      },
+      "before": {
+        "label": "before [object Object]",
+        "url": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net/feed?tab=blogger",
+        "domTextSha256": "7b1a5f6af439a9b6f3b26ef32d8349a4091d6c00ba66e321cd355940102c0bfc",
+        "domText": "Responsive iPhone SE iPhone XR iPhone 12 Pro iPhone 14 Pro Max Pixel 7 Samsung Galaxy S8+ Samsung Galaxy S20 Ultra iPad Mini iPad Air iPad Pro Surface Pro 7 Surface Duo Galaxy Z Fold 5 Asus Zenbook Fold Samsung Galaxy A51/71 Nest Hub Nest Hub Max 390 × 844 自动调整 50% 75% 100% 125% 150% 200% 19:45 穿搭 直播 推荐 博主精选 场景适配 身型适配 高热笔记 成套可买 蓝白约会套装，整套可买 试穿 博主同款 复古通勤 牛仔外套+低腰微喇牛仔裤 试穿 明星同款 平替清单 黑白轻通勤，适合照搬 试穿 高收藏 红人风 红条纹上衣+黑色百褶裙 试穿 试衣间 首页 发现 消息 购物车 我的"
+      },
+      "after": {
+        "label": "after [object Object]",
+        "url": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net/feed?tab=scenario",
+        "domTextSha256": "6dc1b60207bb4b3dbf5fd7bb8e4e9b9b3794f1412349b8ff3563adece19f8513",
+        "domText": "Responsive iPhone SE iPhone XR iPhone 12 Pro iPhone 14 Pro Max Pixel 7 Samsung Galaxy S8+ Samsung Galaxy S20 Ultra iPad Mini iPad Air iPad Pro Surface Pro 7 Surface Duo Galaxy Z Fold 5 Asus Zenbook Fold Samsung Galaxy A51/71 Nest Hub Nest Hub Max 390 × 844 自动调整 50% 75% 100% 125% 150% 200% 19:45 穿搭 直播 推荐 博主精选 场景适配 身型适配 通勤 轻正式 西装+长裤，办公友好 试穿 约会 显气色 低饱和蓝白套装 试穿 试衣间 首页 发现 消息 购物车 我的"
+      },
+      "stateChanged": true,
+      "passed": true,
+      "partial": false,
+      "status": "PASS"
+    },
+    {
+      "id": "open-reason-card",
+      "locator": {
+        "text": "西装+长裤，办公友好",
+        "count": 1
+      },
+      "before": {
+        "label": "before [object Object]",
+        "url": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net/feed?tab=scenario",
+        "domTextSha256": "6dc1b60207bb4b3dbf5fd7bb8e4e9b9b3794f1412349b8ff3563adece19f8513",
+        "domText": "Responsive iPhone SE iPhone XR iPhone 12 Pro iPhone 14 Pro Max Pixel 7 Samsung Galaxy S8+ Samsung Galaxy S20 Ultra iPad Mini iPad Air iPad Pro Surface Pro 7 Surface Duo Galaxy Z Fold 5 Asus Zenbook Fold Samsung Galaxy A51/71 Nest Hub Nest Hub Max 390 × 844 自动调整 50% 75% 100% 125% 150% 200% 19:45 穿搭 直播 推荐 博主精选 场景适配 身型适配 通勤 轻正式 西装+长裤，办公友好 试穿 约会 显气色 低饱和蓝白套装 试穿 试衣间 首页 发现 消息 购物车 我的"
+      },
+      "after": {
+        "label": "after [object Object]",
+        "url": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net/detail?id=5",
+        "domTextSha256": "ad8d60779c4e1d2d65ef5ae1324d6ae8c9386b42304b024eb7e93416caf5d1e6",
+        "domText": "Responsive iPhone SE iPhone XR iPhone 12 Pro iPhone 14 Pro Max Pixel 7 Samsung Galaxy S8+ Samsung Galaxy S20 Ultra iPad Mini iPad Air iPad Pro Surface Pro 7 Surface Duo Galaxy Z Fold 5 Asus Zenbook Fold Samsung Galaxy A51/71 Nest Hub Nest Hub Max 390 × 844 自动调整 50% 75% 100% 125% 150% 200% 19:45 牛仔外套 ¥358 > 棕色皮质托特 ¥399 > < 低腰微喇牛仔裤 ¥299 买家说·版型挺括 复古牛仔短外套 ¥358 购买 好评98% 低腰微喇牛仔裤 ¥299 向右滑查看 > 复古牛仔外套叠穿酒红内搭，搭配低腰微喇牛仔裤 适合人群 试穿 适合 高个子、轻通勤和喜欢 复古红人风 的人群。 配色公式 深牛仔压住轮廓，酒红内搭提气色，棕色皮质托特增强复古感。 AI 继续帮你搭 详情页只露出两个轻入口：保留当前商品继续搭，或看相似风格平替。用户感兴趣再点击进去看完整方案。 同款延展 保留牛仔外套，换一套更日常的搭法 当前主品 牛仔外套 酒红内搭 低腰牛仔裤 棕色托特包 喜欢这套 不喜欢这套 相似风格 保留复古红人感，继续看相似平替 主品 黑色外套 条纹内搭 微喇长裤 通勤鞋包 喜欢这套 不喜欢这套"
+      },
+      "stateChanged": true,
+      "passed": true,
+      "partial": false,
+      "status": "PASS"
+    },
+    {
+      "id": "read-guidance",
+      "locator": {
+        "description": "required guidance sections",
+        "count": 2
+      },
+      "before": {
+        "label": "detail guidance",
+        "url": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net/detail?id=5",
+        "domTextSha256": "ad8d60779c4e1d2d65ef5ae1324d6ae8c9386b42304b024eb7e93416caf5d1e6",
+        "domText": "Responsive iPhone SE iPhone XR iPhone 12 Pro iPhone 14 Pro Max Pixel 7 Samsung Galaxy S8+ Samsung Galaxy S20 Ultra iPad Mini iPad Air iPad Pro Surface Pro 7 Surface Duo Galaxy Z Fold 5 Asus Zenbook Fold Samsung Galaxy A51/71 Nest Hub Nest Hub Max 390 × 844 自动调整 50% 75% 100% 125% 150% 200% 19:45 牛仔外套 ¥358 > 棕色皮质托特 ¥399 > < 低腰微喇牛仔裤 ¥299 买家说·版型挺括 复古牛仔短外套 ¥358 购买 好评98% 低腰微喇牛仔裤 ¥299 向右滑查看 > 复古牛仔外套叠穿酒红内搭，搭配低腰微喇牛仔裤 适合人群 试穿 适合 高个子、轻通勤和喜欢 复古红人风 的人群。 配色公式 深牛仔压住轮廓，酒红内搭提气色，棕色皮质托特增强复古感。 AI 继续帮你搭 详情页只露出两个轻入口：保留当前商品继续搭，或看相似风格平替。用户感兴趣再点击进去看完整方案。 同款延展 保留牛仔外套，换一套更日常的搭法 当前主品 牛仔外套 酒红内搭 低腰牛仔裤 棕色托特包 喜欢这套 不喜欢这套 相似风格 保留复古红人感，继续看相似平替 主品 黑色外套 条纹内搭 微喇长裤 通勤鞋包 喜欢这套 不喜欢这套"
+      },
+      "after": {
+        "label": "detail guidance",
+        "url": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net/detail?id=5",
+        "domTextSha256": "ad8d60779c4e1d2d65ef5ae1324d6ae8c9386b42304b024eb7e93416caf5d1e6",
+        "domText": "Responsive iPhone SE iPhone XR iPhone 12 Pro iPhone 14 Pro Max Pixel 7 Samsung Galaxy S8+ Samsung Galaxy S20 Ultra iPad Mini iPad Air iPad Pro Surface Pro 7 Surface Duo Galaxy Z Fold 5 Asus Zenbook Fold Samsung Galaxy A51/71 Nest Hub Nest Hub Max 390 × 844 自动调整 50% 75% 100% 125% 150% 200% 19:45 牛仔外套 ¥358 > 棕色皮质托特 ¥399 > < 低腰微喇牛仔裤 ¥299 买家说·版型挺括 复古牛仔短外套 ¥358 购买 好评98% 低腰微喇牛仔裤 ¥299 向右滑查看 > 复古牛仔外套叠穿酒红内搭，搭配低腰微喇牛仔裤 适合人群 试穿 适合 高个子、轻通勤和喜欢 复古红人风 的人群。 配色公式 深牛仔压住轮廓，酒红内搭提气色，棕色皮质托特增强复古感。 AI 继续帮你搭 详情页只露出两个轻入口：保留当前商品继续搭，或看相似风格平替。用户感兴趣再点击进去看完整方案。 同款延展 保留牛仔外套，换一套更日常的搭法 当前主品 牛仔外套 酒红内搭 低腰牛仔裤 棕色托特包 喜欢这套 不喜欢这套 相似风格 保留复古红人感，继续看相似平替 主品 黑色外套 条纹内搭 微喇长裤 通勤鞋包 喜欢这套 不喜欢这套"
+      },
+      "stateChanged": false,
+      "observed": {
+        "suitability": true,
+        "formula": true,
+        "avoidance": false,
+        "size": false,
+        "fabric": false
+      },
+      "partial": true,
+      "passed": false,
+      "status": "PARTIAL"
+    },
+    {
+      "id": "open-product-or-alternative",
+      "locator": {
+        "text": "购买",
+        "count": 1
+      },
+      "before": {
+        "label": "before [object Object]",
+        "url": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net/detail?id=5",
+        "domTextSha256": "ad8d60779c4e1d2d65ef5ae1324d6ae8c9386b42304b024eb7e93416caf5d1e6",
+        "domText": "Responsive iPhone SE iPhone XR iPhone 12 Pro iPhone 14 Pro Max Pixel 7 Samsung Galaxy S8+ Samsung Galaxy S20 Ultra iPad Mini iPad Air iPad Pro Surface Pro 7 Surface Duo Galaxy Z Fold 5 Asus Zenbook Fold Samsung Galaxy A51/71 Nest Hub Nest Hub Max 390 × 844 自动调整 50% 75% 100% 125% 150% 200% 19:45 牛仔外套 ¥358 > 棕色皮质托特 ¥399 > < 低腰微喇牛仔裤 ¥299 买家说·版型挺括 复古牛仔短外套 ¥358 购买 好评98% 低腰微喇牛仔裤 ¥299 向右滑查看 > 复古牛仔外套叠穿酒红内搭，搭配低腰微喇牛仔裤 适合人群 试穿 适合 高个子、轻通勤和喜欢 复古红人风 的人群。 配色公式 深牛仔压住轮廓，酒红内搭提气色，棕色皮质托特增强复古感。 AI 继续帮你搭 详情页只露出两个轻入口：保留当前商品继续搭，或看相似风格平替。用户感兴趣再点击进去看完整方案。 同款延展 保留牛仔外套，换一套更日常的搭法 当前主品 牛仔外套 酒红内搭 低腰牛仔裤 棕色托特包 喜欢这套 不喜欢这套 相似风格 保留复古红人感，继续看相似平替 主品 黑色外套 条纹内搭 微喇长裤 通勤鞋包 喜欢这套 不喜欢这套"
+      },
+      "after": {
+        "label": "after [object Object]",
+        "url": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net/detail?id=5",
+        "domTextSha256": "ad8d60779c4e1d2d65ef5ae1324d6ae8c9386b42304b024eb7e93416caf5d1e6",
+        "domText": "Responsive iPhone SE iPhone XR iPhone 12 Pro iPhone 14 Pro Max Pixel 7 Samsung Galaxy S8+ Samsung Galaxy S20 Ultra iPad Mini iPad Air iPad Pro Surface Pro 7 Surface Duo Galaxy Z Fold 5 Asus Zenbook Fold Samsung Galaxy A51/71 Nest Hub Nest Hub Max 390 × 844 自动调整 50% 75% 100% 125% 150% 200% 19:45 牛仔外套 ¥358 > 棕色皮质托特 ¥399 > < 低腰微喇牛仔裤 ¥299 买家说·版型挺括 复古牛仔短外套 ¥358 购买 好评98% 低腰微喇牛仔裤 ¥299 向右滑查看 > 复古牛仔外套叠穿酒红内搭，搭配低腰微喇牛仔裤 适合人群 试穿 适合 高个子、轻通勤和喜欢 复古红人风 的人群。 配色公式 深牛仔压住轮廓，酒红内搭提气色，棕色皮质托特增强复古感。 AI 继续帮你搭 详情页只露出两个轻入口：保留当前商品继续搭，或看相似风格平替。用户感兴趣再点击进去看完整方案。 同款延展 保留牛仔外套，换一套更日常的搭法 当前主品 牛仔外套 酒红内搭 低腰牛仔裤 棕色托特包 喜欢这套 不喜欢这套 相似风格 保留复古红人感，继续看相似平替 主品 黑色外套 条纹内搭 微喇长裤 通勤鞋包 喜欢这套 不喜欢这套"
+      },
+      "stateChanged": false,
+      "productInfoVisible": true,
+      "passed": false,
+      "partial": false,
+      "status": "FAIL"
+    },
+    {
+      "id": "enter-ai-styling-or-try-on",
+      "tryOn": {
+        "locator": {
+          "text": "试穿",
+          "count": 1
+        },
+        "before": {
+          "label": "before [object Object]",
+          "url": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net/detail?id=5",
+          "domTextSha256": "ad8d60779c4e1d2d65ef5ae1324d6ae8c9386b42304b024eb7e93416caf5d1e6",
+          "domText": "Responsive iPhone SE iPhone XR iPhone 12 Pro iPhone 14 Pro Max Pixel 7 Samsung Galaxy S8+ Samsung Galaxy S20 Ultra iPad Mini iPad Air iPad Pro Surface Pro 7 Surface Duo Galaxy Z Fold 5 Asus Zenbook Fold Samsung Galaxy A51/71 Nest Hub Nest Hub Max 390 × 844 自动调整 50% 75% 100% 125% 150% 200% 19:45 牛仔外套 ¥358 > 棕色皮质托特 ¥399 > < 低腰微喇牛仔裤 ¥299 买家说·版型挺括 复古牛仔短外套 ¥358 购买 好评98% 低腰微喇牛仔裤 ¥299 向右滑查看 > 复古牛仔外套叠穿酒红内搭，搭配低腰微喇牛仔裤 适合人群 试穿 适合 高个子、轻通勤和喜欢 复古红人风 的人群。 配色公式 深牛仔压住轮廓，酒红内搭提气色，棕色皮质托特增强复古感。 AI 继续帮你搭 详情页只露出两个轻入口：保留当前商品继续搭，或看相似风格平替。用户感兴趣再点击进去看完整方案。 同款延展 保留牛仔外套，换一套更日常的搭法 当前主品 牛仔外套 酒红内搭 低腰牛仔裤 棕色托特包 喜欢这套 不喜欢这套 相似风格 保留复古红人感，继续看相似平替 主品 黑色外套 条纹内搭 微喇长裤 通勤鞋包 喜欢这套 不喜欢这套"
+        },
+        "after": {
+          "label": "after [object Object]",
+          "url": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net/detail?id=5",
+          "domTextSha256": "ad8d60779c4e1d2d65ef5ae1324d6ae8c9386b42304b024eb7e93416caf5d1e6",
+          "domText": "Responsive iPhone SE iPhone XR iPhone 12 Pro iPhone 14 Pro Max Pixel 7 Samsung Galaxy S8+ Samsung Galaxy S20 Ultra iPad Mini iPad Air iPad Pro Surface Pro 7 Surface Duo Galaxy Z Fold 5 Asus Zenbook Fold Samsung Galaxy A51/71 Nest Hub Nest Hub Max 390 × 844 自动调整 50% 75% 100% 125% 150% 200% 19:45 牛仔外套 ¥358 > 棕色皮质托特 ¥399 > < 低腰微喇牛仔裤 ¥299 买家说·版型挺括 复古牛仔短外套 ¥358 购买 好评98% 低腰微喇牛仔裤 ¥299 向右滑查看 > 复古牛仔外套叠穿酒红内搭，搭配低腰微喇牛仔裤 适合人群 试穿 适合 高个子、轻通勤和喜欢 复古红人风 的人群。 配色公式 深牛仔压住轮廓，酒红内搭提气色，棕色皮质托特增强复古感。 AI 继续帮你搭 详情页只露出两个轻入口：保留当前商品继续搭，或看相似风格平替。用户感兴趣再点击进去看完整方案。 同款延展 保留牛仔外套，换一套更日常的搭法 当前主品 牛仔外套 酒红内搭 低腰牛仔裤 棕色托特包 喜欢这套 不喜欢这套 相似风格 保留复古红人感，继续看相似平替 主品 黑色外套 条纹内搭 微喇长裤 通勤鞋包 喜欢这套 不喜欢这套"
+        },
+        "stateChanged": false
+      },
+      "styling": {
+        "locator": {
+          "text": "保留牛仔外套，换一套更日常的搭法",
+          "count": 1
+        },
+        "before": {
+          "label": "before [object Object]",
+          "url": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net/detail?id=5",
+          "domTextSha256": "ad8d60779c4e1d2d65ef5ae1324d6ae8c9386b42304b024eb7e93416caf5d1e6",
+          "domText": "Responsive iPhone SE iPhone XR iPhone 12 Pro iPhone 14 Pro Max Pixel 7 Samsung Galaxy S8+ Samsung Galaxy S20 Ultra iPad Mini iPad Air iPad Pro Surface Pro 7 Surface Duo Galaxy Z Fold 5 Asus Zenbook Fold Samsung Galaxy A51/71 Nest Hub Nest Hub Max 390 × 844 自动调整 50% 75% 100% 125% 150% 200% 19:45 牛仔外套 ¥358 > 棕色皮质托特 ¥399 > < 低腰微喇牛仔裤 ¥299 买家说·版型挺括 复古牛仔短外套 ¥358 购买 好评98% 低腰微喇牛仔裤 ¥299 向右滑查看 > 复古牛仔外套叠穿酒红内搭，搭配低腰微喇牛仔裤 适合人群 试穿 适合 高个子、轻通勤和喜欢 复古红人风 的人群。 配色公式 深牛仔压住轮廓，酒红内搭提气色，棕色皮质托特增强复古感。 AI 继续帮你搭 详情页只露出两个轻入口：保留当前商品继续搭，或看相似风格平替。用户感兴趣再点击进去看完整方案。 同款延展 保留牛仔外套，换一套更日常的搭法 当前主品 牛仔外套 酒红内搭 低腰牛仔裤 棕色托特包 喜欢这套 不喜欢这套 相似风格 保留复古红人感，继续看相似平替 主品 黑色外套 条纹内搭 微喇长裤 通勤鞋包 喜欢这套 不喜欢这套"
+        },
+        "after": {
+          "label": "after [object Object]",
+          "url": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net/detail?id=5",
+          "domTextSha256": "ad8d60779c4e1d2d65ef5ae1324d6ae8c9386b42304b024eb7e93416caf5d1e6",
+          "domText": "Responsive iPhone SE iPhone XR iPhone 12 Pro iPhone 14 Pro Max Pixel 7 Samsung Galaxy S8+ Samsung Galaxy S20 Ultra iPad Mini iPad Air iPad Pro Surface Pro 7 Surface Duo Galaxy Z Fold 5 Asus Zenbook Fold Samsung Galaxy A51/71 Nest Hub Nest Hub Max 390 × 844 自动调整 50% 75% 100% 125% 150% 200% 19:45 牛仔外套 ¥358 > 棕色皮质托特 ¥399 > < 低腰微喇牛仔裤 ¥299 买家说·版型挺括 复古牛仔短外套 ¥358 购买 好评98% 低腰微喇牛仔裤 ¥299 向右滑查看 > 复古牛仔外套叠穿酒红内搭，搭配低腰微喇牛仔裤 适合人群 试穿 适合 高个子、轻通勤和喜欢 复古红人风 的人群。 配色公式 深牛仔压住轮廓，酒红内搭提气色，棕色皮质托特增强复古感。 AI 继续帮你搭 详情页只露出两个轻入口：保留当前商品继续搭，或看相似风格平替。用户感兴趣再点击进去看完整方案。 同款延展 保留牛仔外套，换一套更日常的搭法 当前主品 牛仔外套 酒红内搭 低腰牛仔裤 棕色托特包 喜欢这套 不喜欢这套 相似风格 保留复古红人感，继续看相似平替 主品 黑色外套 条纹内搭 微喇长裤 通勤鞋包 喜欢这套 不喜欢这套"
+        },
+        "stateChanged": false
+      },
+      "passed": false,
+      "partial": false,
+      "status": "FAIL"
+    }
+  ],
+  "console": [],
+  "pageErrors": {
+    "available": false,
+    "reason": "Selected browser API exposes console logs but no separate pageerror stream."
+  },
+  "finishedAt": "2026-07-13T11:45:15.848Z"
+}
