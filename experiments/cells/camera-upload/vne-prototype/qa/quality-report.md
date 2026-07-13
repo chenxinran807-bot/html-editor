@@ -7,19 +7,21 @@
 | cloud-materials compliance | PASS | Package dependencies, root imports, index.css + legacy.css |
 | Proto Edit | PASS | Spec §7, both manifests, Provider, and four runtime bindings align |
 | Official dev preview | PASS | `dev_demo.sh --background`, exit 0 |
-| Official single-file build | PASS | 1,458,241-byte `dist/index.html` |
+| Official build | PASS_WITH_CONCERNS | 1,458,241-byte HTML plus two referenced files in `dist/assets/`; not strictly single-file |
 | Fixed-task browser QA | PASS | 10/10 tasks, 0 console errors, 0 page errors |
-| Responsive behavior | PASS_WITH_CONCERNS | Desktop console and narrow viewport rules exist; browser QA uses 1280×900 |
-| Edge states | PASS_WITH_CONCERNS | Failure and permission example exist; success and true device/service failures are simulated or absent |
+| Responsive behavior | PASS_WITH_CONCERNS | Browser QA uses 1280×900 desktop viewport; no mobile viewport evidence |
+| Edge states | PASS_WITH_CONCERNS | Failure exists; success, device-unavailable, and review-service failures are absent or non-executable |
+| Clean checkout | NOT_RUN | No fresh checkout reinstall/rebuild was performed |
+| Spec/code alignment | PASS_WITH_CONCERNS | Spec describes five pages and broader empty/error coverage; code implements one stateful page with partial branches |
 
 ## Score rationale
 
-- Fidelity 15/20: requirements and key source patterns are represented, but this is a console-framed mobile simulation.
+- Fidelity 14/20: requirements are recognizable, but the console-framed mobile simulation and cropped source imagery create dual UI systems.
 - Flow coverage 15/15: all ten contracted tasks pass continuously.
 - Interaction 18/20: controls update asserted state and preserve camera facing across retake.
-- Visual hierarchy 11/15: clear workbench hierarchy, with visible duplication from full-screen source imagery beneath generated controls.
-- Edge states 7/10: loading, failure, retry, permission, and empty-album guidance exist; success and real device/service errors do not.
-- Stability 10/10: official build passes and final Chrome run has no console/page errors.
-- Handoff 8/10: spec, manifest, scaffold, dist, reproducible QA, and native command history are present; install needs an internal registry and explicit pnpm build approvals.
+- Visual hierarchy 10/15: hierarchy is readable, but black/cropped imagery and generated controls over full-screen screenshots visibly conflict.
+- Edge states 6/10: loading, failure, retry, and a permission example exist; success and executable device/service errors do not.
+- Stability 9/10: official build and final Chrome run pass, but no clean-checkout rebuild validates the internal dependency path.
+- Handoff 6/10: core files exist, but the output is not strictly single-file, QA hard-codes macOS Chrome, telemetry is not auditable, and spec/code drift remains.
 
-Total: 84/100, `PASS_WITH_CONCERNS`.
+Total: 78/100, `PASS_WITH_CONCERNS`.

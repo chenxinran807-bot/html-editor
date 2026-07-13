@@ -7,7 +7,7 @@ This cell follows the native VNE Path B creation workflow: environment gate, PRD
 - `camera-upload-ui-spec.md`: VNE-format UI specification.
 - `prototype.manifest.json`: Proto Edit bindings aligned with spec §7.
 - `artifact/camera-upload/`: official standard-shell React scaffold using `@cloud-materials/common` and `@cloud-materials/charts-common`.
-- `artifact/camera-upload/dist/index.html`: official single-file build (1,458,241 bytes).
+- `artifact/camera-upload/dist/index.html`: main build HTML (1,458,241 bytes). Despite the VNE script's “single-file” label, it references `dist/assets/camera.png` and `dist/assets/captured.png`; all three files are required.
 - `artifact/camera-upload/qa/`: reproducible Playwright test, raw per-task assertions, screenshots, stdout, and exit code.
 
 ## Reproduce
@@ -23,4 +23,4 @@ The package install requires the internal registry declared in the project `.npm
 
 ## Outcome
 
-All ten fixed camera-upload tasks passed in real Chrome with zero console errors and zero page errors. The result remains `PASS_WITH_CONCERNS`: camera and review are deterministic simulations, the mobile flow is presented inside VNE's required desktop console shell, and the supplied full-screen camera captures are used as media beneath generated controls.
+All ten fixed camera-upload tasks passed in real Chrome with zero console errors and zero page errors. The result remains `PASS_WITH_CONCERNS` at 78/100: QA used a 1280×900 desktop viewport, the console and embedded mobile flow create two UI systems, source captures are black/cropped beneath generated controls, and success/device/service-error branches are incomplete. The harness hard-codes the macOS Chrome executable, install depends on the internal registry, and no clean-checkout reinstall/rebuild was performed.

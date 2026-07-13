@@ -2,6 +2,12 @@
 
 All paths below are workspace-relative. Personal absolute paths and authorization material were removed from this report; exit codes and error semantics are preserved.
 
+## Evidence persistence boundary
+
+- The commands and exit values below were observed in the active execution session. Original terminal streams were not redirected to files at execution time, except for the final browser QA stdout and exit file.
+- Therefore the environment/init/install/dev/build entries below are field-level, path-sanitized transcriptions, not independently replayable raw logs. Their original timestamps were not persisted and are explicitly **unavailable**; no timestamps were reconstructed.
+- The VNE `session_start`, four `step_complete`/artifact calls, and `session_end` telemetry commands were invoked and returned no visible error, but raw responses, command timestamps, and per-call exit files were not persisted. They cannot be independently audited; for scoring this is treated as an unverified/missing native-flow evidence deviation, not asserted as proven telemetry completion.
+
 ## Environment gate
 
 Command:
@@ -14,6 +20,8 @@ Stdout:
 
 Exit: `0`.
 
+Timestamp: not persisted.
+
 ## Official scaffold initialization
 
 Command:
@@ -25,6 +33,8 @@ Stdout/stderr:
 `>> Running pnpm install ...`
 
 Exit: `1`. The script suppressed the underlying package-manager error, so the exact install was replayed inside the generated scaffold.
+
+Timestamp: not persisted.
 
 Diagnostic command: `pnpm install`
 
@@ -48,6 +58,8 @@ Approval and retry:
 
 Result: all six reported install scripts completed; lockfile supply-chain policy passed; install reported `Already up to date`. Exit: `0`.
 
+Install timestamps: not persisted.
+
 ## Official preview
 
 Command:
@@ -55,6 +67,8 @@ Command:
 `[VNE skill root]/scripts/dev_demo.sh experiments/cells/camera-upload/vne-prototype/artifact/camera-upload --background`
 
 Result: preview started at `http://localhost:5173`. Exit: `0`.
+
+Timestamp: not persisted. The background preview was not used as clean-checkout evidence.
 
 ## Official build
 
@@ -73,6 +87,12 @@ Stdout summary:
 
 Exit: `0`.
 
+Build timestamps: not persisted. No fresh-checkout install/build was performed.
+
+### Output topology caveat
+
+The official script labels the result a “single-file demo”, but the final HTML contains runtime references to `assets/camera.png` and `assets/captured.png`, and `dist/assets/` contains those files. The deliverable is therefore HTML plus two images, not a strictly standalone HTML file.
+
 ## Browser QA
 
 Command:
@@ -82,3 +102,9 @@ Command:
 The first replay completed all ten task assertions but found one missing-favicon 404 and exited `1`. A data favicon was added, the official build was rerun successfully, and the final replay passed.
 
 Final stdout and exit are preserved verbatim in `artifact/camera-upload/qa/browser-qa.stdout.txt` and `browser-qa.exit-code.txt`. Structured evidence records 10/10 task passes, zero console errors, and zero page errors.
+
+QA used a `1280×900` desktop viewport and a hard-coded `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome` executable. It did not validate a mobile viewport. The embedded full-screen source images are object-fit cropped under generated controls, yielding black/cropped areas and a visually mixed desktop/mobile UI.
+
+### Wrong-working-directory attempt
+
+After one successful official rebuild, a chained QA command was accidentally invoked from the worktree root instead of the scaffold directory. The observed error was `[ERR_PNPM_NO_PKG_MANIFEST] No package.json found`, exit `1`. Its original stdout/stderr file and timestamp were not persisted, so this is narrative evidence only. Recovery was to rerun the same Playwright command from `artifact/camera-upload/`; the final persisted stdout and exit `0` are the authoritative QA evidence.
