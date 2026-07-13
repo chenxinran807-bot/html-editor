@@ -1,0 +1,45 @@
+{
+  "inputId": "outfit-tab",
+  "skillId": "huashu-design",
+  "status": "PASS_WITH_CONCERNS",
+  "scores": {
+    "fidelity": 19,
+    "flowCoverage": 15,
+    "interaction": 19,
+    "visualHierarchy": 14,
+    "edgeStates": 7,
+    "stability": 10,
+    "handoff": 9
+  },
+  "total": 93,
+  "artifacts": [
+    "artifact/index.html",
+    "run/design-spec.md",
+    "run/assumptions.md",
+    "qa/report.md",
+    "qa/browser-report.json",
+    "qa/screenshots/01-entry.png",
+    "qa/screenshots/02-detail.png",
+    "qa/screenshots/03-product.png",
+    "qa/screenshots/04-ai-entry.png"
+  ],
+  "evidence": [
+    "Clean Chrome session at 1440x1100 completed all five outfit-tab task IDs through actual DOM clicks.",
+    "Category switch changed both active chip and reason-led feed content.",
+    "Detail view exposed suitability, outfit formula, and avoidance guidance.",
+    "Lower-cost alternative sheet exposed product information and price.",
+    "AI try-on entry state opened with an explicit no-backend prototype limitation.",
+    "Final browser report recorded zero page errors and zero console errors.",
+    "Entry, detail, product, and AI-entry screenshots provide visual evidence."
+  ],
+  "deviations": [
+    "Huashu weak-runtime fallback was used because subagents were not permitted: one full Warm Editorial design plus two serial palette/typography variants replaced three independent parallel layouts.",
+    "Brand web verification and new asset acquisition were intentionally skipped because the experiment boundary allowed only frozen cell input; no logo claim was added and only frozen local screenshots were used.",
+    "Production loading, network failure, inventory, privacy consent, and real AI result states remain outside this fixed prototype task."
+  ],
+  "runtime": {
+    "startedAt": "2026-07-13T10:01:21.000Z",
+    "finishedAt": "2026-07-13T10:07:03.000Z",
+    "durationMs": 342000
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "url": "file:///Users/bytedance/Documents/prd-demo/.worktrees/native-skill-experiment/experiments/cells/outfit-tab/huashu-design/artifact/index.html",
+  "viewport": "1440x1100",
+  "checks": {
+    "switch-category": true,
+    "open-reason-card": true,
+    "read-guidance": true,
+    "open-product-or-alternative": true,
+    "enter-ai-styling-or-try-on": true
+  },
+  "pageErrors": [],
+  "consoleErrors": [],
+  "allPassed": true,
+  "screenshots": [
+    "01-entry.png",
+    "02-detail.png",
+    "03-product.png",
+    "04-ai-entry.png"
+  ]
+}
