@@ -1,0 +1,35 @@
+{
+  "verifiedAt": "2026-07-13T13:24:24Z",
+  "branch": "codex/native-skill-experiment",
+  "baseBranch": "main",
+  "baseCommit": "f4f869c9f26c4a43a4667d5993ebf61626e1de8c",
+  "dashboardUrl": "http://127.0.0.1:8765/comparison/native-experiment/",
+  "results": {
+    "expected": 12,
+    "validated": 12,
+    "scored": 11,
+    "blocked": 1
+  },
+  "tests": {
+    "command": "node --test qa/result-contract.test.mjs qa/native-experiment.test.mjs qa/dashboard.test.mjs",
+    "passed": 23,
+    "failed": 0,
+    "exitCode": 0,
+    "note": "Browser QA tests were run outside the filesystem sandbox because the sandbox denied loopback listen with EPERM."
+  },
+  "dashboard": {
+    "indexBytes": 4951,
+    "dataBytes": 211248,
+    "inputs": [
+      "outfit-tab",
+      "camera-upload"
+    ],
+    "loopbackFetch": "PASS",
+    "relativeLinkTest": "PASS"
+  },
+  "repositoryHygiene": {
+    "worktreeCleanBeforeRecord": true,
+    "trackedCredentialQueryScan": "PASS",
+    "remoteConfigured": false
+  }
+}
