@@ -1,0 +1,61 @@
+{
+  "mode": "high-fidelity",
+  "completeness": {
+    "visual": "high",
+    "interaction": "high",
+    "state": "medium",
+    "semantic": "high"
+  },
+  "page_units": [
+    {"id":"P-01","name":"评审场景栏","type":"scenario-bar","source":"Skill requirement","confidence":"high"},
+    {"id":"P-02","name":"创建形象浮层","type":"bottom-sheet","source":"PRD + screenshots 008/009","confidence":"high"},
+    {"id":"P-03","name":"照片来源选择","type":"action-sheet","source":"PRD + screenshot 009","confidence":"high"},
+    {"id":"P-04","name":"相机拍摄","type":"camera","source":"PRD + screenshot 010","confidence":"high"},
+    {"id":"P-05","name":"相册选择","type":"album","source":"PRD","confidence":"medium"},
+    {"id":"P-06","name":"拍摄确认","type":"confirmation","source":"PRD + screenshot 011","confidence":"high"},
+    {"id":"P-07","name":"审核加载与结果","type":"review","source":"PRD + screenshots 012/013","confidence":"high"}
+  ],
+  "visual_inventory": [
+    {"id":"V-01","target":"创建浮层","property":"surface","value":"浅青柠到白色、顶部 28px 圆角","source":"截图","confidence":"high"},
+    {"id":"V-02","target":"来源选择","property":"structure","value":"底部白色 action sheet、蓝色文本操作","source":"截图","confidence":"high"},
+    {"id":"V-03","target":"相机页","property":"chrome","value":"全屏实景、白色相机控件、黑色透明遮罩","source":"截图","confidence":"high"},
+    {"id":"V-04","target":"结果操作","property":"accent","value":"黄绿到粉色主操作渐变","source":"截图","confidence":"medium","note":"截图压缩，色值为近似提取，待确认"},
+    {"id":"V-05","target":"失败提示","property":"semantic color","value":"暖橙错误条","source":"截图","confidence":"high"}
+  ],
+  "interaction_inventory": [
+    {"id":"I-01","trigger":"点击上传照片","behavior":"打开拍照/相册来源选择","source":"PRD + 截图","confidence":"high"},
+    {"id":"I-02","trigger":"点击拍照","behavior":"进入相机拍摄页","source":"PRD","confidence":"high"},
+    {"id":"I-03","trigger":"点击翻转","behavior":"切换前后摄像头状态","source":"PRD","confidence":"high"},
+    {"id":"I-04","trigger":"点击相册","behavior":"打开最近项目选择态","source":"PRD","confidence":"high"},
+    {"id":"I-05","trigger":"点击关闭相机","behavior":"返回来源选择浮层","source":"PRD","confidence":"high"},
+    {"id":"I-06","trigger":"点击快门","behavior":"进入照片确认态","source":"PRD","confidence":"high"},
+    {"id":"I-07","trigger":"点击重拍","behavior":"返回相机并保留摄像头方向","source":"PRD","confidence":"high"},
+    {"id":"I-08","trigger":"点击使用照片","behavior":"进入质量审核加载态","source":"PRD","confidence":"high"},
+    {"id":"I-09","trigger":"审核失败","behavior":"展示原因与合规指导","source":"PRD + 截图","confidence":"high"},
+    {"id":"I-10","trigger":"点击重新上传","behavior":"回到来源选择并可重启流程","source":"PRD","confidence":"high"}
+  ],
+  "state_matrix": [
+    {"key":"normal","label":"主流程","must_have":["来源选择","相机","翻转","确认","审核失败","重试"]},
+    {"key":"empty","label":"空相册","must_have":["空态说明","返回拍照"]},
+    {"key":"loading","label":"审核中","must_have":["进度反馈","不可重复提交"]},
+    {"key":"error","label":"权限拒绝/审核失败","must_have":["具体原因","恢复操作"]},
+    {"key":"boundary","label":"审核超时","must_have":["超时说明","重新检测","重新上传"]}
+  ],
+  "open_questions": [
+    {"id":"Q-01","question":"真实权限拒绝系统弹窗文案与跳转设置方式是什么？","impact":"权限异常态只能以产品内解释层模拟","blocking_level":"soft"},
+    {"id":"Q-02","question":"审核超时阈值与重试策略是什么？","impact":"原型使用演示用确定性超时状态","blocking_level":"soft"},
+    {"id":"Q-03","question":"相册真实素材与选中态规范是什么？","impact":"相册用本地 fixture 缩略图作评审占位","blocking_level":"soft"}
+  ],
+  "do_not_infer": [
+    "不请求真实设备相机权限",
+    "不调用真实照片审核服务",
+    "不声称权限、空态和超时视觉来自原始设计稿",
+    "不扩展形象删除或试穿结果页"
+  ],
+  "evidence_sources": [
+    {"id":"E-01","type":"PRD","scope":"业务目标、十项核心交互与审核恢复"},
+    {"id":"E-02","type":"截图","scope":"创建浮层、来源 sheet、相机、确认和审核结果视觉"},
+    {"id":"E-03","type":"默认推断","scope":"权限拒绝、空相册、审核超时和评审 ScenarioBar"}
+  ]
+}
+

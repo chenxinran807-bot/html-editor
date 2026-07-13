@@ -1,0 +1,75 @@
+{
+  "url": "http://127.0.0.1:8291/index.html",
+  "browserVersion": "139.0.7258.155",
+  "viewport": {
+    "width": 1440,
+    "height": 980
+  },
+  "startedAt": "2026-07-13T12:45:14.213Z",
+  "finishedAt": "2026-07-13T12:45:16.121Z",
+  "durationMs": 1908,
+  "assertions": [
+    {
+      "id": "open-upload-choices",
+      "pass": true,
+      "detail": "both choices visible",
+      "at": "2026-07-13T12:45:14.358Z"
+    },
+    {
+      "id": "enter-camera",
+      "pass": true,
+      "detail": "camera visible",
+      "at": "2026-07-13T12:45:14.497Z"
+    },
+    {
+      "id": "flip-camera",
+      "pass": true,
+      "detail": "facing rear",
+      "at": "2026-07-13T12:45:14.535Z"
+    },
+    {
+      "id": "open-album",
+      "pass": true,
+      "detail": "album visible",
+      "at": "2026-07-13T12:45:14.671Z"
+    },
+    {
+      "id": "close-camera",
+      "pass": true,
+      "detail": "source sheet restored",
+      "at": "2026-07-13T12:45:14.819Z"
+    },
+    {
+      "id": "shutter",
+      "pass": true,
+      "detail": "confirm visible",
+      "at": "2026-07-13T12:45:14.887Z"
+    },
+    {
+      "id": "retake",
+      "pass": true,
+      "detail": "camera restored and facing retained",
+      "at": "2026-07-13T12:45:15.020Z"
+    },
+    {
+      "id": "use-photo",
+      "pass": true,
+      "detail": "review loading visible",
+      "at": "2026-07-13T12:45:15.088Z"
+    },
+    {
+      "id": "review-failure",
+      "pass": true,
+      "detail": "failure reason and guidance visible",
+      "at": "2026-07-13T12:45:16.021Z"
+    },
+    {
+      "id": "retry",
+      "pass": true,
+      "detail": "capture can restart",
+      "at": "2026-07-13T12:45:16.121Z"
+    }
+  ],
+  "consoleErrors": [],
+  "pageErrors": []
+}

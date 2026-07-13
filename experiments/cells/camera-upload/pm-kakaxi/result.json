@@ -1,0 +1,46 @@
+{
+  "inputId": "camera-upload",
+  "skillId": "pm-kakaxi",
+  "status": "PASS_WITH_CONCERNS",
+  "scores": {
+    "fidelity": 17,
+    "flowCoverage": 15,
+    "interaction": 18,
+    "visualHierarchy": 13,
+    "edgeStates": 9,
+    "stability": 9,
+    "handoff": 8
+  },
+  "total": 89,
+  "artifacts": [
+    "experiments/cells/camera-upload/pm-kakaxi/artifact/index.html",
+    "experiments/cells/camera-upload/pm-kakaxi/run/demo-context.json",
+    "experiments/cells/camera-upload/pm-kakaxi/run/mode-and-gates.md",
+    "experiments/cells/camera-upload/pm-kakaxi/README.md"
+  ],
+  "evidence": [
+    "experiments/cells/camera-upload/pm-kakaxi/qa/browser-qa-raw.json",
+    "experiments/cells/camera-upload/pm-kakaxi/qa/browser-qa.stdout.txt",
+    "experiments/cells/camera-upload/pm-kakaxi/qa/browser-qa.exit-code.txt",
+    "experiments/cells/camera-upload/pm-kakaxi/qa/screenshots/01-upload-choices.png",
+    "experiments/cells/camera-upload/pm-kakaxi/qa/screenshots/02-camera-flipped.png",
+    "experiments/cells/camera-upload/pm-kakaxi/qa/screenshots/03-album.png",
+    "experiments/cells/camera-upload/pm-kakaxi/qa/screenshots/04-confirm.png",
+    "experiments/cells/camera-upload/pm-kakaxi/qa/screenshots/05-loading.png",
+    "experiments/cells/camera-upload/pm-kakaxi/qa/screenshots/06-review-failure.png",
+    "experiments/cells/camera-upload/pm-kakaxi/qa/screenshots/07-edge-timeout.png"
+  ],
+  "deviations": [
+    "Camera capture and photo review are deterministic local simulations using supplied fixture assets; no device permission or production service is accessed.",
+    "Permission denial, empty album and review timeout are labeled review inferences because the input supplied no visual references for those states.",
+    "Album thumbnails reuse fixture screenshots as evaluation placeholders and are not production content.",
+    "The required ScenarioBar is an external review control rather than consumer product UI.",
+    "Usage tracking was not sent because it is optional and would mutate an external Base outside this isolated experiment.",
+    "The prototype does not extend beyond the contracted failure and retry journey into successful avatar creation or deletion."
+  ],
+  "runtime": {
+    "startedAt": "2026-07-13T12:20:00.000Z",
+    "finishedAt": "2026-07-13T12:45:16.121Z",
+    "durationMs": 1516121
+  }
+}
