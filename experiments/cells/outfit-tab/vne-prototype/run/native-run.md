@@ -7,10 +7,8 @@
 - Cloud Materials: source and package manifest use `@cloud-materials/common`; no direct Arco dependency/import.
 - Build attempt 1: official build script could not resolve the default public registry DNS.
 - Official fallback attempt: public npm returned 404 for private `@cloud-materials/common`.
-- Official registry retry (2026-07-13): invoked the native `scripts/build_demo.sh` with `NPM_CONFIG_REGISTRY=https://bnpm.byted.org` and common npm credential environment variables explicitly removed. The execution approval was rejected **before process launch** because credentials might still be sourced from default npm configuration. This is a credential-flow authorization constraint, not a claim that the Skill's official bnpm registry is unverified.
-- Retry command exit code: N/A (process was not launched by the execution gate).
-- Retry stdout: none.
-- Retry stderr (sanitized summary): `Execution rejected before launch: the official bnpm request may transmit credentials from default npm configuration or another auth source; explicit authorization for that credential flow is required.`
+- Official registry retry request (2026-07-13): requested approval to launch the native `scripts/build_demo.sh` against `https://bnpm.byted.org`, with common npm credential environment variables removed. The approval gate rejected the request **before process launch** because credentials might still be sourced from default npm configuration. This is a credential-flow authorization constraint, not a claim about the Skill's official bnpm registry.
+- No build subprocess was created. Therefore no subprocess exit code, stdout, or stderr exists. This repository contains only this factual summary; it does not claim to contain the approval system's original response.
 - Terminal state: BLOCKED. Per experiment rules, no alternate stack or fabricated `dist/index.html` was used.
 
 ## Recovery
@@ -23,7 +21,25 @@
 NPM_CONFIG_REGISTRY=https://bnpm.byted.org /Users/bytedance/.codex/skills/vne-prototype/scripts/build_demo.sh /Users/bytedance/Documents/prd-demo/.worktrees/native-skill-experiment/experiments/cells/outfit-tab/vne-prototype/artifact/outfit-tab-prototype
 ```
 
-4. On success, run the native dev script, then execute all five fixed browser tasks, capture console/page errors, and save entry/detail/product-or-AI screenshots.
+4. After build success, start the native preview with the Skill's actual parameter form:
+
+```bash
+/Users/bytedance/.codex/skills/vne-prototype/scripts/dev_demo.sh /Users/bytedance/Documents/prd-demo/.worktrees/native-skill-experiment/experiments/cells/outfit-tab/vne-prototype/artifact/outfit-tab-prototype --background
+```
+
+5. No automatic browser runner is available in this cell. Manually run the five fixed tasks against `http://localhost:5173`:
+   - `switch-category`: open entry → switch second-level category → confirm Feed changes.
+   - `open-reason-card`: choose a reason-led card → open its detail.
+   - `read-guidance`: inspect suitability → outfit formula → avoidance guidance.
+   - `open-product-or-alternative`: open a recommended product or lower-cost alternative → confirm product information.
+   - `enter-ai-styling-or-try-on`: activate AI styling or AI try-on → confirm its entry state.
+6. Write the manual task results and console/pageerror observations to `experiments/cells/outfit-tab/vne-prototype/qa/fixed-tasks.md`. Save screenshots as:
+   - `experiments/cells/outfit-tab/vne-prototype/qa/01-entry.png`
+   - `experiments/cells/outfit-tab/vne-prototype/qa/02-category-feed.png`
+   - `experiments/cells/outfit-tab/vne-prototype/qa/03-detail-guidance.png`
+   - `experiments/cells/outfit-tab/vne-prototype/qa/04-product.png`
+   - `experiments/cells/outfit-tab/vne-prototype/qa/05-ai-entry.png`
+7. Update `qa/quality-report.md` and replace the `BLOCKED` null result only after the build and manual QA evidence actually exist.
 
 ## Image consumption
 

@@ -1,6 +1,6 @@
 # Fixed browser task results
 
-Browser execution was not started because the native build gate failed. All five fixed tasks are recorded as NOT_RUN, not inferred as passing.
+Browser execution was not started because the native build gate failed. This cell has no automatic browser runner, so recovery requires the manual procedure in `run/native-run.md`. All five fixed tasks are recorded as NOT_RUN, not inferred as passing.
 
 | Task | Status | Static implementation evidence |
 |---|---|---|
@@ -13,4 +13,4 @@ Browser execution was not started because the native build gate failed. All five
 - Console errors: NOT_CAPTURED
 - Page errors: NOT_CAPTURED
 - Screenshots: none; no runnable build was available.
-
+- Planned evidence paths after recovery: `qa/01-entry.png`, `qa/02-category-feed.png`, `qa/03-detail-guidance.png`, `qa/04-product.png`, `qa/05-ai-entry.png`.
