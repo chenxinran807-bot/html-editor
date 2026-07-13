@@ -5,16 +5,25 @@
   "additionalProperties": false,
   "required": ["inputId", "skillId", "status", "scores", "total", "artifacts", "evidence", "deviations", "runtime"],
   "properties": {
-    "inputId": { "type": "string", "minLength": 1 },
-    "skillId": { "type": "string", "minLength": 1 },
+    "inputId": { "type": "string", "pattern": "^(?=.*[a-z0-9])[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "skillId": { "type": "string", "pattern": "^(?=.*[a-z0-9])[a-z0-9]+(?:-[a-z0-9]+)*$" },
     "status": { "enum": ["PENDING", "RUNNING", "PASS", "PASS_WITH_CONCERNS", "BLOCKED", "NOT_APPLICABLE"] },
     "scores": { "oneOf": [{ "$ref": "#/$defs/scores" }, { "type": "null" }] },
     "total": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
-    "artifacts": { "type": "array", "items": { "type": "string" } },
-    "evidence": { "type": "array", "items": { "type": "string" } },
-    "deviations": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-    "reason": { "type": "string", "minLength": 10 },
-    "runtime": { "type": "object" }
+    "artifacts": { "type": "array", "items": { "type": "string", "pattern": "\\S" } },
+    "evidence": { "type": "array", "items": { "type": "string", "pattern": "\\S" } },
+    "deviations": { "type": "array", "items": { "type": "string", "pattern": "\\S" } },
+    "reason": { "type": "string", "pattern": "^(?=.{10,})(?=.*\\S).*$" },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["startedAt", "finishedAt", "durationMs"],
+      "properties": {
+        "startedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?Z$" },
+        "finishedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?Z$" },
+        "durationMs": { "type": "number", "minimum": 0 }
+      }
+    }
   },
   "$defs": {
     "scores": {
@@ -35,6 +44,6 @@
   "allOf": [{
     "if": { "properties": { "status": { "enum": ["BLOCKED", "NOT_APPLICABLE"] } }, "required": ["status"] },
     "then": { "required": ["reason"], "properties": { "scores": { "type": "null" }, "total": { "type": "null" }, "deviations": { "minItems": 1 } } },
-    "else": { "properties": { "scores": { "$ref": "#/$defs/scores" }, "total": { "type": "number" } } }
+    "else": { "not": { "required": ["reason"] }, "properties": { "scores": { "$ref": "#/$defs/scores" }, "total": { "type": "number" } } }
   }]
 }

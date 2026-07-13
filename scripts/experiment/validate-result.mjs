@@ -13,14 +13,25 @@ export const SCORE_MAXIMA = Object.freeze({
 });
 
 const statuses = new Set(['PENDING', 'RUNNING', 'PASS', 'PASS_WITH_CONCERNS', 'BLOCKED', 'NOT_APPLICABLE']);
+const baseKeys = new Set(['inputId', 'skillId', 'status', 'scores', 'total', 'artifacts', 'evidence', 'deviations', 'runtime']);
+const runtimeKeys = new Set(['startedAt', 'finishedAt', 'durationMs']);
+const isoDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/;
 
 export function validateResult(value) {
   const errors = [];
   if (!value || typeof value !== 'object' || Array.isArray(value)) return { valid: false, errors: ['result must be an object'] };
+  const allowed = new Set(baseKeys);
+  if (value.status === 'BLOCKED' || value.status === 'NOT_APPLICABLE') allowed.add('reason');
+  for (const key of Object.keys(value)) if (!allowed.has(key)) errors.push(`unknown result field: ${key}`);
   for (const key of ['inputId', 'skillId']) if (typeof value[key] !== 'string' || !value[key].trim()) errors.push(`${key} must be non-empty`);
   if (!statuses.has(value.status)) errors.push('status is invalid');
-  for (const key of ['artifacts', 'evidence', 'deviations']) if (!Array.isArray(value[key]) || value[key].some((item) => typeof item !== 'string')) errors.push(`${key} must be an array of strings`);
+  for (const key of ['artifacts', 'evidence', 'deviations']) if (!Array.isArray(value[key]) || value[key].some((item) => typeof item !== 'string' || !item.trim())) errors.push(`${key} must be an array of non-empty strings`);
   if (!value.runtime || typeof value.runtime !== 'object' || Array.isArray(value.runtime)) errors.push('runtime must be an object');
+  else {
+    for (const key of Object.keys(value.runtime)) if (!runtimeKeys.has(key)) errors.push(`unknown runtime field: ${key}`);
+    if (!isoDate.test(value.runtime.startedAt ?? '') || !isoDate.test(value.runtime.finishedAt ?? '')) errors.push('runtime timestamps must be ISO UTC strings');
+    if (!Number.isFinite(value.runtime.durationMs) || value.runtime.durationMs < 0) errors.push('runtime durationMs must be a non-negative number');
+  }
 
   if (value.status === 'BLOCKED' || value.status === 'NOT_APPLICABLE') {
     if (value.scores !== null) errors.push(`${value.status} scores must be null`);

@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-import { createHash } from 'node:crypto';
-import { cp, mkdir, readFile, readdir, stat } from 'node:fs/promises';
+import { createHash, randomUUID } from 'node:crypto';
+import { copyFile, lstat, mkdir, readFile, readdir, realpath, rename, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 
 function detectedMime(bytes) {
@@ -14,32 +15,31 @@ function detectedMime(bytes) {
   return 'application/octet-stream';
 }
 
-async function directoryHasEntries(directory) {
-  try { return (await readdir(directory)).length > 0; } catch (error) { if (error.code === 'ENOENT') return false; throw error; }
+async function requireRegular(file, label) {
+  const info = await lstat(file);
+  if (info.isSymbolicLink() || !info.isFile()) throw new Error(`${label} must be a regular file, not a symlink`);
+  return info;
 }
 
-async function findArtifactContent(cellsRoot) {
-  async function walk(directory) {
-    let entries;
-    try { entries = await readdir(directory, { withFileTypes: true }); } catch (error) { if (error.code === 'ENOENT') return null; throw error; }
-    if (path.basename(directory) === 'artifact' && entries.length) return directory;
-    for (const entry of entries) if (entry.isDirectory()) {
-      const found = await walk(path.join(directory, entry.name));
-      if (found) return found;
-    }
-    return null;
-  }
-  return walk(cellsRoot);
+async function requireDirectory(directory, label) {
+  const info = await lstat(directory);
+  if (info.isSymbolicLink() || !info.isDirectory()) throw new Error(`${label} must be a real directory, not a symlink`);
 }
 
-function safeAssetPath(inputRoot, relative) {
-  if (typeof relative !== 'string' || !relative.startsWith('assets/')) throw new Error(`Unsafe asset path: ${relative}`);
-  const resolved = path.resolve(inputRoot, relative);
-  if (!resolved.startsWith(`${path.resolve(inputRoot)}${path.sep}`)) throw new Error(`Asset escapes input: ${relative}`);
-  return resolved;
+async function containedRegularFile(root, relative, label) {
+  if (typeof relative !== 'string' || path.posix.normalize(relative) !== relative || !relative.startsWith('assets/') || relative.includes('\\')) throw new Error(`${label}: unsafe asset path ${relative}`);
+  const rootReal = await realpath(root);
+  const file = path.resolve(root, relative);
+  await requireRegular(file, `${label}: ${relative}`);
+  const fileReal = await realpath(file);
+  if (!fileReal.startsWith(`${rootReal}${path.sep}`)) throw new Error(`${label}: asset escapes fixture ${relative}`);
+  return fileReal;
 }
 
 export async function validateFixtureDirectory(inputRoot, label = inputRoot) {
+  await requireDirectory(inputRoot, label);
+  await requireDirectory(path.join(inputRoot, 'assets'), `${label}/assets`);
+  for (const name of ['source.md', 'metadata.json', 'assets-manifest.json']) await requireRegular(path.join(inputRoot, name), `${label}/${name}`);
   const [source, metadata, manifest] = await Promise.all([
     readFile(path.join(inputRoot, 'source.md')),
     readFile(path.join(inputRoot, 'metadata.json'), 'utf8').then(JSON.parse),
@@ -48,53 +48,108 @@ export async function validateFixtureDirectory(inputRoot, label = inputRoot) {
   if (sha256(source) !== metadata.fixtureSha256) throw new Error(`${label}: fixture hash mismatch`);
   if (!Array.isArray(manifest.assets)) throw new Error(`${label}: assets manifest is invalid`);
   if (metadata.assetCount !== manifest.assets.length || manifest.assetCount !== manifest.assets.length) throw new Error(`${label}: asset count mismatch`);
-  const seen = new Set();
+  const expected = new Set();
   for (const asset of manifest.assets) {
-    if (seen.has(asset.file)) throw new Error(`${label}: duplicate asset ${asset.file}`);
-    seen.add(asset.file);
-    const file = safeAssetPath(inputRoot, asset.file);
+    if (expected.has(asset.file)) throw new Error(`${label}: duplicate asset ${asset.file}`);
+    expected.add(asset.file);
+    const file = await containedRegularFile(inputRoot, asset.file, label);
     const bytes = await readFile(file);
     if (bytes.length !== asset.bytes) throw new Error(`${label}: byte count mismatch for ${asset.file}`);
     if (sha256(bytes) !== asset.sha256) throw new Error(`${label}: hash mismatch for ${asset.file}`);
     if (detectedMime(bytes) !== asset.mime) throw new Error(`${label}: MIME mismatch for ${asset.file}`);
   }
-  return inputRoot;
+  const actual = new Set();
+  async function collect(directory, prefix = 'assets') {
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      const relative = `${prefix}/${entry.name}`;
+      const full = path.join(directory, entry.name);
+      const info = await lstat(full);
+      if (info.isSymbolicLink()) throw new Error(`${label}: symlink asset is forbidden: ${relative}`);
+      if (info.isDirectory()) await collect(full, relative);
+      else if (info.isFile()) actual.add(relative);
+      else throw new Error(`${label}: asset is not a regular file: ${relative}`);
+    }
+  }
+  await collect(path.join(inputRoot, 'assets'));
+  if (actual.size !== expected.size || [...actual].some((file) => !expected.has(file))) throw new Error(`${label}: assets directory has extra or missing files compared with manifest`);
+  return { inputRoot, assets: manifest.assets.map(({ file }) => file) };
+}
+
+function validateManifest(manifest) {
+  if (!Array.isArray(manifest.inputs) || manifest.inputs.length !== 2 || !Array.isArray(manifest.skills) || manifest.skills.length !== 6) throw new Error('Manifest must define exactly 2 inputs and 6 skill objects (12 cells)');
+  const inputIds = manifest.inputs;
+  const skillIds = manifest.skills.map((skill) => skill?.id);
+  for (const [kind, ids] of [['input', inputIds], ['skill', skillIds]]) {
+    if (ids.some((id) => typeof id !== 'string' || !SLUG.test(id))) throw new Error(`Manifest contains unsafe ${kind} id`);
+    if (new Set(ids).size !== ids.length) throw new Error(`Manifest contains duplicate ${kind} id`);
+  }
+}
+
+async function ensureExactExistingCell(cell, fixture) {
+  await requireDirectory(cell, `existing cell ${cell}`);
+  const entries = (await readdir(cell)).sort();
+  if (entries.join('\0') !== ['artifact', 'input', 'qa', 'run'].sort().join('\0')) throw new Error(`Existing cell differs from isolated layout: ${cell}`);
+  for (const empty of ['run', 'artifact', 'qa']) {
+    const directory = path.join(cell, empty);
+    await requireDirectory(directory, directory);
+    if ((await readdir(directory)).length) throw new Error(`Refusing to overwrite non-empty existing cell: ${cell}`);
+  }
+  const input = path.join(cell, 'input');
+  const copied = await validateFixtureDirectory(input, `existing cell ${cell}`);
+  if (copied.assets.join('\0') !== fixture.assets.join('\0')) throw new Error(`Existing cell differs from source fixture: ${cell}`);
+  for (const relative of ['source.md', 'metadata.json', 'assets-manifest.json', ...fixture.assets]) {
+    const [source, target] = await Promise.all([readFile(path.join(fixture.inputRoot, relative)), readFile(path.join(input, relative))]);
+    if (!source.equals(target)) throw new Error(`Existing cell differs from source fixture: ${cell}/${relative}`);
+  }
+}
+
+async function createCellAtomically(cell, fixture) {
+  const parent = path.dirname(cell);
+  await mkdir(parent, { recursive: true });
+  const temporary = path.join(parent, `.${path.basename(cell)}.tmp-${randomUUID()}`);
+  try {
+    for (const name of ['input/assets', 'run', 'artifact', 'qa']) await mkdir(path.join(temporary, name), { recursive: true });
+    for (const relative of ['source.md', 'metadata.json', 'assets-manifest.json', ...fixture.assets]) {
+      const destination = path.join(temporary, 'input', relative);
+      await mkdir(path.dirname(destination), { recursive: true });
+      await copyFile(path.join(fixture.inputRoot, relative), destination);
+    }
+    await validateFixtureDirectory(path.join(temporary, 'input'), `temporary cell ${cell}`);
+    await rename(temporary, cell);
+  } catch (error) {
+    await rm(temporary, { recursive: true, force: true });
+    throw error;
+  }
 }
 
 export async function initializeCells(root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')) {
-  const cellsRoot = path.join(root, 'experiments', 'cells');
-  const existingArtifact = await findArtifactContent(cellsRoot);
-  if (existingArtifact) throw new Error(`Refusing to overwrite existing artifact: ${existingArtifact}`);
-
-  const manifest = JSON.parse(await readFile(path.join(root, 'experiments', 'manifest.json'), 'utf8'));
-  if (!Array.isArray(manifest.inputs) || !Array.isArray(manifest.skills) || manifest.skills.some((skill) => !skill || typeof skill.id !== 'string')) throw new Error('experiments/manifest.json must define inputs and skill objects');
-  if (manifest.inputs.length * manifest.skills.length !== 12) throw new Error('Manifest must define exactly 12 experiment cells');
-
-  const validated = new Map();
+  const manifestFile = path.join(root, 'experiments', 'manifest.json');
+  await requireRegular(manifestFile, 'experiments/manifest.json');
+  const manifest = JSON.parse(await readFile(manifestFile, 'utf8'));
+  validateManifest(manifest);
+  const fixtures = new Map();
   for (const inputId of manifest.inputs) {
-    const inputRoot = path.join(root, 'experiments', 'inputs', inputId);
-    validated.set(inputId, await validateFixtureDirectory(inputRoot, inputId));
+    const inputRoot = path.resolve(root, 'experiments', 'inputs', inputId);
+    const expectedParent = path.resolve(root, 'experiments', 'inputs');
+    if (!inputRoot.startsWith(`${expectedParent}${path.sep}`)) throw new Error(`Manifest input escapes inputs root: ${inputId}`);
+    fixtures.set(inputId, await validateFixtureDirectory(inputRoot, inputId));
   }
-
   for (const inputId of manifest.inputs) for (const { id: skillId } of manifest.skills) {
-    const cell = path.join(cellsRoot, inputId, skillId);
-    const artifact = path.join(cell, 'artifact');
-    if (await directoryHasEntries(artifact)) throw new Error(`Refusing to overwrite existing artifact: ${artifact}`);
-    await Promise.all(['input', 'run', 'artifact', 'qa'].map((name) => mkdir(path.join(cell, name), { recursive: true })));
-    const source = validated.get(inputId);
-    const target = path.join(cell, 'input');
-    await Promise.all([
-      cp(path.join(source, 'source.md'), path.join(target, 'source.md')),
-      cp(path.join(source, 'metadata.json'), path.join(target, 'metadata.json')),
-      cp(path.join(source, 'assets-manifest.json'), path.join(target, 'assets-manifest.json')),
-      cp(path.join(source, 'assets'), path.join(target, 'assets'), { recursive: true }),
-    ]);
-    await validateFixtureDirectory(target, `${inputId}/${skillId} copied fixture`);
+    const cell = path.resolve(root, 'experiments', 'cells', inputId, skillId);
+    const cellsRoot = path.resolve(root, 'experiments', 'cells');
+    if (!cell.startsWith(`${cellsRoot}${path.sep}`)) throw new Error('Cell path escapes cells root');
+    try {
+      await lstat(cell);
+      await ensureExactExistingCell(cell, fixtures.get(inputId));
+    } catch (error) {
+      if (error.code === 'ENOENT') await createCellAtomically(cell, fixtures.get(inputId));
+      else throw error;
+    }
   }
   return { cells: 12 };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const result = await initializeCells();
-  console.log(`Initialized ${result.cells} isolated experiment cells.`);
+  console.log(`Initialized or verified ${result.cells} isolated experiment cells.`);
 }
