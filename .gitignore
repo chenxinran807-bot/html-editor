@@ -1,0 +1,20 @@
+.DS_Store
+node_modules/
+.superpowers/
+
+# Local authentication and transient runtime state
+lark-auth-qr.png
+*.pid
+*.sock
+*.log
+
+# Generated caches and temporary browser data
+.cache/
+playwright-report/
+test-results/
+
+# Downloaded archives; extracted, reviewed sources can be committed explicitly
+vendor/downloads/
+*.tar.gz
+*.zip
+
