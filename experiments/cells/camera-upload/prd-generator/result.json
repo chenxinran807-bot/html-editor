@@ -1,41 +1,57 @@
 {
   "inputId": "camera-upload",
   "skillId": "prd-generator",
-  "status": "PASS",
+  "status": "PASS_WITH_CONCERNS",
   "scores": {
     "fidelity": 17,
     "flowCoverage": 15,
-    "interaction": 20,
-    "visualHierarchy": 14,
-    "edgeStates": 10,
-    "stability": 10,
-    "handoff": 9
+    "interaction": 18,
+    "visualHierarchy": 13,
+    "edgeStates": 8,
+    "stability": 9,
+    "handoff": 8
   },
-  "total": 95,
+  "total": 88,
   "artifacts": [
     "artifact/index.html",
     "artifact/assets/create.png",
     "artifact/assets/camera.png",
     "artifact/assets/captured.png",
     "artifact/assets/review-failed.png",
-    "README.md"
+    "README.md",
+    "docs/prd/camera-upload/prd.yaml",
+    "docs/prd/camera-upload/prd.md",
+    "docs/prd/camera-upload/prd-v0.md",
+    "docs/prd/camera-upload/canvas/pages/01-camera-upload.html",
+    "docs/prd/camera-upload/canvas/tokens.css",
+    "docs/prd/camera-upload/canvas/patterns.md"
   ],
   "evidence": [
-    "qa/task-results.json",
+    "qa/browser-qa.spec.js",
+    "qa/run-browser-qa.sh",
+    "qa/browser-qa-raw.json",
+    "qa/browser-qa-execution.json",
+    "qa/browser-qa-stdout.log",
     "qa/01-entry.png",
     "qa/02-upload-choices.png",
     "qa/03-camera.png",
     "qa/04-album.png",
     "qa/05-confirm.png",
-    "qa/06-review-failure.png",
-    "run/evidence/browser-qa.json"
+    "qa/06-loading.png",
+    "qa/07-review-failure.png",
+    "qa/08-service-timeout.png",
+    "run/evidence/prototype-audit.txt",
+    "docs/prd/camera-upload/reviews/stage-2-review.md",
+    "docs/prd/camera-upload/reviews/stage-3-review.md"
   ],
   "deviations": [
-    "Camera capture and remote review are deterministic simulations using the supplied local fixture assets."
+    "Camera capture and remote review are deterministic simulations using the supplied local fixture assets.",
+    "Reviewer records are reproducible but were not produced by an independent clean-context reviewer.",
+    "Browser QA defaults to the system Chrome executable on macOS; other environments must set QA_BROWSER_EXECUTABLE."
   ],
   "runtime": {
     "startedAt": "2026-07-13T11:51:16.300Z",
-    "finishedAt": "2026-07-13T11:57:35.300Z",
-    "durationMs": 379000
+    "finishedAt": "2026-07-13T12:23:44.605Z",
+    "durationMs": 1948305
   }
 }

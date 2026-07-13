@@ -1,0 +1,48 @@
+schema_version: 1
+feature: AI 试穿形象拍照上传
+slug: camera-upload
+created: 2026-07-13
+updated: 2026-07-13
+
+status: review
+stage: 3
+complexity: standard
+review_mode: single
+design_posture: incremental
+
+journey_summary: |
+  主线：用户进入创建试穿形象 → 打开照片来源 → 拍照 → 确认照片 → 审核 → 根据结果继续或恢复。
+  功能模块：照片来源、相机拍摄、照片确认、质量审核、异常恢复。
+  关键分支决策：
+    - 用户可选择拍照或相册；相册选择后同样进入照片确认。
+    - 关闭相机回到来源选择，不退出整个创建流程。
+    - 重拍保留前后摄像头选择。
+    - 照片不合格时展示具体指导；重试回到来源选择。
+    - 审核服务超时保留照片，支持再次审核或重新选图。
+
+tracking:
+  needed: true
+  questions:
+    - 用户从拍照和相册分别进入的比例
+    - 用户在哪一步退出或重试
+    - 拍照上传的审核通过率与失败原因
+  conventions_source: default
+
+canvas:
+  enabled: true
+  consent_scope: [server, design-token-analysis, browser-qa]
+  last_pushed: 2026-07-13T20:00:00+08:00
+
+iterations:
+  - date: 2026-07-13
+    summary: 根据冻结 PRD 建立需求摘要与旅程走查
+    trigger: 新建
+  - date: 2026-07-13
+    summary: 生成 PRD 与可点击相机上传原型
+    trigger: 阶段过门
+  - date: 2026-07-13
+    summary: 补齐异常恢复、可复跑 QA、audit 与 reviewer 记录
+    trigger: 规格审查
+
+open_questions: []
+user_style_prefs: []

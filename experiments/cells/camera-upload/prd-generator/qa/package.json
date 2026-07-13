@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "qa": "playwright test browser-qa.spec.js --reporter=line --workers=1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0"
+  }
+}

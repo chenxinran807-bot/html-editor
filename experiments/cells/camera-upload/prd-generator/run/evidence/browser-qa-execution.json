@@ -1,0 +1,9 @@
+{
+  "command": "npm --prefix qa run qa",
+  "serverUrl": "http://127.0.0.1:4183/",
+  "startedAt": "2026-07-13T12:23:35.000Z",
+  "finishedAt": "2026-07-13T12:23:44.000Z",
+  "exitCode": 0,
+  "stdout": "qa/browser-qa-stdout.log",
+  "serverLog": "qa/server.log"
+}

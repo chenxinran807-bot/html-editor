@@ -1,0 +1,131 @@
+{
+  "startedAt": "2026-07-13T12:23:37.861Z",
+  "finishedAt": "2026-07-13T12:23:44.605Z",
+  "url": "http://127.0.0.1:4183/",
+  "browser": {
+    "name": "chromium",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/139.0.0.0 Safari/537.36",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  },
+  "steps": [
+    {
+      "taskId": "entry",
+      "selector": "http://127.0.0.1:4183/",
+      "expected": "http://127.0.0.1:4183/",
+      "observed": "http://127.0.0.1:4183/",
+      "passed": true
+    },
+    {
+      "taskId": "visible-control-menu",
+      "selector": "#menu",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "visible-control-search",
+      "selector": "#search",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "open-upload-choices",
+      "selector": "#upload → #source.show",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "enter-camera",
+      "selector": "#chooseCamera → #camera.active",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "flip-camera",
+      "selector": "#flip → [data-facing]",
+      "expected": "front",
+      "observed": "front",
+      "passed": true
+    },
+    {
+      "taskId": "open-album",
+      "selector": "#albumButton → #album.show",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "album-thumbnail",
+      "selector": "#albumPhoto2 → #confirm.active",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "close-camera",
+      "selector": "#closeCamera → #source.show",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "shutter",
+      "selector": "#shutter → #confirm.active",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "retake",
+      "selector": "#retake → facing preserved",
+      "expected": "front",
+      "observed": "front",
+      "passed": true
+    },
+    {
+      "taskId": "use-photo",
+      "selector": "#usePhoto → #reviewing.active",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "review-failure",
+      "selector": "#reviewing → #failed.active",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "service-timeout",
+      "selector": "#simulateTimeout → #serviceError.active",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "service-retry",
+      "selector": "#retryReview → #reviewing.active",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "retry",
+      "selector": "#retry → #source.show",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    }
+  ],
+  "taskPassCount": 10,
+  "consoleEvents": [],
+  "pageErrors": []
+}

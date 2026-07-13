@@ -1,0 +1,9 @@
+原型体检 · 1 个页 · 入口=01-camera-upload
+————————————————————————————————————————————————
+✅ 没有硬伤：从入口能一路点到每一个页，没有断链、没有死键。
+
+⚠ 需要人工扫一眼（启发式，可能误报）：
+  • 01-camera-upload：21 个元素看着能点却没接 handler，例如 <button class="iconbtn">  <button class="iconbtn">  <button class="retry">  <button class="close">
+    （若是用 JS 事件委托接的可忽略；否则就是"假 affordance"——hover 变手型却点不动，最招人骂。）
+————————————————————————————————————————————————
+结论：结构上走得通。剩下的好不好看交给设计 reviewer + 你自己点一遍。
