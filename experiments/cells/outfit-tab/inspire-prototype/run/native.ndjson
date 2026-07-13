@@ -1,0 +1,109 @@
+{
+  "event": "preflight",
+  "command": "inspire-prototype whoami --json",
+  "status": "authenticated"
+}
+{
+  "event": "schema",
+  "command": "inspire-prototype schema generate prototype",
+  "status": "success",
+  "required": [
+    "--prompt"
+  ],
+  "generationFlags": [
+    "--fail-on-generation-error",
+    "--wait"
+  ]
+}
+{
+  "event": "visible-skills",
+  "command": "inspire-prototype skills visible --json",
+  "selected": [
+    "built-in:mobile-shell",
+    "built-in:tiktok-design-system"
+  ],
+  "reason": "The frozen PRD is a Douyin mobile product surface; mobile-shell is mandatory for mobile UI and tiktok-design-system is the exact product design system."
+}
+{
+  "event": "generation-attempt",
+  "status": "rejected-before-asset-creation",
+  "error": {
+    "kind": "internal",
+    "message": "Too many images: 13, max 10",
+    "retryable": false
+  },
+  "recovery": "Retained the frozen PRD body unchanged and attached only the five product-solution images from this cell (image-009 through image-013)."
+}
+{
+  "event": "started",
+  "data": {
+    "assetId": "6a54c06f0355ab02671022c5",
+    "inboxCanvasId": "6a1fbf72fc6413028e2870d7",
+    "inboxDeepLink": "https://inspire.bytedance.net/prototype/inbox",
+    "attachedCellAssets": [
+      "image-009.png",
+      "image-010.png",
+      "image-011.png",
+      "image-012.png",
+      "image-013.png"
+    ]
+  }
+}
+{
+  "event": "progress",
+  "message": "status=pending"
+}
+{
+  "event": "progress",
+  "message": "status=success"
+}
+{
+  "event": "done",
+  "data": {
+    "assetId": "6a54c06f0355ab02671022c5",
+    "inboxCanvasId": "6a1fbf72fc6413028e2870d7",
+    "status": "success",
+    "previewUrl": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
+    "inboxDeepLink": "https://inspire.bytedance.net/prototype/inbox",
+    "captures": [
+      {
+        "stateUrl": "/feed?tab=blogger",
+        "imageUrl": "https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/4f959012ba29b8aa2bb1a950eef31270a5f7732b5809496aff31e6c4ebdd82e2.png"
+      },
+      {
+        "stateUrl": "/feed?tab=scenario",
+        "imageUrl": "https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/379202262c8e531c341942b1c3abed60627199b527fdf7de6a155e44cf991f1d.png"
+      },
+      {
+        "stateUrl": "/feed?tab=body",
+        "imageUrl": "https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/b30475d866d464c97d490171568c64b29389ff3c4fc00c37ae4595119e3ddf25.png"
+      },
+      {
+        "stateUrl": "/detail?id=1",
+        "imageUrl": "https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/573972fdff73e75c392158e265072db1261104b5c249d970d80c69b534e895c3.png"
+      },
+      {
+        "stateUrl": "/detail?id=1&section=ai",
+        "imageUrl": "https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/c31bf85fd4e6e4d8a46c991f2095725fa36240cbe2487d536ae1cf8b853eb011.png"
+      }
+    ],
+    "skillTrace": {
+      "selected": [
+        "built-in:mobile-shell",
+        "built-in:tiktok-design-system"
+      ],
+      "activated": [
+        "built-in:mobile-shell",
+        "built-in:tiktok-design-system"
+      ],
+      "opened": [
+        "built-in:mobile-shell",
+        "built-in:tiktok-design-system"
+      ],
+      "warnings": []
+    },
+    "compileErrors": [],
+    "runtimeErrors": [],
+    "sandboxSummary": "compile=success, captures=5/5"
+  }
+}

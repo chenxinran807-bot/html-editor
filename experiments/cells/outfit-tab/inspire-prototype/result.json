@@ -1,0 +1,44 @@
+{
+  "inputId": "outfit-tab",
+  "skillId": "inspire-prototype",
+  "status": "PASS_WITH_CONCERNS",
+  "scores": {
+    "fidelity": 12,
+    "flowCoverage": 7,
+    "interaction": 7,
+    "visualHierarchy": 7,
+    "edgeStates": 1,
+    "stability": 9,
+    "handoff": 8
+  },
+  "total": 51,
+  "artifacts": [
+    "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
+    "https://inspire.bytedance.net/prototype/inbox",
+    "assetId:6a54c06f0355ab02671022c5",
+    "inboxCanvasId:6a1fbf72fc6413028e2870d7"
+  ],
+  "evidence": [
+    "run/native.ndjson",
+    "qa/browser-qa.md",
+    "qa/01-entry.png",
+    "qa/02-category-scene.png",
+    "qa/03-detail-guidance.png",
+    "qa/04-product-ai-actions.png",
+    "https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/4f959012ba29b8aa2bb1a950eef31270a5f7732b5809496aff31e6c4ebdd82e2.png",
+    "https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/379202262c8e531c341942b1c3abed60627199b527fdf7de6a155e44cf991f1d.png",
+    "https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/b30475d866d464c97d490171568c64b29389ff3c4fc00c37ae4595119e3ddf25.png",
+    "https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/573972fdff73e75c392158e265072db1261104b5c249d970d80c69b534e895c3.png",
+    "https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/c31bf85fd4e6e4d8a46c991f2095725fa36240cbe2487d536ae1cf8b853eb011.png"
+  ],
+  "deviations": [
+    "The platform maximum is 10 images, so the rejected 13-image attempt was recovered with the frozen PRD body unchanged and only this cell's five product-solution images attached.",
+    "Live browser testing found dead purchase, AI styling, and AI try-on controls despite platform compile success and 5/5 generated captures.",
+    "Generated feed/detail imagery is unrelated to clothing, and avoidance, size, and fabric guidance are absent."
+  ],
+  "runtime": {
+    "startedAt": "2026-07-13T10:39:38.000Z",
+    "finishedAt": "2026-07-13T10:47:20.300Z",
+    "durationMs": 462300
+  }
+}
