@@ -3,15 +3,15 @@
   "skillId": "open-design",
   "status": "PASS_WITH_CONCERNS",
   "scores": {
-    "fidelity": 18,
+    "fidelity": 17,
     "flowCoverage": 15,
-    "interaction": 20,
-    "visualHierarchy": 14,
-    "edgeStates": 10,
-    "stability": 10,
+    "interaction": 16,
+    "visualHierarchy": 10,
+    "edgeStates": 7,
+    "stability": 9,
     "handoff": 9
   },
-  "total": 96,
+  "total": 83,
   "artifacts": [
     "artifact/opendesign/index.html",
     "artifact/opendesign/manifest.json",
@@ -29,8 +29,12 @@
     "qa/score-evidence.md provides dimension-by-dimension scoring evidence."
   ],
   "deviations": [
-    "The Open Design setup/run/verifier subagents could not be derived in the assigned cell execution context; setup and serving were run directly, and verification used a separate reproducible headless Chrome process instead.",
-    "Babel Standalone is vendored for readable in-browser JSX and emits a prototype-only precompile warning; no console error or page exception occurs."
+    "AI retry has a permanent-loading bug after retry, and QA only asserts that loading reappears without verifying a final recovered success or failure state.",
+    "Several visible controls resolve only to transient toast messages, while hover coverage and animated screen transitions are insufficient for the interactive-prototype requirement.",
+    "The supplied reference screenshot is reused as an image inside newly built UI, causing nested UI, ghosted controls, and visible cropping artifacts.",
+    "The three required condition categories are not fully represented, and AI similar-style styling has no successful terminal state.",
+    "The structured intake questionnaire and the prescribed setup, run, and verifier subagent steps were not executed.",
+    "Browser QA assertions are shallow and the harness hard-codes tasksPassed as 5 instead of deriving it from assertion outcomes."
   ],
   "runtime": {
     "startedAt": "2026-07-13T09:40:00.000Z",

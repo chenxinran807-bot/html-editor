@@ -19,3 +19,12 @@
 ## Visual constraint correction
 
 - The initial prototype used a CSS gradient in a placeholder product thumbnail while claiming no gradients. The React revision removes that gradient and uses a solid thumbnail treatment, aligning implementation and evidence.
+
+## Independent review calibration
+
+- AI retry has a permanent-loading bug; the QA run verifies only that loading reappears, not a recovered terminal state.
+- Several visible controls are toast-only, and hover/transition coverage is below the interactive-prototype requirement.
+- Reusing the reference screenshot within the constructed UI causes nested UI, ghosted controls, and cropping.
+- Three distinct condition categories are incomplete, and AI similar-style styling has no successful state.
+- The structured questionnaire and prescribed setup/run/verifier subagent steps were not executed.
+- QA assertions are shallow and `tasksPassed` is hard-coded rather than calculated.
