@@ -5,13 +5,13 @@
   "scores": {
     "fidelity": 16,
     "flowCoverage": 15,
-    "interaction": 19,
-    "visualHierarchy": 13,
-    "edgeStates": 8,
+    "interaction": 17,
+    "visualHierarchy": 11,
+    "edgeStates": 7,
     "stability": 8,
     "handoff": 7
   },
-  "total": 86,
+  "total": 81,
   "artifacts": [
     "artifact/design-demos/a-system-sheet.html",
     "artifact/design-demos/b-capture-coach.html",
@@ -30,6 +30,13 @@
   "deviations": [
     "Weak-runtime fallback was used: three directions were produced serially as isolated self-contained HTML files rather than by subagents.",
     "No official brand identity or design system was supplied; invented labels, colors, review timing and simulated failure controls are explicitly marked Mock.",
+    "Direction A visibly contains a stretched black empty area around the official iOS frame at the captured viewport; this layout defect is retained in the experiment evidence.",
+    "The PRD screenshots are nested back into the prototype as camera and review imagery, creating a visible screen-within-screen artifact rather than a clean camera feed.",
+    "Camera flip changes only the facing text state; it does not visibly change the camera image or perspective.",
+    "Review failure is exposed through an explicit simulated-failure button. This is test affordance UI, not a production review transition.",
+    "Success, camera-permission denial, unavailable camera, upload/network failure and timeout states are not implemented.",
+    "The external CDP harness verifies selector availability, click progression, console errors and page exceptions, but its assertions are shallow and do not validate detailed visual or semantic state after every action.",
+    "Each self-contained direction is approximately 9.6 MB and mostly single-line because React, Babel and images are embedded; the roughly 29 MB total has substantial maintenance and review cost.",
     "Browser QA used headless Google Chrome through an external CDP harness because Playwright was unavailable in the worktree. CDP console/pageerror events, screenshots and task results were persisted; Chrome stderr environment noise is stored separately and is not counted as page evidence."
   ],
   "runtime": {
