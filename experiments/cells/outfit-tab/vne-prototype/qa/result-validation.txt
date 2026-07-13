@@ -1,0 +1,6 @@
+PASS: result.json is valid JSON.
+PASS: required keys are present.
+PASS: status BLOCKED implies scores=null and total=null.
+PASS: reason is present and deviations has at least one item.
+PASS: inputId and skillId satisfy kebab-case patterns.
+PASS: runtime timestamps satisfy the contract format and durationMs is non-negative.

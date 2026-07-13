@@ -1,0 +1,1 @@
+{"version":"1.0","productId":"outfit-tab","pages":[{"pageId":"feed","title":"穿搭","bindings":[{"key":"page.title","type":"text","label":"频道标题","default":"穿搭","pageId":"feed","specRef":"ui-spec §7"}]}]}
