@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "result.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["inputId", "skillId", "status", "scores", "total", "artifacts", "evidence", "deviations", "runtime"],
+  "properties": {
+    "inputId": { "type": "string", "minLength": 1 },
+    "skillId": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["PENDING", "RUNNING", "PASS", "PASS_WITH_CONCERNS", "BLOCKED", "NOT_APPLICABLE"] },
+    "scores": { "oneOf": [{ "$ref": "#/$defs/scores" }, { "type": "null" }] },
+    "total": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "artifacts": { "type": "array", "items": { "type": "string" } },
+    "evidence": { "type": "array", "items": { "type": "string" } },
+    "deviations": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "reason": { "type": "string", "minLength": 10 },
+    "runtime": { "type": "object" }
+  },
+  "$defs": {
+    "scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fidelity", "flowCoverage", "interaction", "visualHierarchy", "edgeStates", "stability", "handoff"],
+      "properties": {
+        "fidelity": { "type": "number", "minimum": 0, "maximum": 20 },
+        "flowCoverage": { "type": "number", "minimum": 0, "maximum": 15 },
+        "interaction": { "type": "number", "minimum": 0, "maximum": 20 },
+        "visualHierarchy": { "type": "number", "minimum": 0, "maximum": 15 },
+        "edgeStates": { "type": "number", "minimum": 0, "maximum": 10 },
+        "stability": { "type": "number", "minimum": 0, "maximum": 10 },
+        "handoff": { "type": "number", "minimum": 0, "maximum": 10 }
+      }
+    }
+  },
+  "allOf": [{
+    "if": { "properties": { "status": { "enum": ["BLOCKED", "NOT_APPLICABLE"] } }, "required": ["status"] },
+    "then": { "required": ["reason"], "properties": { "scores": { "type": "null" }, "total": { "type": "null" }, "deviations": { "minItems": 1 } } },
+    "else": { "properties": { "scores": { "$ref": "#/$defs/scores" }, "total": { "type": "number" } } }
+  }]
+}

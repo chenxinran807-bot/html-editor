@@ -1,0 +1,21 @@
+{
+  "outfit-tab": [
+    { "id": "switch-category", "steps": ["Open the prototype entry", "Switch to a different second-level outfit category", "Confirm the feed changes"] },
+    { "id": "open-reason-card", "steps": ["Choose a reason-led feed card", "Open its detail view"] },
+    { "id": "read-guidance", "steps": ["Read suitability guidance", "Read the outfit formula", "Read avoidance guidance"] },
+    { "id": "open-product-or-alternative", "steps": ["Open a recommended product or lower-cost alternative", "Confirm product information is visible"] },
+    { "id": "enter-ai-styling-or-try-on", "steps": ["Activate AI styling or AI try-on", "Confirm the destination or entry state opens"] }
+  ],
+  "camera-upload": [
+    { "id": "open-upload-choices", "steps": ["Open create-avatar upload choices", "Confirm camera and album choices"] },
+    { "id": "enter-camera", "steps": ["Choose camera", "Confirm the capture screen opens"] },
+    { "id": "flip-camera", "steps": ["Activate camera flip", "Confirm camera-facing state changes"] },
+    { "id": "open-album", "steps": ["Activate album", "Confirm album selection state opens"] },
+    { "id": "close-camera", "steps": ["Activate close", "Confirm return to the prior state"] },
+    { "id": "shutter", "steps": ["Re-enter camera", "Activate shutter", "Confirm photo confirmation opens"] },
+    { "id": "retake", "steps": ["Activate retake", "Confirm capture state returns"] },
+    { "id": "use-photo", "steps": ["Capture a photo", "Activate use photo", "Confirm review begins"] },
+    { "id": "review-failure", "steps": ["Trigger or select review failure", "Confirm failure guidance is visible"] },
+    { "id": "retry", "steps": ["Activate retry", "Confirm upload or capture can restart"] }
+  ]
+}

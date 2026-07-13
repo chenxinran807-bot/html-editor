@@ -1,0 +1,10 @@
+{
+  "url": "https://bytedance.larkoffice.com/docx/G2S7dXD5Boj5FSxOQYJcuCxJnDd",
+  "documentId": "G2S7dXD5Boj5FSxOQYJcuCxJnDd",
+  "revisionId": 3,
+  "fetchedAt": "2026-07-13T08:59:26.133Z",
+  "originalContentSha256": "ce287328ba33245d03ff50b178d4ce86e6d9dd0ce334770e201e706382ffbcb2",
+  "fixtureSha256": "01ac64112ba1d1868677d3e6dda657cbd7a682aad37431066f005b43fd888fce",
+  "transformation": "Downloaded each unique internal Feishu image to a numbered local asset and replaced every credential-bearing remote image URL with its relative assets path; all text was preserved.",
+  "assetCount": 13
+}
