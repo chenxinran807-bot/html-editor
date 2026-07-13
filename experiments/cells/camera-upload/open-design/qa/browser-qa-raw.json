@@ -1,21 +1,78 @@
 {
   "url": "http://127.0.0.1:8289/opendesign/mockups/camera-upload/index.html",
-  "tasks": {
-    "openUploadChoices": true,
-    "enterCamera": true,
-    "flipCamera": true,
-    "openAlbum": true,
-    "closeCamera": true,
-    "shutter": true,
-    "retake": true,
-    "usePhoto": true,
-    "reviewFailure": true,
-    "retry": true
+  "browserVersion": "139.0.7258.155",
+  "viewport": {
+    "width": 390,
+    "height": 844
   },
+  "startedAt": "2026-07-13T12:17:57.926Z",
+  "finishedAt": "2026-07-13T12:18:06.734Z",
+  "durationMs": 8808,
+  "taskAssertions": [
+    {
+      "id": "open-upload-choices",
+      "pass": true,
+      "details": "camera and album choices visible",
+      "at": "2026-07-13T12:17:59.099Z"
+    },
+    {
+      "id": "enter-camera",
+      "pass": true,
+      "details": "capture screen active",
+      "at": "2026-07-13T12:17:59.399Z"
+    },
+    {
+      "id": "flip-camera",
+      "pass": true,
+      "details": "facing changed to rear",
+      "at": "2026-07-13T12:17:59.773Z"
+    },
+    {
+      "id": "open-album",
+      "pass": true,
+      "details": "album selection visible",
+      "at": "2026-07-13T12:17:59.913Z"
+    },
+    {
+      "id": "close-camera",
+      "pass": true,
+      "details": "returned to upload choices",
+      "at": "2026-07-13T12:18:00.607Z"
+    },
+    {
+      "id": "shutter",
+      "pass": true,
+      "details": "photo confirmation visible",
+      "at": "2026-07-13T12:18:01.381Z"
+    },
+    {
+      "id": "retake",
+      "pass": true,
+      "details": "capture screen restored with facing preserved",
+      "at": "2026-07-13T12:18:01.729Z"
+    },
+    {
+      "id": "use-photo",
+      "pass": true,
+      "details": "review loading visible",
+      "at": "2026-07-13T12:18:02.461Z"
+    },
+    {
+      "id": "review-failure",
+      "pass": true,
+      "details": "failure guidance visible",
+      "at": "2026-07-13T12:18:03.380Z"
+    },
+    {
+      "id": "retry",
+      "pass": true,
+      "details": "upload choices restored",
+      "at": "2026-07-13T12:18:03.681Z"
+    }
+  ],
   "persistence": {
     "facingAfterReturn": "rear"
   },
   "consoleErrors": [],
-  "pageErrors": [],
-  "finishedAt": "2026-07-13T11:59:04.737Z"
+  "pageErrors": []
 }

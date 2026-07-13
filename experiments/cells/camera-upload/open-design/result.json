@@ -7,11 +7,11 @@
     "flowCoverage": 15,
     "interaction": 19,
     "visualHierarchy": 13,
-    "edgeStates": 9,
+    "edgeStates": 10,
     "stability": 10,
-    "handoff": 6
+    "handoff": 7
   },
-  "total": 90,
+  "total": 92,
   "artifacts": [
     "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
     "experiments/cells/camera-upload/open-design/artifact/opendesign/manifest.json",
@@ -21,20 +21,28 @@
   "evidence": [
     "experiments/cells/camera-upload/open-design/qa/browser-qa-raw.json",
     "experiments/cells/camera-upload/open-design/qa/screenshots/01-entry.png",
-    "experiments/cells/camera-upload/open-design/qa/screenshots/02-upload-choices.png",
-    "experiments/cells/camera-upload/open-design/qa/screenshots/03-photo-confirmation.png",
-    "experiments/cells/camera-upload/open-design/qa/screenshots/04-review-failure.png",
+    "experiments/cells/camera-upload/open-design/qa/screenshots/02-policy-dialog.png",
+    "experiments/cells/camera-upload/open-design/qa/screenshots/03-upload-choices.png",
+    "experiments/cells/camera-upload/open-design/qa/screenshots/04-camera-flipped.png",
+    "experiments/cells/camera-upload/open-design/qa/screenshots/05-album.png",
+    "experiments/cells/camera-upload/open-design/qa/screenshots/06-photo-confirmation.png",
+    "experiments/cells/camera-upload/open-design/qa/screenshots/07-review-loading.png",
+    "experiments/cells/camera-upload/open-design/qa/screenshots/08-review-failure.png",
+    "experiments/cells/camera-upload/open-design/qa/screenshots/09-review-success.png",
+    "experiments/cells/camera-upload/open-design/qa/screenshots/10-viewport-430x900.png",
+    "experiments/cells/camera-upload/open-design/qa/browser-qa.stdout.txt",
+    "experiments/cells/camera-upload/open-design/qa/browser-qa.exit-code.txt",
     "experiments/cells/camera-upload/open-design/qa/score-evidence.md"
   ],
   "deviations": [
     "Native intake answers were inferred from the frozen PRD and recorded because the isolated experiment could not pause for a user response.",
     "setup-opendesign, run-opendesign and verifier subagents could not be independently derived; local setup/server and reproducible real-browser QA were used and not misrepresented as clean-context verification.",
-    "Camera hardware is simulated with a supplied PRD image for deterministic offline playback."
+    "Camera hardware is simulated with a supplied PRD image for deterministic offline playback.",
+    "One older-cell vendor file was mistakenly read during setup, then replaced with a pinned public package download; all final vendor hashes were independently matched against fresh official-source downloads and recorded without sensitive information."
   ],
   "runtime": {
     "startedAt": "2026-07-13T11:30:00.000Z",
-    "finishedAt": "2026-07-13T11:59:04.737Z",
-    "durationMs": 1744737
+    "finishedAt": "2026-07-13T12:18:06.734Z",
+    "durationMs": 2886734
   }
 }
-

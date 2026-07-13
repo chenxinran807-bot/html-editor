@@ -6,5 +6,11 @@
   --font-body:"Avenir Next","PingFang SC",sans-serif;
   --h1:700 30px/1.2 var(--font-display); --h2:700 20px/1.25 var(--font-display);
   --body:500 16px/1.5 var(--font-body); --caption:500 13px/1.4 var(--font-body);
+  --canvas-bg:#ececf0; --home-bg:#f7f7f9; --camera-bg:#050505; --album-bg:#f5f5f7;
+  --feed-1:#d9dde4; --feed-2:#b6bec8; --close-bg:#e8f4dc; --guide-bg:#dde9d6;
+  --card-border:#f5f5f7; --choice-hover:#f6f8ff; --pill-bg:#f0f0f2; --link:#2878f0;
+  --focus:#6fd8ff; --scrim:#11131c70; --camera-control:#0007; --album-control:#ffffffd0;
+  --shutter:#ffffff55; --frame-guide:#ffffffa0; --camera-shade-top:#0008; --camera-shade-bottom:#000a;
+  --shadow-phone:0 24px 80px #20202a33; --shadow-card:0 14px 38px #17202916;
+  --shadow-card-hover:0 18px 44px #17202924; --shadow-pop:0 12px 50px #0005;
 }
-

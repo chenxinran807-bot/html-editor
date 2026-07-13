@@ -1,0 +1,14 @@
+
+Running 2 tests using 1 worker
+
+[1A[2K(node:36983) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:36983) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K[1/2] experiments/cells/camera-upload/open-design/qa/browser-qa.spec.js:6:1 › camera upload fixed tasks
+[1A[2K[2/2] experiments/cells/camera-upload/open-design/qa/browser-qa.spec.js:76:1 › larger mobile viewport remains usable
+[1A[2K  2 passed (10.4s)
