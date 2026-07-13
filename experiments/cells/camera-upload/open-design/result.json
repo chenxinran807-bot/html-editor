@@ -3,20 +3,21 @@
   "skillId": "open-design",
   "status": "PASS_WITH_CONCERNS",
   "scores": {
-    "fidelity": 18,
+    "fidelity": 16,
     "flowCoverage": 15,
-    "interaction": 19,
-    "visualHierarchy": 13,
-    "edgeStates": 10,
-    "stability": 10,
+    "interaction": 18,
+    "visualHierarchy": 12,
+    "edgeStates": 8,
+    "stability": 9,
     "handoff": 7
   },
-  "total": 92,
+  "total": 85,
   "artifacts": [
     "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
     "experiments/cells/camera-upload/open-design/artifact/opendesign/manifest.json",
     "experiments/cells/camera-upload/open-design/artifact/opendesign/mockups/camera-upload/index.html",
-    "experiments/cells/camera-upload/open-design/artifact/opendesign/design-systems/camera-product/tokens/colors_and_type.css"
+    "experiments/cells/camera-upload/open-design/artifact/opendesign/design-systems/camera-product/tokens/colors_and_type.css",
+    "experiments/cells/camera-upload/open-design/README.md"
   ],
   "evidence": [
     "experiments/cells/camera-upload/open-design/qa/browser-qa-raw.json",
@@ -31,13 +32,17 @@
     "experiments/cells/camera-upload/open-design/qa/screenshots/09-review-success.png",
     "experiments/cells/camera-upload/open-design/qa/screenshots/10-viewport-430x900.png",
     "experiments/cells/camera-upload/open-design/qa/browser-qa.stdout.txt",
-    "experiments/cells/camera-upload/open-design/qa/browser-qa.exit-code.txt",
-    "experiments/cells/camera-upload/open-design/qa/score-evidence.md"
+    "experiments/cells/camera-upload/open-design/qa/browser-qa.exit-code.txt"
   ],
   "deviations": [
     "Native intake answers were inferred from the frozen PRD and recorded because the isolated experiment could not pause for a user response.",
     "setup-opendesign, run-opendesign and verifier subagents could not be independently derived; local setup/server and reproducible real-browser QA were used and not misrepresented as clean-context verification.",
     "Camera hardware is simulated with a supplied PRD image for deterministic offline playback.",
+    "The supplied toy-camera image and a complete supplied UI screenshot are reused as success-path content, producing nested-interface artifacts that reduce fidelity.",
+    "Some screenshots were captured during the 240ms entry transition and therefore show partially transparent intermediate frames.",
+    "The agreement indicator is not toggleable, album thumbnails have no selected state, and completing a successful review ends with a toast rather than a durable destination.",
+    "Camera permission denial, empty album, network failure and review timeout states are not implemented.",
+    "The QA replay script does not start its own HTTP server; structured raw evidence covers the ten contracted failure-path tasks but not the success branch or second viewport, which are evidenced by screenshots and stdout only.",
     "One older-cell vendor file was mistakenly read during setup, then replaced with a pinned public package download; all final vendor hashes were independently matched against fresh official-source downloads and recorded without sensitive information."
   ],
   "runtime": {
