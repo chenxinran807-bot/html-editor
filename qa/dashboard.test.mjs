@@ -136,16 +136,17 @@ test('publishes the Chinese dashboard sections without an evidence gallery', asy
   assert.match(html, /技能正式名称/);
   assert.doesNotMatch(html, /Skill 正式名称/);
   assert.doesNotMatch(html, /证据画廊/);
+  assert.ok(html.indexOf('跨输入比较') < html.indexOf('概览'), 'cross-input comparison must appear before overview');
+  assert.doesNotMatch(html, /\['排名','技能正式名称','总分','状态'\]/);
   assert.doesNotMatch(html, /id=["']gallery["']/);
   assert.doesNotMatch(html, /class=["']gallery["']/);
   assert.equal(Object.hasOwn(data, 'gallery'), false);
 });
 
-test('renders twelve identified artifact cards with per-result Chinese statuses and links', async (t) => {
+test('renders twelve identified artifact cards with per-result effect summaries and links', async (t) => {
   const { output, data } = await buildFixture();
   const pairs = data.results.map((result) => `${result.inputId}::${result.skillId}`);
   assert.equal(new Set(pairs).size, 12, 'each experiment must have a unique inputId × skillId pair');
-  const statusLabels = { PASS_WITH_CONCERNS: '通过，但有关注项', BLOCKED: '已阻断' };
   const { server, url } = await serveDashboard(output);
   t.after(() => server.close());
   const { chromium } = await import(pathToFileURL(await findPlaywrightCore()).href);
@@ -159,8 +160,9 @@ test('renders twelve identified artifact cards with per-result Chinese statuses 
   for (const result of data.results) {
     const card = page.locator(`.artifact-result[data-result-id="${result.inputId}::${result.skillId}"]`);
     assert.equal(await card.count(), 1, `missing Artifact card for ${result.inputId}::${result.skillId}`);
-    assert.ok(statusLabels[result.status], `missing Chinese status mapping for ${result.status}`);
-    assert.match(await card.innerText(), new RegExp(statusLabels[result.status]));
+    assert.ok(result.effectZh, `missing effect summary for ${result.inputId}::${result.skillId}`);
+    assert.match(await card.innerText(), /原型生成效果/);
+    assert.match(await card.innerText(), new RegExp(result.effectZh.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
     assert.doesNotMatch(await card.innerText(), /PASS_WITH_CONCERNS|BLOCKED/);
     assert.deepEqual(await card.locator('a[href]').evaluateAll((links) => links.map((link) => link.getAttribute('href'))), result.artifacts.map((artifact) => artifact.href));
 

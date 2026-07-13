@@ -153,6 +153,21 @@ const deviationSummaryZh = {
   ],
 };
 
+const effectSummaryZh = {
+  'outfit-tab::open-design': '核心浏览与 AI 入口完整，整体最均衡；视觉套娃和重试终态仍影响真实感。',
+  'outfit-tab::huashu-design': '能快速给出多套方向，信息层级清楚；分类内容和深层交互覆盖不够完整。',
+  'outfit-tab::prd-generator': '原型与 PRD、画布和交付记录结合紧密；运行质感与部分控件完成度一般。',
+  'outfit-tab::pm-kakaxi': '主流程可演示且页面完成度较高；无来源商品信息和死控件削弱可信度。',
+  'outfit-tab::vne-prototype': '未生成可评估原型：私有依赖和构建审批未通过。',
+  'outfit-tab::inspire-prototype': '可以快速获得在线预览，但核心购买与 AI 操作不可用，图片也偏离服装主题。',
+  'camera-upload::open-design': '相机、失败重试和成功支路覆盖完整，整体效果优秀；素材套娃和部分边界态仍需改进。',
+  'camera-upload::huashu-design': '三个方向差异明显且主路径完整；画面拉伸、模拟按钮和浅层断言影响成品质感。',
+  'camera-upload::prd-generator': '流程恢复和配套文档较强；整屏截图复用造成明显双重界面，视觉效果一般。',
+  'camera-upload::pm-kakaxi': '固定任务覆盖最完整，交互和视觉表现最均衡，是该输入下效果最佳的方案。',
+  'camera-upload::vne-prototype': '能够真实构建并跑通流程；控制台外壳与移动相机界面冲突，视觉还原度有限。',
+  'camera-upload::inspire-prototype': '在线原型主流程可体验，但两个重新上传入口失效，人物素材也不符合正脸目标。',
+};
+
 async function build() {
   const manifest = JSON.parse(await readFile(path.join(root, 'experiments/manifest.json'), 'utf8'));
   const results = [];
@@ -176,8 +191,10 @@ async function build() {
       const artifacts = await Promise.all(value.artifacts.map((entry) => resolveEntry(entry, inputId, skill.id)));
       const evidence = await Promise.all(value.evidence.map((entry) => resolveEntry(entry, inputId, skill.id)));
       const deviationsZh = deviationSummaryZh[`${inputId}::${skill.id}`];
+      const effectZh = effectSummaryZh[`${inputId}::${skill.id}`];
       if (!deviationsZh?.length) failures.push(`${resultRepoPath}: missing Chinese deviation summary`);
-      results.push({ ...value, deviationsZh, capabilityName: skill.capabilityName, resultHref: repoHref(resultRepoPath), artifacts, evidence });
+      if (!effectZh) failures.push(`${resultRepoPath}: missing Chinese effect summary`);
+      results.push({ ...value, deviationsZh, effectZh, capabilityName: skill.capabilityName, resultHref: repoHref(resultRepoPath), artifacts, evidence });
     }
   }
   if (failures.length || results.length !== 12) throw new Error(`Result validation failed before aggregation:\n${failures.join('\n')}\nvalidated=${results.length}/12`);
@@ -199,7 +216,7 @@ async function build() {
     };
   });
   const data = {
-    summary: { resultCount: results.length, scoredCount: results.filter((row) => row.scores).length, blockedCount: results.filter((row) => row.status === 'BLOCKED').length },
+    summary: { resultCount: results.length, scoredCount: results.filter((row) => row.scores).length, blockedCount: results.filter((row) => row.status === 'BLOCKED').length, averageScore: Math.round(results.filter((row) => row.scores).reduce((sum, row) => sum + row.total, 0) / results.filter((row) => row.scores).length) },
     dimensions,
     rankings,
     results,
@@ -218,30 +235,30 @@ function dashboardHtml() {
   return `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>原型能力实验对比</title>
 <style>:root{color-scheme:dark;--bg:#09111f;--panel:#111d31;--line:#263653;--text:#edf4ff;--muted:#9fb0ca;--accent:#69e4c4}*{box-sizing:border-box}body{margin:0;font:14px/1.5 ui-sans-serif,system-ui;background:radial-gradient(circle at 10% 0,#18345b,transparent 32%),var(--bg);color:var(--text)}main{max-width:1440px;margin:auto;padding:32px}h1{font-size:32px;margin:0 0 8px}h2{margin-top:42px}h3{margin:24px 0 12px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.card{background:rgba(17,29,49,.94);border:1px solid var(--line);border-radius:16px;padding:18px;overflow:auto}.metric{font-size:28px;font-weight:800;color:var(--accent)}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}.bar{height:8px;background:#263653;border-radius:8px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#6f8cff,var(--accent))}.artifact-result ul{padding-left:20px}.artifact-result a{display:inline-block;margin:4px 0;color:#8fdcff}.deviation{border-left:3px solid #ffb86b;padding-left:10px;margin:8px 0}@media(max-width:700px){main{padding:18px}table{font-size:12px}}</style></head>
-<body><main><h1>原型能力实验对比</h1><p class="muted">12 个隔离实验结果的可审计聚合。已阻断结果不补分、不参与排名。</p>
+<body><main><h1>原型能力实验对比</h1><p class="muted">聚焦不同 Skill 在两份 PRD 下实际生成的原型效果；未产出可评估原型的实验不参与排名。</p>
+<section><h2>跨输入比较</h2><div id="cross" class="card"></div></section>
 <section><h2>概览</h2><div id="overview" class="grid"></div></section>
 <section><h2>相机上传排名</h2><div id="rank-camera" class="card"></div></section>
 <section><h2>穿搭 Tab 排名</h2><div id="rank-outfit" class="card"></div></section>
 <section><h2>七维分解</h2><div id="dimensions" class="card"></div></section>
 <section><h2>原型产物</h2><div id="artifacts"></div></section>
 <section><h2>未完全按 Skill 标准执行的部分</h2><div id="deviations" class="grid"></div></section>
-<section><h2>跨输入比较</h2><div id="cross" class="card"></div></section>
 <section><h2>适用性</h2><div id="applicability" class="card"></div></section>
 </main><script>
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const table=(heads,rows)=>'<table><thead><tr>'+heads.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
 const inputLabel={"camera-upload":'相机上传',"outfit-tab":'穿搭 Tab'};
-const statusLabel={PASS:'通过',CONCERNS:'有关注项',PASS_WITH_CONCERNS:'通过，但有关注项',BLOCKED:'已阻断',NOT_APPLICABLE:'不适用'};
 const dimensionLabel={fidelity:'还原度',flowCoverage:'流程覆盖',interaction:'交互',visualHierarchy:'视觉层级',edgeStates:'边界状态',stability:'稳定性',handoff:'交付质量'};
+const effectLevel=total=>total==null?'未生成可评估原型':total>=85?'优秀':total>=80?'良好':total>=70?'可用，仍需改进':'较弱';
 fetch('data.json').then(r=>r.json()).then(d=>{
- overview.innerHTML=[['实验结果',d.summary.resultCount],['已评分',d.summary.scoredCount],['已阻断',d.summary.blockedCount]].map(x=>'<div class="card"><div class="metric">'+x[1]+'</div>'+x[0]+'</div>').join('');
- const ranking=id=>table(['排名','技能正式名称','总分','状态'],d.rankings[id].map(x=>[x.rank,esc(x.capabilityName),x.total,esc(statusLabel[x.status]??'未知状态')]));
+ overview.innerHTML=[['实验结果',d.summary.resultCount],['可评估原型',d.summary.scoredCount],['平均效果分',d.summary.averageScore]].map(x=>'<div class="card"><div class="metric">'+x[1]+'</div>'+x[0]+'</div>').join('');
+ const ranking=id=>table(['排名','技能正式名称','原型生成效果','总分'],d.rankings[id].map(x=>[x.rank,esc(x.capabilityName),esc(effectLevel(x.total)+'：'+x.effectZh),x.total]));
  document.querySelector('#rank-camera').innerHTML=ranking('camera-upload');document.querySelector('#rank-outfit').innerHTML=ranking('outfit-tab');
  dimensions.innerHTML=table(['输入','技能正式名称','总分',...d.dimensions.map(k=>dimensionLabel[k])],d.results.map(x=>[esc(inputLabel[x.inputId]),esc(x.capabilityName),x.total??'未评分',...d.dimensions.map(k=>x.scores?'<div>'+x.scores[k]+'</div><div class="bar"><i style="width:'+(x.scores[k]/({fidelity:20,flowCoverage:15,interaction:20,visualHierarchy:15,edgeStates:10,stability:10,handoff:10}[k])*100)+'%"></i></div>':'未评分')]));
- artifacts.innerHTML=Object.keys(inputLabel).map(inputId=>'<h3>'+inputLabel[inputId]+'</h3><div class="grid">'+d.results.filter(x=>x.inputId===inputId).map(x=>{const available=x.artifacts.filter(a=>a.exists);return '<article class="card artifact-result" data-result-id="'+esc(x.inputId+'::'+x.skillId)+'"><b>'+esc(x.capabilityName)+'</b><p>状态：'+esc(statusLabel[x.status]??'未知状态')+' · 总分：'+(x.total??'未评分')+'</p>'+(available.length?'<ul>'+available.map(a=>'<li><a href="'+esc(a.href)+'">打开产物：'+esc(a.value)+'</a></li>').join('')+'</ul>':'<p class="muted">暂无可打开产物</p>')+'</article>'}).join('')+'</div>').join('');
+ artifacts.innerHTML=Object.keys(inputLabel).map(inputId=>'<h3>'+inputLabel[inputId]+'</h3><div class="grid">'+d.results.filter(x=>x.inputId===inputId).map(x=>{const available=x.artifacts.filter(a=>a.exists);return '<article class="card artifact-result" data-result-id="'+esc(x.inputId+'::'+x.skillId)+'"><b>'+esc(x.capabilityName)+'</b><p><strong>原型生成效果：'+esc(effectLevel(x.total))+'</strong>'+(x.total==null?'':' · '+x.total+' 分')+'</p><p class="muted">'+esc(x.effectZh)+'</p>'+(available.length?'<ul>'+available.map(a=>'<li><a href="'+esc(a.href)+'">打开产物：'+esc(a.value)+'</a></li>').join('')+'</ul>':'<p class="muted">暂无可打开产物</p>')+'</article>'}).join('')+'</div>').join('');
  deviations.innerHTML=d.results.map(x=>'<article class="card deviation-result" data-result-id="'+esc(x.inputId+'::'+x.skillId)+'"><b>'+esc(inputLabel[x.inputId])+' · '+esc(x.capabilityName)+'</b>'+(x.deviationsZh.length?x.deviationsZh.map(v=>'<div class="deviation">'+esc(v)+'</div>').join(''):'<p class="muted">暂无偏离记录</p>')+'</article>').join('');
- cross.innerHTML=table(['技能正式名称','穿搭 Tab','相机上传','差值（相机上传−穿搭 Tab）'],d.crossInput.map(x=>[esc(d.results.find(y=>y.skillId===x.skillId).capabilityName),x.outfitTotal??'不适用',x.cameraTotal??'不适用',x.delta??'不适用']));
- applicability.innerHTML=table(['技能正式名称','参与排名的输入','排除的输入'],d.applicability.map(x=>[esc(x.capabilityName),x.rankedInputs.length?esc(x.rankedInputs.map(y=>inputLabel[y]).join('、')):'无',x.excludedInputs.length?esc(x.excludedInputs.map(y=>inputLabel[y.inputId]+'（'+(statusLabel[y.status]??'未知状态')+'）').join('、')):'无']));
+ cross.innerHTML=table(['技能正式名称','穿搭 Tab 原型效果','相机上传原型效果','分差'],d.crossInput.map(x=>{const outfit=d.results.find(y=>y.skillId===x.skillId&&y.inputId==='outfit-tab');const camera=d.results.find(y=>y.skillId===x.skillId&&y.inputId==='camera-upload');return [esc(outfit.capabilityName),esc(effectLevel(outfit.total)+(outfit.total==null?'':' · '+outfit.total+' 分')+'：'+outfit.effectZh),esc(effectLevel(camera.total)+' · '+camera.total+' 分：'+camera.effectZh),x.delta==null?'无法比较':(x.delta>0?'+':'')+x.delta+' 分']}));
+ applicability.innerHTML=table(['技能正式名称','参与效果排名的输入','未参与排名的输入'],d.applicability.map(x=>[esc(x.capabilityName),x.rankedInputs.length?esc(x.rankedInputs.map(y=>inputLabel[y]).join('、')):'无',x.excludedInputs.length?esc(x.excludedInputs.map(y=>inputLabel[y.inputId]+'（未生成可评估原型）').join('、')):'无']));
 });</script></body></html>`;
 }
 

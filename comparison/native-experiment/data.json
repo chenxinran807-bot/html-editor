@@ -2,7 +2,8 @@
   "summary": {
     "resultCount": 12,
     "scoredCount": 11,
-    "blockedCount": 1
+    "blockedCount": 1,
+    "averageScore": 77
   },
   "dimensions": [
     "fidelity",
@@ -136,6 +137,7 @@
           "参考截图被再次嵌入新界面，产生界面套娃、控件残影和裁切；分类与 AI 终态覆盖也不完整。",
           "未执行规定的结构化需求问卷及独立的 setup、run、verifier 子流程，浏览器断言也较浅。"
         ],
+        "effectZh": "核心浏览与 AI 入口完整，整体最均衡；视觉套娃和重试终态仍影响真实感。",
         "capabilityName": "Open Design",
         "resultHref": "../../experiments/cells/outfit-tab/open-design/result.json",
         "rank": 1
@@ -346,6 +348,7 @@
           "浏览器验证仅覆盖首台手机和出游路径，未完整验证全部分类、反馈、返回与两项 AI 操作。",
           "部分尺码、适配建议和商品信息缺少来源或 Mock 标识；品牌核验与新素材采集未执行。"
         ],
+        "effectZh": "能快速给出多套方向，信息层级清楚；分类内容和深层交互覆盖不够完整。",
         "capabilityName": "huashu-design",
         "resultHref": "../../experiments/cells/outfit-tab/huashu-design/result.json",
         "rank": 2
@@ -487,6 +490,7 @@
           "参考拼图被直接放入产品界面，形成明显的界面套娃；设计 token 与追踪交付未真正接入。",
           "未进行独立评审，浏览器验证改用 Chrome CDP，且没有覆盖完整反馈与异常矩阵。"
         ],
+        "effectZh": "原型与 PRD、画布和交付记录结合紧密；运行质感与部分控件完成度一般。",
         "capabilityName": "prd-generator",
         "resultHref": "../../experiments/cells/outfit-tab/prd-generator/result.json",
         "rank": 3
@@ -629,6 +633,7 @@
           "异常态、键盘操作和视觉还原验证不足，完整页面截图的嵌入与裁切削弱了高保真程度。",
           "没有独立人工视觉评审，也未向外部飞书多维表格发送使用追踪数据。"
         ],
+        "effectZh": "主流程可演示且页面完成度较高；无来源商品信息和死控件削弱可信度。",
         "capabilityName": "pm-kakaxi-skills",
         "resultHref": "../../experiments/cells/outfit-tab/pm-kakaxi/result.json",
         "rank": 4
@@ -771,6 +776,7 @@
           "平台最多接收 10 张图片，因此从 13 张输入恢复为只附带 5 张产品方案图。",
           "购买、AI 搭配和 AI 试穿控件不可用；生成图片与服装无关，且缺少避雷、尺码和面料建议。"
         ],
+        "effectZh": "可以快速获得在线预览，但核心购买与 AI 操作不可用，图片也偏离服装主题。",
         "capabilityName": "inspire-prototype",
         "resultHref": "../../experiments/cells/outfit-tab/inspire-prototype/result.json",
         "rank": 5
@@ -917,6 +923,7 @@
           "未实现成功创建与删除；相机缺少闪光灯，失败结果缺少参考稿中的完成操作。",
           "视觉规格记录与失败文案断言较浅，三个推断异常态也缺少完整原始轨迹和独立截图。"
         ],
+        "effectZh": "固定任务覆盖最完整，交互和视觉表现最均衡，是该输入下效果最佳的方案。",
         "capabilityName": "pm-kakaxi-skills",
         "resultHref": "../../experiments/cells/camera-upload/pm-kakaxi/result.json",
         "rank": 1
@@ -1087,6 +1094,7 @@
           "协议选择、相册选中态和完成后的持久终态不完整，权限、空相册、网络失败和超时未实现。",
           "部分截图处于转场中间帧，QA 不自动启动服务，结构化记录也未覆盖成功支路与第二视口。"
         ],
+        "effectZh": "相机、失败重试和成功支路覆盖完整，整体效果优秀；素材套娃和部分边界态仍需改进。",
         "capabilityName": "Open Design",
         "resultHref": "../../experiments/cells/camera-upload/open-design/result.json",
         "rank": 2
@@ -1209,6 +1217,7 @@
           "镜头翻转只改变文字，审核失败依赖显式测试按钮，成功、权限、设备、网络与超时状态缺失。",
           "CDP 断言偏浅；三份自包含 HTML 合计约 29 MB，维护和评审成本较高。"
         ],
+        "effectZh": "三个方向差异明显且主路径完整；画面拉伸、模拟按钮和浅层断言影响成品质感。",
         "capabilityName": "huashu-design",
         "resultHref": "../../experiments/cells/camera-upload/huashu-design/result.json",
         "rank": 3
@@ -1447,6 +1456,7 @@
           "菜单与搜索仅用提示反馈，相册选项汇入同一路径；成功审核、权限拒绝和空相册未实现。",
           "导出的设计 token 仅用于文档说明，独立画布页面运行时没有真正引用。"
         ],
+        "effectZh": "流程恢复和配套文档较强；整屏截图复用造成明显双重界面，视觉效果一般。",
         "capabilityName": "prd-generator",
         "resultHref": "../../experiments/cells/camera-upload/prd-generator/result.json",
         "rank": 4
@@ -1640,6 +1650,7 @@
           "QA 只在桌面视口验证失败路径，缺少成功、真实设备不可用和审核服务或网络异常分支。",
           "规格与单页状态机实现存在漂移，浏览器路径、内网依赖和遥测记录也降低了可移植与可审计性。"
         ],
+        "effectZh": "能够真实构建并跑通流程；控制台外壳与移动相机界面冲突，视觉还原度有限。",
         "capabilityName": "vne-prototype",
         "resultHref": "../../experiments/cells/camera-upload/vne-prototype/result.json",
         "rank": 5
@@ -1791,6 +1802,7 @@
           "原始生成 NDJSON 未保存，现有报告为字段级脱敏查询和压缩后的生成记录。",
           "相机与内容审核均为演示模拟，没有调用真实设备或审核服务。"
         ],
+        "effectZh": "在线原型主流程可体验，但两个重新上传入口失效，人物素材也不符合正脸目标。",
         "capabilityName": "inspire-prototype",
         "resultHref": "../../experiments/cells/camera-upload/inspire-prototype/result.json",
         "rank": 6
@@ -1919,6 +1931,7 @@
         "参考截图被再次嵌入新界面，产生界面套娃、控件残影和裁切；分类与 AI 终态覆盖也不完整。",
         "未执行规定的结构化需求问卷及独立的 setup、run、verifier 子流程，浏览器断言也较浅。"
       ],
+      "effectZh": "核心浏览与 AI 入口完整，整体最均衡；视觉套娃和重试终态仍影响真实感。",
       "capabilityName": "Open Design",
       "resultHref": "../../experiments/cells/outfit-tab/open-design/result.json"
     },
@@ -2128,6 +2141,7 @@
         "浏览器验证仅覆盖首台手机和出游路径，未完整验证全部分类、反馈、返回与两项 AI 操作。",
         "部分尺码、适配建议和商品信息缺少来源或 Mock 标识；品牌核验与新素材采集未执行。"
       ],
+      "effectZh": "能快速给出多套方向，信息层级清楚；分类内容和深层交互覆盖不够完整。",
       "capabilityName": "huashu-design",
       "resultHref": "../../experiments/cells/outfit-tab/huashu-design/result.json"
     },
@@ -2268,6 +2282,7 @@
         "参考拼图被直接放入产品界面，形成明显的界面套娃；设计 token 与追踪交付未真正接入。",
         "未进行独立评审，浏览器验证改用 Chrome CDP，且没有覆盖完整反馈与异常矩阵。"
       ],
+      "effectZh": "原型与 PRD、画布和交付记录结合紧密；运行质感与部分控件完成度一般。",
       "capabilityName": "prd-generator",
       "resultHref": "../../experiments/cells/outfit-tab/prd-generator/result.json"
     },
@@ -2409,6 +2424,7 @@
         "异常态、键盘操作和视觉还原验证不足，完整页面截图的嵌入与裁切削弱了高保真程度。",
         "没有独立人工视觉评审，也未向外部飞书多维表格发送使用追踪数据。"
       ],
+      "effectZh": "主流程可演示且页面完成度较高；无来源商品信息和死控件削弱可信度。",
       "capabilityName": "pm-kakaxi-skills",
       "resultHref": "../../experiments/cells/outfit-tab/pm-kakaxi/result.json"
     },
@@ -2478,6 +2494,7 @@
         "官方私有 cloud-materials 依赖无法从公共 npm 获取，后续官方构建命令又在启动前被审批门禁拒绝。",
         "由于原生构建门禁未通过，没有生成 dist、开发预览、浏览器任务、错误记录或截图。"
       ],
+      "effectZh": "未生成可评估原型：私有依赖和构建审批未通过。",
       "capabilityName": "vne-prototype",
       "resultHref": "../../experiments/cells/outfit-tab/vne-prototype/result.json"
     },
@@ -2619,6 +2636,7 @@
         "平台最多接收 10 张图片，因此从 13 张输入恢复为只附带 5 张产品方案图。",
         "购买、AI 搭配和 AI 试穿控件不可用；生成图片与服装无关，且缺少避雷、尺码和面料建议。"
       ],
+      "effectZh": "可以快速获得在线预览，但核心购买与 AI 操作不可用，图片也偏离服装主题。",
       "capabilityName": "inspire-prototype",
       "resultHref": "../../experiments/cells/outfit-tab/inspire-prototype/result.json"
     },
@@ -2788,6 +2806,7 @@
         "协议选择、相册选中态和完成后的持久终态不完整，权限、空相册、网络失败和超时未实现。",
         "部分截图处于转场中间帧，QA 不自动启动服务，结构化记录也未覆盖成功支路与第二视口。"
       ],
+      "effectZh": "相机、失败重试和成功支路覆盖完整，整体效果优秀；素材套娃和部分边界态仍需改进。",
       "capabilityName": "Open Design",
       "resultHref": "../../experiments/cells/camera-upload/open-design/result.json"
     },
@@ -2909,6 +2928,7 @@
         "镜头翻转只改变文字，审核失败依赖显式测试按钮，成功、权限、设备、网络与超时状态缺失。",
         "CDP 断言偏浅；三份自包含 HTML 合计约 29 MB，维护和评审成本较高。"
       ],
+      "effectZh": "三个方向差异明显且主路径完整；画面拉伸、模拟按钮和浅层断言影响成品质感。",
       "capabilityName": "huashu-design",
       "resultHref": "../../experiments/cells/camera-upload/huashu-design/result.json"
     },
@@ -3146,6 +3166,7 @@
         "菜单与搜索仅用提示反馈，相册选项汇入同一路径；成功审核、权限拒绝和空相册未实现。",
         "导出的设计 token 仅用于文档说明，独立画布页面运行时没有真正引用。"
       ],
+      "effectZh": "流程恢复和配套文档较强；整屏截图复用造成明显双重界面，视觉效果一般。",
       "capabilityName": "prd-generator",
       "resultHref": "../../experiments/cells/camera-upload/prd-generator/result.json"
     },
@@ -3289,6 +3310,7 @@
         "未实现成功创建与删除；相机缺少闪光灯，失败结果缺少参考稿中的完成操作。",
         "视觉规格记录与失败文案断言较浅，三个推断异常态也缺少完整原始轨迹和独立截图。"
       ],
+      "effectZh": "固定任务覆盖最完整，交互和视觉表现最均衡，是该输入下效果最佳的方案。",
       "capabilityName": "pm-kakaxi-skills",
       "resultHref": "../../experiments/cells/camera-upload/pm-kakaxi/result.json"
     },
@@ -3481,6 +3503,7 @@
         "QA 只在桌面视口验证失败路径，缺少成功、真实设备不可用和审核服务或网络异常分支。",
         "规格与单页状态机实现存在漂移，浏览器路径、内网依赖和遥测记录也降低了可移植与可审计性。"
       ],
+      "effectZh": "能够真实构建并跑通流程；控制台外壳与移动相机界面冲突，视觉还原度有限。",
       "capabilityName": "vne-prototype",
       "resultHref": "../../experiments/cells/camera-upload/vne-prototype/result.json"
     },
@@ -3631,6 +3654,7 @@
         "原始生成 NDJSON 未保存，现有报告为字段级脱敏查询和压缩后的生成记录。",
         "相机与内容审核均为演示模拟，没有调用真实设备或审核服务。"
       ],
+      "effectZh": "在线原型主流程可体验，但两个重新上传入口失效，人物素材也不符合正脸目标。",
       "capabilityName": "inspire-prototype",
       "resultHref": "../../experiments/cells/camera-upload/inspire-prototype/result.json"
     }
