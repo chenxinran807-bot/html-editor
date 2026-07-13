@@ -13,3 +13,7 @@ Environment: Google Chrome CDP, 430 × 932 viewport. `run-fixed-journey.mjs` sta
 | enter-ai-styling-or-try-on | `screenshots/ai.png`: current look is carried into AI try-on upload entry | PASS |
 
 Additional checks: back navigation preserves a coherent journey; feedback presents confirmation; loading/error/retry preview states render; all images are local assets; no network dependency is needed.
+
+## Calibration concerns
+
+The automated journey verifies only the five required happy-path tasks plus upload entry. It does **not** establish complete coverage for like/dislike feedback, purchase completion, menu/search destinations, continue-styling, or the loading/empty/error/retry state matrix. Several responses are toast-only or shallow affordances. Chrome CDP substituted for Playwright. Reference collage assets also create nested UI imagery in rendered screens.

@@ -3,15 +3,15 @@
   "skillId": "prd-generator",
   "status": "PASS_WITH_CONCERNS",
   "scores": {
-    "fidelity": 18,
-    "flowCoverage": 15,
-    "interaction": 19,
-    "visualHierarchy": 14,
-    "edgeStates": 10,
+    "fidelity": 14,
+    "flowCoverage": 13,
+    "interaction": 14,
+    "visualHierarchy": 10,
+    "edgeStates": 8,
     "stability": 9,
-    "handoff": 10
+    "handoff": 8
   },
-  "total": 95,
+  "total": 76,
   "artifacts": [
     "artifact/index.html",
     "artifact/prd.md",
@@ -32,8 +32,14 @@
     "qa/screenshots/ai.png proves the AI try-on destination state."
   ],
   "deviations": [
-    "Playwright was unavailable in the worktree; a reproducible Google Chrome CDP script performed the consecutive click journey instead.",
-    "Independent reviewer agents were not authorized for this worker; text and design reviews are explicitly labeled main-agent self-review."
+    "prd.yaml does not fully conform to the native state schema: required state fields are incomplete, design_posture uses an invalid value, and tracking/canvas metadata are incomplete.",
+    "The promised three scene plus three condition classifications are not all exposed as selectable options.",
+    "Continue-styling, purchase, menu/search, toast-only responses and other affordances do not provide complete destination states and include fake or shallow interaction.",
+    "QA does not cover like/dislike feedback, purchase completion, or the complete loading/empty/error/retry state matrix.",
+    "Reference collage images are reused inside the product UI, producing visibly nested phone/interface imagery.",
+    "No independent reviewer was run; text and design reports are main-agent self-review only.",
+    "Design tokens are not wired into the prototype, tracking.md is absent, and tracking handoff is incomplete.",
+    "Playwright was unavailable; Chrome CDP was used as a substitute for browser QA."
   ],
   "runtime": {
     "startedAt": "2026-07-13T09:57:00.000Z",
