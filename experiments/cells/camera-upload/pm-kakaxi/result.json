@@ -3,15 +3,15 @@
   "skillId": "pm-kakaxi",
   "status": "PASS_WITH_CONCERNS",
   "scores": {
-    "fidelity": 17,
+    "fidelity": 15,
     "flowCoverage": 15,
     "interaction": 18,
     "visualHierarchy": 13,
-    "edgeStates": 9,
+    "edgeStates": 8,
     "stability": 9,
     "handoff": 8
   },
-  "total": 89,
+  "total": 86,
   "artifacts": [
     "experiments/cells/camera-upload/pm-kakaxi/artifact/index.html",
     "experiments/cells/camera-upload/pm-kakaxi/run/demo-context.json",
@@ -36,7 +36,12 @@
     "Album thumbnails reuse fixture screenshots as evaluation placeholders and are not production content.",
     "The required ScenarioBar is an external review control rather than consumer product UI.",
     "Usage tracking was not sent because it is optional and would mutate an external Base outside this isolated experiment.",
-    "The prototype does not extend beyond the contracted failure and retry journey into successful avatar creation or deletion."
+    "The prototype does not extend beyond the contracted failure and retry journey into successful avatar creation or deletion.",
+    "The camera screen omits the PRD reference's flash control, and the review-failure result omits the visible completion action shown in the supplied reference.",
+    "Some default-inferred product elements are not individually labeled as inference inside the review surface.",
+    "The structured demo context does not record typography sizes, spacing values, or icon dimensions, limiting exact visual handoff.",
+    "The automated failure-copy assertion checks only a shallow text fragment rather than the full required guidance.",
+    "The three inferred exception states do not each have complete raw interaction traces and dedicated screenshot coverage."
   ],
   "runtime": {
     "startedAt": "2026-07-13T12:20:00.000Z",

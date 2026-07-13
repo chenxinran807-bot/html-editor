@@ -26,9 +26,12 @@ The top ScenarioBar switches between the primary flow and three inferred recover
 - Camera and review are deterministic mocks.
 - Album thumbnails use local fixture screenshots as placeholders.
 - No real permission, media picker, network request, successful avatar destination or deletion flow exists.
+- The camera omits the reference flash control, and the failed-review result omits the reference completion button.
+- Some default-inferred elements are not individually marked as inference in the review surface.
+- `demo-context.json` does not capture typography sizes, spacing values or icon dimensions.
+- Failure-copy automation asserts only a shallow text fragment; the three inferred exception states do not each have complete raw traces and dedicated screenshots.
 - Some visual values are approximate because the source is compressed screenshots rather than Figma or tokens.
 
 ## Final score
 
-`PASS_WITH_CONCERNS` — 89/100: fidelity 17, flow coverage 15, interaction 18, visual hierarchy 13, edge states 9, stability 9, handoff 8.
-
+`PASS_WITH_CONCERNS` — 86/100: fidelity 15, flow coverage 15, interaction 18, visual hierarchy 13, edge states 8, stability 9, handoff 8.
