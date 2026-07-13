@@ -1,31 +1,31 @@
 # QA report · Huashu native outfit directions
 
-## 可复跑路径
+## 实际执行范围
 
-1. 用任意 Chrome 启动本地 CDP 端口，例如 `--remote-debugging-port=9335 about:blank`。
-2. 在 cell 目录或仓库根目录执行 `CDP_PORT=9335 node qa/browser-qa.mjs`。脚本通过 `import.meta.url` 解析 `../artifact/index.html`，不含工作区绝对路径。
-3. `run/build-artifacts.mjs` 可从冻结 input 重建 4 个 base64 自包含 HTML。
+- QA 脚本使用相对路径解析 `../artifact/index.html`，可通过本地 Chrome CDP 复跑。
+- 实际只操作主版第一台手机，路径为：切换「出游」→ 打开理由卡 → 检查适配/公式/避雷 → 打开 Mock 平替 → 打开 AI 试穿入口。
+- 该路径的固定 5 项断言通过；记录 `pageerror=0`、console error `=0`。
+- 保存了入口、详情、商品、AI 入口及三个方向截图。
 
-## 浏览器证据
+## 未验证范围
 
-- 1440×1100 Chrome；固定 5 项任务均通过真实 DOM 点击。
-- 切到「出游」后 active 分类与理由型 feed 同步变化。
-- 卡片进入详情；适合人群、配色公式与避雷完整可见。
-- 平替 sheet 显示 `Mock ¥189`、尺码和 Mock 声明。
-- AI 试穿入口状态打开，明确不上传照片、不伪造结果。
-- `pageerror=0`，console error `=0`。
-- 三个方向独立截图：`direction-1.png`、`direction-2.png`、`direction-3.png`；主流程证据：`01-entry.png` 至 `04-ai-entry.png`。
+- 未点击或断言 like/dislike。
+- 未验证其余三台手机各自的状态独立性和完整交互。
+- 未遍历日常、通勤、出游、小个子、梨形、黄黑皮全部六类。
+- 未验证返回导航、搜索响应、disabled tabs/底栏的每个状态。
+- AI 仅验证试穿入口，未验证「保留外套继续搭」入口。
+- 截图证明三个页面可渲染，但不能证明三方向达到充分结构独立。
 
-## 评分
+## 校准评分
 
-| 维度 | 分数 | 证据 |
+| 维度 | 分数 | 校准依据 |
 |---|---:|---|
-| Fidelity | 20/20 | 冻结真图 base64、自包含；真实 IosFrame 组件结构；3 个独立方向；4 屏主版。 |
-| Flow coverage | 15/15 | 固定五项任务全覆盖；3 场景 + 3 条件完整。 |
-| Interaction | 20/20 | 分类、卡片、like/dislike、商品、AI、返回均响应；未覆盖入口 disabled。 |
-| Visual hierarchy | 15/15 | 三方向有明确结构差异，主版按发现→解释→商品→AI 排布。 |
-| Edge states | 8/10 | Mock 与 AI 限制透明、disabled 入口明确；生产网络/隐私授权失败仍不在固定范围。 |
-| Stability | 10/10 | clean Chrome pageerror 与 console 均为 0。 |
-| Handoff | 10/10 | 相对 QA、重建脚本、四个自包含 HTML、规格、选择证据齐全。 |
+| Fidelity | 16/20 | 使用冻结真图和自包含 HTML，但仅部分移植 `ios_frame.jsx`，不是完整真实组件使用；部分文案无依据。 |
+| Flow coverage | 13/15 | 固定五步主路径存在，但六分类只有三类真实数据，其余 fallback。 |
+| Interaction | 17/20 | 主路径可点；like/dislike、四机、返回、全部分类及两个 AI 入口未完整验证。 |
+| Visual hierarchy | 11/15 | 有三份方向和主版，但结构共享较多，独立方向不足。 |
+| Edge states | 6/10 | disabled 和 Mock 处理部分存在；S–XL 与适配内容未全部标 Mock，失败/隐私态不足。 |
+| Stability | 10/10 | 已执行路径 pageerror 与 console error 均为 0。 |
+| Handoff | 8/10 | 有构建脚本、相对 QA、截图与报告，但 QA 覆盖和组件来源声明此前过度。 |
 
-总分：**98/100**。
+总分：**81/100**，状态：**PASS_WITH_CONCERNS**。

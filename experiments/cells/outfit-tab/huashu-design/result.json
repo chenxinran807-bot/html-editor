@@ -3,15 +3,15 @@
   "skillId": "huashu-design",
   "status": "PASS_WITH_CONCERNS",
   "scores": {
-    "fidelity": 20,
-    "flowCoverage": 15,
-    "interaction": 20,
-    "visualHierarchy": 15,
-    "edgeStates": 8,
+    "fidelity": 16,
+    "flowCoverage": 13,
+    "interaction": 17,
+    "visualHierarchy": 11,
+    "edgeStates": 6,
     "stability": 10,
-    "handoff": 10
+    "handoff": 8
   },
-  "total": 98,
+  "total": 81,
   "artifacts": [
     "artifact/index.html",
     "artifact/direction-1-roulette.html",
@@ -38,12 +38,16 @@
     "AI try-on entry state opened with an explicit no-backend prototype limitation.",
     "Final browser report recorded zero page errors and zero console errors.",
     "Three structurally distinct direction screenshots and entry/detail/product/AI screenshots provide selection and flow evidence.",
-    "All four HTML artifacts embed frozen PNG assets as base64 and contain the ported iosFrameStyles/IosFrame component structure."
+    "All four HTML artifacts embed frozen PNG assets as base64; the device implementation only partially ports the ios_frame.jsx structure and is not a complete real use of the source component."
   ],
   "deviations": [
-    "Huashu weak-runtime fallback was used because subagents were not permitted: three structurally independent directions were produced serially by one agent rather than in isolated parallel contexts.",
-    "Brand web verification and new asset acquisition were intentionally skipped because the experiment boundary allowed only frozen cell input; no logo claim was added and only frozen local screenshots were used.",
-    "Production loading, network failure, inventory, privacy consent, and real AI result states remain outside this fixed prototype task; unsupported navigation is explicitly disabled and ungrounded price is labeled Mock."
+    "The implementation did not fully and directly use vendor/huashu-design/assets/ios_frame.jsx; it partially transplanted the structure and styles into a custom DOM helper.",
+    "The three visual directions are not sufficiently structurally independent: they retain substantial shared runtime, content, and phone-flow structure despite surface and feed-layout differences.",
+    "Six category labels are visible, but only 通勤、出游、小个子 have distinct frozen-image/card data; 日常、梨形、黄黑皮 fall back to the same default card rather than representing six real category datasets.",
+    "Browser QA exercises only the first phone and the 出游 path. It does not verify like/dislike, all four independent phones, all six categories, return navigation, or both AI actions.",
+    "Visible S–XL sizing and some suitability/guidance claims are not grounded by the frozen source and are not consistently labeled Mock; only the invented ¥189 price is explicitly labeled Mock.",
+    "Subagents were unavailable, so the three directions were produced serially in one context rather than independently in parallel.",
+    "Brand verification and new asset acquisition were not performed because the experiment was constrained to frozen local input; only provided local screenshots were used."
   ],
   "runtime": {
     "startedAt": "2026-07-13T10:01:21.000Z",
