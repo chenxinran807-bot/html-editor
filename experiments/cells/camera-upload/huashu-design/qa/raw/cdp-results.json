@@ -1,0 +1,145 @@
+{
+  "runtime": "Chrome DevTools Protocol",
+  "startedAt": "2026-07-13T12:11:33.989Z",
+  "directions": {
+    "a": {
+      "file": "a-system-sheet.html",
+      "tasks": [
+        {
+          "task": "open-upload-choices",
+          "status": "PASS"
+        },
+        {
+          "task": "enter-camera",
+          "status": "PASS"
+        },
+        {
+          "task": "flip-camera",
+          "status": "PASS"
+        },
+        {
+          "task": "open-album",
+          "status": "PASS"
+        },
+        {
+          "task": "return-camera",
+          "status": "PASS"
+        },
+        {
+          "task": "close-camera",
+          "status": "PASS"
+        },
+        {
+          "task": "reopen-upload",
+          "status": "PASS"
+        },
+        {
+          "task": "reenter-camera",
+          "status": "PASS"
+        },
+        {
+          "task": "shutter",
+          "status": "PASS"
+        },
+        {
+          "task": "retake",
+          "status": "PASS"
+        },
+        {
+          "task": "shutter-again",
+          "status": "PASS"
+        },
+        {
+          "task": "use-photo",
+          "status": "PASS"
+        },
+        {
+          "task": "review-failure",
+          "status": "PASS"
+        },
+        {
+          "task": "retry",
+          "status": "PASS"
+        }
+      ],
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    "b": {
+      "file": "b-capture-coach.html",
+      "tasks": [
+        {
+          "task": "open-source-coach",
+          "status": "PASS"
+        },
+        {
+          "task": "enter-camera",
+          "status": "PASS"
+        },
+        {
+          "task": "flip-camera",
+          "status": "PASS"
+        },
+        {
+          "task": "shutter",
+          "status": "PASS"
+        },
+        {
+          "task": "use-photo",
+          "status": "PASS"
+        },
+        {
+          "task": "review-failure",
+          "status": "PASS"
+        },
+        {
+          "task": "retry",
+          "status": "PASS"
+        }
+      ],
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    "c": {
+      "file": "c-task-rail.html",
+      "tasks": [
+        {
+          "task": "enter-camera",
+          "status": "PASS"
+        },
+        {
+          "task": "flip-camera",
+          "status": "PASS"
+        },
+        {
+          "task": "open-album",
+          "status": "PASS"
+        },
+        {
+          "task": "return-camera",
+          "status": "PASS"
+        },
+        {
+          "task": "shutter",
+          "status": "PASS"
+        },
+        {
+          "task": "use-photo",
+          "status": "PASS"
+        },
+        {
+          "task": "review-failure",
+          "status": "PASS"
+        },
+        {
+          "task": "retry",
+          "status": "PASS"
+        }
+      ],
+      "consoleErrors": [],
+      "pageErrors": []
+    }
+  },
+  "environmentNoise": [],
+  "finishedAt": "2026-07-13T12:11:48.292Z"
+}

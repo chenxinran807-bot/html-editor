@@ -3,35 +3,38 @@
   "skillId": "huashu-design",
   "status": "PASS_WITH_CONCERNS",
   "scores": {
-    "fidelity": 15,
+    "fidelity": 16,
     "flowCoverage": 15,
-    "interaction": 18,
-    "visualHierarchy": 12,
+    "interaction": 19,
+    "visualHierarchy": 13,
     "edgeStates": 8,
     "stability": 8,
-    "handoff": 6
+    "handoff": 7
   },
-  "total": 82,
+  "total": 86,
   "artifacts": [
-    "artifact/camera-upload-directions.html",
+    "artifact/design-demos/a-system-sheet.html",
+    "artifact/design-demos/b-capture-coach.html",
+    "artifact/design-demos/c-task-rail.html",
     "artifact/design-spec.md",
     "artifact/brand-spec.md"
   ],
   "evidence": [
     "qa/screenshots/direction-a.png",
-    "qa/screenshots/qa-run.png",
-    "qa/raw/interaction-results.json",
-    "qa/raw/qa-dom.html"
+    "qa/screenshots/direction-b.png",
+    "qa/screenshots/direction-c.png",
+    "qa/raw/cdp-results.json",
+    "run/run-log.md",
+    "run/qa-cdp.mjs"
   ],
   "deviations": [
-    "Weak-runtime fallback was used: three directions were produced serially in one self-contained artifact rather than by isolated subagents.",
-    "The three directions share one complete state-machine implementation; their entry composition, capture guidance, progress treatment, typography and container geometry differ, but they are less structurally independent than three separately authored prototypes.",
+    "Weak-runtime fallback was used: three directions were produced serially as isolated self-contained HTML files rather than by subagents.",
     "No official brand identity or design system was supplied; invented labels, colors, review timing and simulated failure controls are explicitly marked Mock.",
-    "Browser QA used headless Google Chrome with an in-page deterministic click harness because Playwright was unavailable in the worktree. Raw DOM, screenshots, consoleErrors and pageErrors were persisted."
+    "Browser QA used headless Google Chrome through an external CDP harness because Playwright was unavailable in the worktree. CDP console/pageerror events, screenshots and task results were persisted; Chrome stderr environment noise is stored separately and is not counted as page evidence."
   ],
   "runtime": {
     "startedAt": "2026-07-13T11:45:00Z",
-    "finishedAt": "2026-07-13T11:58:02Z",
-    "durationMs": 782000
+    "finishedAt": "2026-07-13T12:12:00Z",
+    "durationMs": 1620000
   }
 }
