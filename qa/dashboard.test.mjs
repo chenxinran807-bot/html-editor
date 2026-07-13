@@ -154,6 +154,7 @@ test('renders twelve identified artifact cards with per-result Chinese statuses 
   await page.goto(url, { waitUntil: 'networkidle' });
 
   assert.equal(await page.locator('.artifact-result').count(), 12);
+  assert.equal(await page.locator('.deviation-result').count(), 12);
   for (const result of data.results) {
     const card = page.locator(`.artifact-result[data-result-id="${result.inputId}::${result.skillId}"]`);
     assert.equal(await card.count(), 1, `missing Artifact card for ${result.inputId}::${result.skillId}`);
@@ -161,6 +162,13 @@ test('renders twelve identified artifact cards with per-result Chinese statuses 
     assert.match(await card.innerText(), new RegExp(statusLabels[result.status]));
     assert.doesNotMatch(await card.innerText(), /PASS_WITH_CONCERNS|BLOCKED/);
     assert.deepEqual(await card.locator('a[href]').evaluateAll((links) => links.map((link) => link.getAttribute('href'))), result.artifacts.map((artifact) => artifact.href));
+
+    assert.ok(Array.isArray(result.deviationsZh) && result.deviationsZh.length > 0, `missing Chinese deviations for ${result.inputId}::${result.skillId}`);
+    const deviationCard = page.locator(`.deviation-result[data-result-id="${result.inputId}::${result.skillId}"]`);
+    assert.equal(await deviationCard.count(), 1, `missing deviation card for ${result.inputId}::${result.skillId}`);
+    const deviationText = await deviationCard.innerText();
+    for (const item of result.deviationsZh) assert.match(deviationText, new RegExp(item.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+    for (const original of result.deviations) assert.equal(deviationText.includes(original), false, 'must not render the original English deviation text');
   }
 });
 

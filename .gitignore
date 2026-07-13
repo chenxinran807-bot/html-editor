@@ -11,6 +11,7 @@ lark-auth-qr.png
 
 # Generated caches and temporary browser data
 .cache/
+.vite/
 playwright-report/
 test-results/
 

@@ -81,6 +81,78 @@ const strategy = {
   },
 };
 
+const deviationSummaryZh = {
+  'outfit-tab::open-design': [
+    'AI 重试后会持续停留在加载态，尚未验证最终恢复为成功或失败。',
+    '部分可见控件仅显示短暂提示，交互反馈、悬停效果和页面转场不够完整。',
+    '参考截图被再次嵌入新界面，产生界面套娃、控件残影和裁切；分类与 AI 终态覆盖也不完整。',
+    '未执行规定的结构化需求问卷及独立的 setup、run、verifier 子流程，浏览器断言也较浅。',
+  ],
+  'outfit-tab::huashu-design': [
+    '没有完整直接复用官方 ios_frame.jsx，三个设计方向仍共享较多运行结构与内容。',
+    '六个分类中只有通勤、出游、小个子具备独立数据，其余分类复用了默认卡片。',
+    '浏览器验证仅覆盖首台手机和出游路径，未完整验证全部分类、反馈、返回与两项 AI 操作。',
+    '部分尺码、适配建议和商品信息缺少来源或 Mock 标识；品牌核验与新素材采集未执行。',
+  ],
+  'outfit-tab::prd-generator': [
+    'prd.yaml 与原生状态规范仍有差距，设计姿态、追踪和画布元数据不完整。',
+    '场景与体型分类、购买和继续搭配等目标状态没有完整呈现，部分控件交互较浅。',
+    '参考拼图被直接放入产品界面，形成明显的界面套娃；设计 token 与追踪交付未真正接入。',
+    '未进行独立评审，浏览器验证改用 Chrome CDP，且没有覆盖完整反馈与异常矩阵。',
+  ],
+  'outfit-tab::pm-kakaxi': [
+    '商品尺码、材质、发货和加购信息存在无来源推断，替代商品价格也前后冲突。',
+    '关注、导航、加购、上传和 AI 推荐等多个可见控件没有实际行为。',
+    '异常态、键盘操作和视觉还原验证不足，完整页面截图的嵌入与裁切削弱了高保真程度。',
+    '没有独立人工视觉评审，也未向外部飞书多维表格发送使用追踪数据。',
+  ],
+  'outfit-tab::vne-prototype': [
+    '官方私有 cloud-materials 依赖无法从公共 npm 获取，后续官方构建命令又在启动前被审批门禁拒绝。',
+    '由于原生构建门禁未通过，没有生成 dist、开发预览、浏览器任务、错误记录或截图。',
+  ],
+  'outfit-tab::inspire-prototype': [
+    '原始生成标准输出未逐字保存，现有 NDJSON 是经过规范化和脱敏的审计记录。',
+    '平台最多接收 10 张图片，因此从 13 张输入恢复为只附带 5 张产品方案图。',
+    '购买、AI 搭配和 AI 试穿控件不可用；生成图片与服装无关，且缺少避雷、尺码和面料建议。',
+  ],
+  'camera-upload::open-design': [
+    '需求问答由冻结 PRD 推断，独立 setup、run、verifier 子流程无法执行。',
+    '相机与审核使用本地模拟；玩偶图片和完整界面截图被用于成功路径，造成界面套娃。',
+    '协议选择、相册选中态和完成后的持久终态不完整，权限、空相册、网络失败和超时未实现。',
+    '部分截图处于转场中间帧，QA 不自动启动服务，结构化记录也未覆盖成功支路与第二视口。',
+  ],
+  'camera-upload::huashu-design': [
+    '弱运行环境下三个方向采用串行隔离生成，品牌、颜色、审核时长和模拟失败控件均为 Mock。',
+    '方向 A 存在黑色拉伸空白，PRD 截图被再次嵌入相机和审核页面，形成界面套娃。',
+    '镜头翻转只改变文字，审核失败依赖显式测试按钮，成功、权限、设备、网络与超时状态缺失。',
+    'CDP 断言偏浅；三份自包含 HTML 合计约 29 MB，维护和评审成本较高。',
+  ],
+  'camera-upload::prd-generator': [
+    '相机拍摄与远程审核使用本地确定性模拟，评审记录也不是由独立上下文生成。',
+    '整屏截图被复用为相机、信息流和相册素材，产生双状态栏、双控件和镜像文字。',
+    '菜单与搜索仅用提示反馈，相册选项汇入同一路径；成功审核、权限拒绝和空相册未实现。',
+    '导出的设计 token 仅用于文档说明，独立画布页面运行时没有真正引用。',
+  ],
+  'camera-upload::pm-kakaxi': [
+    '相机与审核为本地模拟，权限拒绝、空相册和审核超时属于无视觉依据的评审推断态。',
+    '相册缩略图是评估占位素材，ScenarioBar 属于外部评审控件而非用户产品界面。',
+    '未实现成功创建与删除；相机缺少闪光灯，失败结果缺少参考稿中的完成操作。',
+    '视觉规格记录与失败文案断言较浅，三个推断异常态也缺少完整原始轨迹和独立截图。',
+  ],
+  'camera-upload::vne-prototype': [
+    '移动交互被放在 VNE 控制台框架中，整屏相机截图又叠加生成控件，形成双重界面与裁切黑边。',
+    '初始化需要内部源和六项构建脚本审批；构建产物还依赖两张外部图片，并非严格单文件。',
+    'QA 只在桌面视口验证失败路径，缺少成功、真实设备不可用和审核服务或网络异常分支。',
+    '规格与单页状态机实现存在漂移，浏览器路径、内网依赖和遥测记录也降低了可移植与可审计性。',
+  ],
+  'camera-upload::inspire-prototype': [
+    '审核失败与服务异常页面的“重新上传”均不可用，无法重新开始上传或拍摄。',
+    '失败指导过于笼统，食物、风景和泛人物占位图也不符合清晰单人正脸目标。',
+    '原始生成 NDJSON 未保存，现有报告为字段级脱敏查询和压缩后的生成记录。',
+    '相机与内容审核均为演示模拟，没有调用真实设备或审核服务。',
+  ],
+};
+
 async function build() {
   const manifest = JSON.parse(await readFile(path.join(root, 'experiments/manifest.json'), 'utf8'));
   const results = [];
@@ -103,7 +175,9 @@ async function build() {
       if (value.inputId !== inputId || value.skillId !== skill.id) failures.push(`${resultRepoPath}: manifest identity mismatch`);
       const artifacts = await Promise.all(value.artifacts.map((entry) => resolveEntry(entry, inputId, skill.id)));
       const evidence = await Promise.all(value.evidence.map((entry) => resolveEntry(entry, inputId, skill.id)));
-      results.push({ ...value, capabilityName: skill.capabilityName, resultHref: repoHref(resultRepoPath), artifacts, evidence });
+      const deviationsZh = deviationSummaryZh[`${inputId}::${skill.id}`];
+      if (!deviationsZh?.length) failures.push(`${resultRepoPath}: missing Chinese deviation summary`);
+      results.push({ ...value, deviationsZh, capabilityName: skill.capabilityName, resultHref: repoHref(resultRepoPath), artifacts, evidence });
     }
   }
   if (failures.length || results.length !== 12) throw new Error(`Result validation failed before aggregation:\n${failures.join('\n')}\nvalidated=${results.length}/12`);
@@ -165,7 +239,7 @@ fetch('data.json').then(r=>r.json()).then(d=>{
  document.querySelector('#rank-camera').innerHTML=ranking('camera-upload');document.querySelector('#rank-outfit').innerHTML=ranking('outfit-tab');
  dimensions.innerHTML=table(['输入','技能正式名称','总分',...d.dimensions.map(k=>dimensionLabel[k])],d.results.map(x=>[esc(inputLabel[x.inputId]),esc(x.capabilityName),x.total??'未评分',...d.dimensions.map(k=>x.scores?'<div>'+x.scores[k]+'</div><div class="bar"><i style="width:'+(x.scores[k]/({fidelity:20,flowCoverage:15,interaction:20,visualHierarchy:15,edgeStates:10,stability:10,handoff:10}[k])*100)+'%"></i></div>':'未评分')]));
  artifacts.innerHTML=Object.keys(inputLabel).map(inputId=>'<h3>'+inputLabel[inputId]+'</h3><div class="grid">'+d.results.filter(x=>x.inputId===inputId).map(x=>{const available=x.artifacts.filter(a=>a.exists);return '<article class="card artifact-result" data-result-id="'+esc(x.inputId+'::'+x.skillId)+'"><b>'+esc(x.capabilityName)+'</b><p>状态：'+esc(statusLabel[x.status]??'未知状态')+' · 总分：'+(x.total??'未评分')+'</p>'+(available.length?'<ul>'+available.map(a=>'<li><a href="'+esc(a.href)+'">打开产物：'+esc(a.value)+'</a></li>').join('')+'</ul>':'<p class="muted">暂无可打开产物</p>')+'</article>'}).join('')+'</div>').join('');
- deviations.innerHTML=d.results.map(x=>'<div class="card"><b>'+esc(inputLabel[x.inputId])+' · '+esc(x.capabilityName)+'</b>'+(x.deviations.length?x.deviations.map(v=>'<div class="deviation">'+esc(v)+'</div>').join(''):'<p class="muted">暂无偏离记录</p>')+'</div>').join('');
+ deviations.innerHTML=d.results.map(x=>'<article class="card deviation-result" data-result-id="'+esc(x.inputId+'::'+x.skillId)+'"><b>'+esc(inputLabel[x.inputId])+' · '+esc(x.capabilityName)+'</b>'+(x.deviationsZh.length?x.deviationsZh.map(v=>'<div class="deviation">'+esc(v)+'</div>').join(''):'<p class="muted">暂无偏离记录</p>')+'</article>').join('');
  cross.innerHTML=table(['技能正式名称','穿搭 Tab','相机上传','差值（相机上传−穿搭 Tab）'],d.crossInput.map(x=>[esc(d.results.find(y=>y.skillId===x.skillId).capabilityName),x.outfitTotal??'不适用',x.cameraTotal??'不适用',x.delta??'不适用']));
  applicability.innerHTML=table(['技能正式名称','参与排名的输入','排除的输入'],d.applicability.map(x=>[esc(x.capabilityName),x.rankedInputs.length?esc(x.rankedInputs.map(y=>inputLabel[y]).join('、')):'无',x.excludedInputs.length?esc(x.excludedInputs.map(y=>inputLabel[y.inputId]+'（'+(statusLabel[y.status]??'未知状态')+'）').join('、')):'无']));
 });</script></body></html>`;
