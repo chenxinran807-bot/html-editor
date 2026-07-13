@@ -129,9 +129,10 @@ test('publishes the Chinese dashboard sections without an evidence gallery', asy
   const { output, data } = await buildFixture();
   const html = await readFile(path.join(output, 'index.html'), 'utf8');
 
-  for (const label of ['原型能力实验对比', '相机上传排名', '穿搭 Tab 排名', '原型产物', '原生流程偏离', '跨输入比较', '适用性']) {
+  for (const label of ['原型能力实验对比', '相机上传排名', '穿搭 Tab 排名', '原型产物', '未完全按 Skill 标准执行的部分', '跨输入比较', '适用性']) {
     assert.match(html, new RegExp(label));
   }
+  assert.doesNotMatch(html, /原生流程偏离/);
   assert.match(html, /技能正式名称/);
   assert.doesNotMatch(html, /Skill 正式名称/);
   assert.doesNotMatch(html, /证据画廊/);
