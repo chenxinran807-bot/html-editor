@@ -5,7 +5,7 @@
   "artifacts": ["index.html", "demo-context.json", "qa/feed.png", "qa/detail.png", "qa/ai-entry.png", "qa/playwright-report.json"],
   "evidence": [
     "Native input completeness scored visual=high, interaction=medium, state=medium, semantic=high; high-fidelity mode selected with two soft gates documented in demo-context.json.",
-    "qa/playwright-report.json: Playwright ran 6 tests in isolated Chromium and all 6 passed, including the five fixed outfit tasks plus a screenshot/edge-scenario test.",
+    "qa/playwright-report.json is a sanitized portable summary: Playwright ran 6 tests in isolated Chromium and all 6 passed, including the five fixed outfit tasks plus a screenshot/edge-scenario test.",
     "switch-category changed the feed and exposed '西装 + 长裤，办公友好'.",
     "open-reason-card opened the detail view; read-guidance verified suitability, outfit formula, and avoidance guidance headings.",
     "open-product-or-alternative opened a scoped alternative-product sheet with product title, size, material, shipping, and price information.",
@@ -20,8 +20,9 @@
     "Edge-state QA only clicked empty/loading/error/boundary and asserted that #feed remained visible; it did not verify each state's required content or behavior.",
     "The visual=high completeness claim has thin evidence because source screenshots were embedded and cropped as whole-page images rather than reconstructed from source-native fashion assets.",
     "interaction_inventory source values such as '任务契约+PRD' and '截图 image-010+PRD' do not follow the documented source enumeration, and repository evidence cannot prove demo-context.json existed before coding began.",
+    "Feed cards have tabindex=0 but no Enter or Space keyboard activation handler, and QA covers pointer clicks only; keyboard accessibility is therefore unverified and nonfunctional.",
     "No independent human visual or usability review was performed; screenshot existence alone was previously overstated as manual review.",
     "Skill usage tracking was not sent to external Lark Base because experiment scope permits writes only inside this cell."
   ],
-  "runtime": { "startedAt": "2026-07-13T10:32:00.000Z", "finishedAt": "2026-07-13T10:43:38.000Z", "durationMs": 698000 }
+  "runtime": { "startedAt": "2026-07-13T10:32:00.000Z", "finishedAt": "2026-07-13T11:03:31.000Z", "durationMs": 1891000 }
 }

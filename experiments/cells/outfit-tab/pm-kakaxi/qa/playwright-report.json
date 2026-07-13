@@ -1,282 +1,44 @@
 {
+  "reportType": "sanitized-playwright-summary",
+  "sanitized": true,
+  "description": "Portable sanitized QA evidence. Local user paths, machine directories, environment details, raw traces, and attachments were removed.",
   "config": {
-    "configFile": "/Users/bytedance/Documents/prd-demo/.worktrees/native-skill-experiment/experiments/cells/outfit-tab/pm-kakaxi/playwright.config.js",
-    "rootDir": "/Users/bytedance/Documents/prd-demo/.worktrees/native-skill-experiment/experiments/cells/outfit-tab/pm-kakaxi/qa",
-    "forbidOnly": false,
-    "fullyParallel": false,
-    "globalSetup": null,
-    "globalTeardown": null,
-    "globalTimeout": 0,
-    "grep": {},
-    "grepInvert": null,
-    "maxFailures": 0,
-    "metadata": {
-      "actualWorkers": 1
-    },
-    "preserveOutput": "always",
-    "reporter": [
-      [
-        "line",
-        null
-      ],
-      [
-        "json",
-        {
-          "outputFile": "qa/playwright-report.json"
-        }
-      ]
-    ],
-    "reportSlowTests": {
-      "max": 5,
-      "threshold": 300000
-    },
-    "quiet": false,
-    "projects": [
-      {
-        "outputDir": "/Users/bytedance/Documents/prd-demo/.worktrees/native-skill-experiment/experiments/cells/outfit-tab/pm-kakaxi/test-results",
-        "repeatEach": 1,
-        "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
-        "id": "",
-        "name": "",
-        "testDir": "/Users/bytedance/Documents/prd-demo/.worktrees/native-skill-experiment/experiments/cells/outfit-tab/pm-kakaxi/qa",
-        "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
-        "timeout": 30000
-      }
-    ],
-    "shard": null,
-    "updateSnapshots": "missing",
-    "updateSourceMethod": "patch",
-    "version": "1.55.1",
+    "configFile": "playwright.config.js",
+    "testDir": "qa",
+    "testFile": "qa/outfit.spec.js",
     "workers": 1,
-    "webServer": null
+    "retries": 0,
+    "timeoutMs": 30000,
+    "viewport": { "width": 430, "height": 932 }
   },
-  "suites": [
-    {
-      "title": "outfit.spec.js",
-      "file": "outfit.spec.js",
-      "column": 0,
-      "line": 0,
-      "specs": [
-        {
-          "title": "switch-category",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 458,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-07-13T10:50:55.837Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "cfef473c4c70b1751739-4beb6a524b04a0148dbf",
-          "file": "outfit.spec.js",
-          "line": 12,
-          "column": 1
-        },
-        {
-          "title": "open-reason-card",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 187,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-07-13T10:50:56.540Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "cfef473c4c70b1751739-fbd92f7d62eb51683b1f",
-          "file": "outfit.spec.js",
-          "line": 16,
-          "column": 1
-        },
-        {
-          "title": "read-guidance",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 177,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-07-13T10:50:56.737Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "cfef473c4c70b1751739-fa936eec49020760b612",
-          "file": "outfit.spec.js",
-          "line": 20,
-          "column": 1
-        },
-        {
-          "title": "open-product-or-alternative",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 207,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-07-13T10:50:56.920Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "cfef473c4c70b1751739-864951025014be01ff53",
-          "file": "outfit.spec.js",
-          "line": 27,
-          "column": 1
-        },
-        {
-          "title": "enter-ai-styling-or-try-on",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 197,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-07-13T10:50:57.132Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "cfef473c4c70b1751739-487ea7b523043207cf2c",
-          "file": "outfit.spec.js",
-          "line": 33,
-          "column": 1
-        },
-        {
-          "title": "visual screenshots and edge scenarios",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 615,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-07-13T10:50:57.334Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "cfef473c4c70b1751739-354d87e42f4b57d2c6e2",
-          "file": "outfit.spec.js",
-          "line": 39,
-          "column": 1
-        }
-      ]
-    }
-  ],
-  "errors": [],
+  "runtime": {
+    "runner": "Playwright Test",
+    "runnerVersion": "1.55.1",
+    "browser": "Chromium",
+    "browserVersion": "140.0.7339.186",
+    "headless": true
+  },
   "stats": {
-    "startTime": "2026-07-13T10:50:55.532Z",
-    "duration": 2450.327,
+    "startedAt": "2026-07-13T10:50:55.532Z",
+    "finishedAt": "2026-07-13T10:50:57.982Z",
+    "durationMs": 2450.327,
     "expected": 6,
+    "passed": 6,
+    "failed": 0,
     "skipped": 0,
-    "unexpected": 0,
     "flaky": 0
-  }
+  },
+  "tests": [
+    { "title": "switch-category", "status": "passed", "durationMs": 458, "consoleErrors": [], "pageErrors": [] },
+    { "title": "open-reason-card", "status": "passed", "durationMs": 187, "consoleErrors": [], "pageErrors": [] },
+    { "title": "read-guidance", "status": "passed", "durationMs": 177, "consoleErrors": [], "pageErrors": [] },
+    { "title": "open-product-or-alternative", "status": "passed", "durationMs": 207, "consoleErrors": [], "pageErrors": [] },
+    { "title": "enter-ai-styling-or-try-on", "status": "passed", "durationMs": 197, "consoleErrors": [], "pageErrors": [] },
+    { "title": "visual screenshots and edge scenarios", "status": "passed", "durationMs": 615, "consoleErrors": [], "pageErrors": [] }
+  ],
+  "outcomeNotes": [
+    "The five fixed outfit tasks passed.",
+    "The edge-scenario test only asserted feed visibility after switching states; it did not validate state-specific content or behavior.",
+    "Console and page error arrays were empty for all tests."
+  ]
 }
