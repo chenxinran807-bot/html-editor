@@ -1,5 +1,5 @@
 {
   "authenticated": true,
-  "isAdmin": false,
-  "sanitization": "Email and account name removed; digest retained only to correlate repeated checks without revealing identity."
+  "adminCapability": false,
+  "sanitization": "All account-linked fields removed."
 }
