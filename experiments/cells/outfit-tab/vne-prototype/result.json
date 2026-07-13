@@ -15,14 +15,13 @@
     "qa/quality-report.md"
   ],
   "deviations": [
-    "The official private cloud-materials dependency could not be installed: public npm returned 404, while the internal registry attempt was rejected to prevent sending an existing npm Bearer token to an unverified registry.",
+    "The official private cloud-materials dependency could not be installed: public npm returned 404, while the official bnpm build retry was rejected before process launch pending explicit authorization for the registry credential flow.",
     "Because the native build gate did not pass, no dist/index.html, dev preview, browser task execution, console/pageerror capture, or screenshots were produced."
   ],
-  "reason": "Native VNE build is blocked because the required private cloud-materials dependency cannot be installed without an explicitly authorized internal registry credential flow.",
+  "reason": "Native VNE build is blocked because the required private cloud-materials dependency cannot be installed until the user explicitly authorizes the official bnpm registry credential flow.",
   "runtime": {
     "startedAt": "2026-07-13T09:00:00.000Z",
     "finishedAt": "2026-07-13T09:12:00.000Z",
     "durationMs": 720000
   }
 }
-

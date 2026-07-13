@@ -2,7 +2,7 @@
 
 ## 1. 设计概要
 
-- **设计方向**：火山控制台（Skill 固定预设；依据 Path A 移动视觉稿做移动端微调）
+- **设计方向**：Path A 视觉稿驱动的移动端内容 Feed；布局、色彩、圆角与交互层级以图片 9–13 为准
 - **设计系统**：`@cloud-materials/common` + `@cloud-materials/charts-common`
 
 | Token | 值 | 说明 |
