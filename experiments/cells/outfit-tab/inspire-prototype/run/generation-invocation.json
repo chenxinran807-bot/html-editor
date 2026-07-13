@@ -1,0 +1,52 @@
+{
+  "evidenceType": "reconstructed-safe-argv",
+  "recoverability": "verified-from-agent-tool-call-record-and-platform-started/done-events",
+  "onlineAssetModifiedDuringCalibration": false,
+  "executable": "inspire-prototype",
+  "subcommand": ["generate", "prototype"],
+  "safeArgv": [
+    "--prompt", "@run/prompt.txt",
+    "--name", "outfit-tab-inspire-native",
+    "--skill", "built-in:mobile-shell",
+    "--skill", "built-in:tiktok-design-system",
+    "--file", "input/assets/image-009.png",
+    "--file", "input/assets/image-010.png",
+    "--file", "input/assets/image-011.png",
+    "--file", "input/assets/image-012.png",
+    "--file", "input/assets/image-013.png",
+    "--fail-on-generation-error",
+    "--wait",
+    "--timeout", "15m",
+    "--json"
+  ],
+  "prompt": {
+    "passedAsFullText": true,
+    "sourceFixturePath": "input/source.md",
+    "retainedCopy": "run/prompt.txt",
+    "originalContentSha256": "2e1c59161a9152c37395c5ef7d166b8059ad9d050f939ee3ba14c7049345c617",
+    "fixtureSha256": "e46b07945ac39e9c17ecf12b7b53a1963765830fb185bf77019f4d1555b9fc55"
+  },
+  "attachedAssets": [
+    "input/assets/image-009.png",
+    "input/assets/image-010.png",
+    "input/assets/image-011.png",
+    "input/assets/image-012.png",
+    "input/assets/image-013.png"
+  ],
+  "skills": {
+    "selected": ["built-in:mobile-shell", "built-in:tiktok-design-system"],
+    "reason": "The fixture describes a Douyin mobile product UI. mobile-shell is mandatory for mobile surfaces and tiktok-design-system directly matches the product context.",
+    "selectionEvidence": "run/raw/skills-visible.json"
+  },
+  "fieldProvenance": {
+    "assetIdAndInboxCanvasId": "original CLI started event",
+    "statusPreviewCapturesAndSkillTrace": "original CLI done event",
+    "argvPromptAndFiles": "agent tool-call record",
+    "fixtureHashes": "input/metadata.json"
+  },
+  "initialRejectedAttempt": {
+    "assetCreated": false,
+    "attachedAssets": "all 13 input assets",
+    "error": "Too many images: 13, max 10"
+  }
+}
