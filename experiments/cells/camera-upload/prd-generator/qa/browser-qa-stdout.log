@@ -1,0 +1,17 @@
+
+> qa
+> playwright test browser-qa.spec.js --reporter=line --workers=1
+
+
+Running 1 test using 1 worker
+
+[1A[2K(node:59435) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:59435) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K[1/1] browser-qa.spec.js:11:1 › camera upload contract and recovery states
+[1A[2K  1 passed (10.4s)

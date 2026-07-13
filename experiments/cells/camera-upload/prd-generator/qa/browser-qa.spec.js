@@ -31,10 +31,34 @@ test('camera upload contract and recovery states', async ({ page, browserName })
   record('visible-control-search', '#search', true, await page.locator('#toast').isVisible());
 
   await page.locator('#create').click();
+  await expect(page.locator('#creator')).toHaveClass(/show/);
+  record('visible-control-create', '#create → #creator.show', true, await page.locator('#creator').evaluate(el => el.classList.contains('show')));
+  await page.locator('#closeCreator').click();
+  await expect(page.locator('#creator')).not.toHaveClass(/show/);
+  record('visible-control-close-creator', '#closeCreator → #creator:not(.show)', false, await page.locator('#creator').evaluate(el => el.classList.contains('show')));
+  await page.locator('#create').click();
   await page.locator('#upload').click();
   await expect(page.locator('#source')).toHaveClass(/show/);
   record('open-upload-choices', '#upload → #source.show', true, await page.locator('#source').evaluate(el => el.classList.contains('show')));
   await page.screenshot({ path: path.join(OUT, '02-upload-choices.png') });
+
+  await page.locator('#chooseAlbum').click();
+  await expect(page.locator('#album')).toHaveClass(/show/);
+  record('visible-control-choose-album', '#chooseAlbum → #album.show', true, await page.locator('#album').evaluate(el => el.classList.contains('show')));
+  await page.locator('#albumClose').click();
+  await expect(page.locator('#album')).not.toHaveClass(/show/);
+  record('visible-control-album-close', '#albumClose → #album:not(.show)', false, await page.locator('#album').evaluate(el => el.classList.contains('show')));
+  await page.locator('#albumButton').click();
+  await page.locator('#albumPhoto').click();
+  await expect(page.locator('#confirm')).toHaveClass(/active/);
+  record('visible-control-album-photo-1', '#albumPhoto → #confirm.active', true, await page.locator('#confirm').evaluate(el => el.classList.contains('active')));
+  await page.locator('#retake').click();
+  await page.locator('#albumButton').click();
+  await page.locator('#albumPhoto3').click();
+  await expect(page.locator('#confirm')).toHaveClass(/active/);
+  record('visible-control-album-photo-3', '#albumPhoto3 → #confirm.active', true, await page.locator('#confirm').evaluate(el => el.classList.contains('active')));
+  await page.locator('#retake').click();
+  await page.locator('#closeCamera').click();
 
   await page.locator('#chooseCamera').click();
   await expect(page.locator('#camera')).toHaveClass(/active/);
@@ -81,6 +105,14 @@ test('camera upload contract and recovery states', async ({ page, browserName })
   await expect(page.locator('#serviceError')).toHaveClass(/active/);
   record('service-timeout', '#simulateTimeout → #serviceError.active', true, await page.locator('#serviceError').evaluate(el => el.classList.contains('active')));
   await page.screenshot({ path: path.join(OUT, '08-service-timeout.png') });
+  await page.locator('#backSources').click();
+  await expect(page.locator('#source')).toHaveClass(/show/);
+  record('service-back-sources', '#backSources → #source.show', true, await page.locator('#source').evaluate(el => el.classList.contains('show')));
+  await page.locator('#chooseCamera').click();
+  await page.locator('#shutter').click();
+  await page.locator('#usePhoto').click();
+  await expect(page.locator('#failed')).toHaveClass(/active/, { timeout: 3000 });
+  await page.locator('#simulateTimeout').click();
   await page.locator('#retryReview').click();
   await expect(page.locator('#reviewing')).toHaveClass(/active/);
   record('service-retry', '#retryReview → #reviewing.active', true, await page.locator('#reviewing').evaluate(el => el.classList.contains('active')));

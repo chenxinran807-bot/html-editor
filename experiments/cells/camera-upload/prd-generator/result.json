@@ -3,15 +3,15 @@
   "skillId": "prd-generator",
   "status": "PASS_WITH_CONCERNS",
   "scores": {
-    "fidelity": 17,
+    "fidelity": 15,
     "flowCoverage": 15,
-    "interaction": 18,
-    "visualHierarchy": 13,
+    "interaction": 17,
+    "visualHierarchy": 10,
     "edgeStates": 8,
     "stability": 9,
-    "handoff": 8
+    "handoff": 7
   },
-  "total": 88,
+  "total": 81,
   "artifacts": [
     "artifact/index.html",
     "artifact/assets/create.png",
@@ -47,7 +47,11 @@
   "deviations": [
     "Camera capture and remote review are deterministic simulations using the supplied local fixture assets.",
     "Reviewer records are reproducible but were not produced by an independent clean-context reviewer.",
-    "Browser QA defaults to the system Chrome executable on macOS; other environments must set QA_BROWSER_EXECUTABLE."
+    "Browser QA defaults to the system Chrome executable on macOS; other environments must set QA_BROWSER_EXECUTABLE.",
+    "Supplied full-screen screenshots are reused as media inside the prototype shell, producing duplicated status bars, close/flip/shutter controls, and mirrored text in camera-related views.",
+    "Menu and search are scope markers implemented as toast acknowledgements; album choices converge on one confirmation path.",
+    "A successful review, camera-permission denial, and empty-album state are not represented.",
+    "The exported canvas tokens document the inferred design system but the standalone canvas page does not consume tokens.css at runtime."
   ],
   "runtime": {
     "startedAt": "2026-07-13T11:51:16.300Z",

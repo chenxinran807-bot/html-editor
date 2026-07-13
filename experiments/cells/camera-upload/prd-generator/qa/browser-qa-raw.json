@@ -1,6 +1,6 @@
 {
-  "startedAt": "2026-07-13T12:23:37.861Z",
-  "finishedAt": "2026-07-13T12:23:44.605Z",
+  "startedAt": "2026-07-13T12:31:40.467Z",
+  "finishedAt": "2026-07-13T12:31:49.603Z",
   "url": "http://127.0.0.1:4183/",
   "browser": {
     "name": "chromium",
@@ -34,8 +34,50 @@
       "passed": true
     },
     {
+      "taskId": "visible-control-create",
+      "selector": "#create → #creator.show",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "visible-control-close-creator",
+      "selector": "#closeCreator → #creator:not(.show)",
+      "expected": false,
+      "observed": false,
+      "passed": true
+    },
+    {
       "taskId": "open-upload-choices",
       "selector": "#upload → #source.show",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "visible-control-choose-album",
+      "selector": "#chooseAlbum → #album.show",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "visible-control-album-close",
+      "selector": "#albumClose → #album:not(.show)",
+      "expected": false,
+      "observed": false,
+      "passed": true
+    },
+    {
+      "taskId": "visible-control-album-photo-1",
+      "selector": "#albumPhoto → #confirm.active",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "visible-control-album-photo-3",
+      "selector": "#albumPhoto3 → #confirm.active",
       "expected": true,
       "observed": true,
       "passed": true
@@ -106,6 +148,13 @@
     {
       "taskId": "service-timeout",
       "selector": "#simulateTimeout → #serviceError.active",
+      "expected": true,
+      "observed": true,
+      "passed": true
+    },
+    {
+      "taskId": "service-back-sources",
+      "selector": "#backSources → #source.show",
       "expected": true,
       "observed": true,
       "passed": true

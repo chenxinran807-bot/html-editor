@@ -23,7 +23,7 @@ The complete package is in `docs/prd/camera-upload/`: `prd.yaml`, `prd.md`, the 
 ## QA
 
 - Re-run with `npm install --prefix qa && qa/run-browser-qa.sh`.
-- Real-browser task run: 10/10 fixed tasks passed, plus menu/search/album-thumbnail and service-timeout recovery checks.
+- Real-browser task run: 10/10 fixed tasks passed, plus complete visible-control, album-thumbnail, and service-timeout recovery checks.
 - Console errors: 0; page errors: 0; process exit code: 0.
 - `qa/browser-qa-raw.json` records selectors, expected/observed values, timestamps, URL, browser metadata, console events, and page errors.
 - `qa/browser-qa-stdout.log` and `qa/browser-qa-execution.json` preserve stdout, command, server URL, timestamps, and exit status.
@@ -39,4 +39,4 @@ The complete package is in `docs/prd/camera-upload/`: `prd.yaml`, `prd.md`, the 
 
 ## Deviation
 
-The prototype simulates camera and review behavior with supplied local imagery; it does not request device camera permission or call a review service. Reviewer records were produced in the same execution context rather than by an independent clean-context reviewer, so the final status remains `PASS_WITH_CONCERNS`.
+The prototype simulates camera and review behavior with supplied local imagery; it does not request device camera permission or call a review service. The supplied imagery contains complete mobile screens and is reused inside another prototype shell, so camera-related views visibly duplicate status bars and close/flip/shutter controls and include mirrored source text. Menu/search only acknowledge clicks with toasts, and every album thumbnail converges on the same confirmation path. Successful review, permission-denied, and empty-album states are absent. `tokens.css` records inferred tokens but is not consumed by the standalone canvas page. Reviewer records were produced in the same execution context rather than by an independent clean-context reviewer, so the calibrated result is `PASS_WITH_CONCERNS` at 81/100.

@@ -9,7 +9,7 @@ cleanup() { kill "$SERVER_PID" 2>/dev/null || true; }
 trap cleanup EXIT
 
 for _ in 1 2 3 4 5; do
-  curl --noproxy localhost -fsS http://127.0.0.1:4183/ >/dev/null && break
+  curl --noproxy localhost -fsS http://127.0.0.1:4183/ >/dev/null 2>&1 && break
   sleep 1
 done
 
@@ -26,7 +26,6 @@ fs.writeFileSync("qa/browser-qa-execution.json",JSON.stringify({
   startedAt:process.env.STARTED_AT,
   finishedAt:process.env.FINISHED_AT,
   exitCode:Number(process.env.EXIT_CODE),
-  stdout:"qa/browser-qa-stdout.log",
-  serverLog:"qa/server.log"
+  stdout:"qa/browser-qa-stdout.log"
 },null,2));'
 exit "$EXIT_CODE"
