@@ -1,0 +1,44 @@
+{
+  "inputId": "camera-upload",
+  "skillId": "inspire-prototype",
+  "status": "PASS_WITH_CONCERNS",
+  "scores": {
+    "fidelity": 14,
+    "flowCoverage": 13,
+    "interaction": 16,
+    "visualHierarchy": 13,
+    "edgeStates": 8,
+    "stability": 9,
+    "handoff": 7
+  },
+  "total": 80,
+  "artifacts": [
+    "artifact/remote-asset.json",
+    "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net"
+  ],
+  "evidence": [
+    "run/generation.sanitized.json",
+    "run/commands.md",
+    "qa/raw/browser-qa.json",
+    "qa/raw/chrome-runtime-summary.json",
+    "qa/assessment.md",
+    "qa/screenshots/01-source-sheet.png",
+    "qa/screenshots/03-camera-front.png",
+    "qa/screenshots/06-confirm.png",
+    "qa/screenshots/08-moderating.png",
+    "qa/screenshots/09-review-failed.png",
+    "qa/screenshots/branch-success.png",
+    "qa/screenshots/branch-error.png"
+  ],
+  "deviations": [
+    "The failed-review and service-error re-upload controls do not restart upload or capture.",
+    "Failure guidance is generic and lacks the requested concrete compliance instructions.",
+    "The generated visual content uses remote placeholder photography instead of clearly reusing supplied fixture imagery.",
+    "Camera and moderation are explicitly simulated and do not call device or review services, as required for the demo."
+  ],
+  "runtime": {
+    "startedAt": "2026-07-13T12:35:46.367Z",
+    "finishedAt": "2026-07-13T12:39:23.894Z",
+    "durationMs": 217527
+  }
+}

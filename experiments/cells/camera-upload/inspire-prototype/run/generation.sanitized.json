@@ -1,0 +1,39 @@
+{
+  "status": "success",
+  "assetId": "6a54dba21afe4f0267392504",
+  "inboxCanvasId": "6a1fbf72fc6413028e2870d7",
+  "previewUrl": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
+  "inboxUrl": "https://inspire.bytedance.net/prototype/inbox",
+  "startedAt": "2026-07-13T12:35:46.367Z",
+  "finishedAt": "2026-07-13T12:39:23.894Z",
+  "compileErrors": [],
+  "runtimeErrors": [],
+  "sandbox": {
+    "compile": "success",
+    "captures": "16/16"
+  },
+  "skillTrace": {
+    "selected": ["built-in:mobile-shell"],
+    "activated": ["built-in:mobile-shell"],
+    "opened": ["built-in:mobile-shell"],
+    "warnings": []
+  },
+  "captureStates": [
+    "/",
+    "/?modal=create",
+    "/?modal=create&sheet=source",
+    "/camera?facing=back",
+    "/camera?facing=front",
+    "/album",
+    "/?modal=create&sheet=source",
+    "/camera/confirm?facing=back",
+    "/camera?facing=back",
+    "/moderating?mock=success",
+    "/?modal=result&status=success",
+    "/moderating?mock=fail",
+    "/?modal=result&status=fail",
+    "/?modal=create&sheet=source",
+    "/moderating?mock=error",
+    "/?modal=result&status=error"
+  ]
+}

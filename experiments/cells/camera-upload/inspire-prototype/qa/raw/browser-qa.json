@@ -1,0 +1,149 @@
+{
+  "preview": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
+  "viewport": {
+    "width": 390,
+    "height": 844,
+    "mobile": true
+  },
+  "status": "FAIL",
+  "tasks": [
+    {
+      "id": 1,
+      "name": "打开创建形象并显示照片来源",
+      "status": "PASS",
+      "started": "2026-07-13T12:46:38.020Z",
+      "ended": "2026-07-13T12:46:38.391Z",
+      "state": {
+        "url": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net/?modal=create&sheet=source",
+        "path": "/",
+        "search": "?modal=create&sheet=source",
+        "text": "20:46\n穿搭\n直播\n推荐\n打开创建形象 (演示)\n首页\n朋友\n+\n消息\n我\n创建我的试穿形象\n上传1张\n面部清晰\n照片，即可开始试穿\n上传1张照片\n正脸照片\n面部无遮挡\n单人照片\n已阅读并同意试穿功能用户协议\n选择照片来源\n上传 1 张面部清晰的照片创建试穿形象\n拍照从相册选择\n取消"
+      }
+    },
+    {
+      "id": 2,
+      "name": "进入相机",
+      "status": "PASS",
+      "started": "2026-07-13T12:46:38.392Z",
+      "ended": "2026-07-13T12:46:38.580Z",
+      "state": {
+        "url": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net/camera?facing=back",
+        "path": "/camera",
+        "search": "?facing=back",
+        "text": "20:46\n翻转\n闪光灯\n相册"
+      }
+    },
+    {
+      "id": 3,
+      "name": "翻转前后摄像头",
+      "status": "PASS",
+      "started": "2026-07-13T12:46:38.581Z",
+      "ended": "2026-07-13T12:46:38.779Z",
+      "state": {
+        "url": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net/camera?facing=front",
+        "path": "/camera",
+        "search": "?facing=front",
+        "text": "20:46\n翻转\n闪光灯\n相册"
+      }
+    },
+    {
+      "id": 4,
+      "name": "打开相册并返回相机",
+      "status": "PASS",
+      "started": "2026-07-13T12:46:38.780Z",
+      "ended": "2026-07-13T12:46:39.110Z",
+      "state": {
+        "url": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net/camera?facing=front",
+        "path": "/camera",
+        "search": "?facing=front",
+        "text": "20:46\n翻转\n闪光灯\n相册"
+      }
+    },
+    {
+      "id": 5,
+      "name": "关闭相机回到照片来源",
+      "status": "PASS",
+      "started": "2026-07-13T12:46:39.111Z",
+      "ended": "2026-07-13T12:46:39.367Z",
+      "state": {
+        "url": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net/?modal=create&sheet=source",
+        "path": "/",
+        "search": "?modal=create&sheet=source",
+        "text": "20:46\n穿搭\n直播\n推荐\n打开创建形象 (演示)\n首页\n朋友\n+\n消息\n我\n创建我的试穿形象\n上传1张\n面部清晰\n照片，即可开始试穿\n上传1张照片\n正脸照片\n面部无遮挡\n单人照片\n已阅读并同意试穿功能用户协议\n选择照片来源\n上传 1 张面部清晰的照片创建试穿形象\n拍照从相册选择\n取消"
+      }
+    },
+    {
+      "id": 6,
+      "name": "快门进入照片确认",
+      "status": "PASS",
+      "started": "2026-07-13T12:46:39.368Z",
+      "ended": "2026-07-13T12:46:39.877Z",
+      "state": {
+        "url": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net/camera/confirm?facing=front",
+        "path": "/camera/confirm",
+        "search": "?facing=front",
+        "text": "20:46\n重拍\n使用照片"
+      }
+    },
+    {
+      "id": 7,
+      "name": "重拍并保留摄像头方向",
+      "status": "PASS",
+      "started": "2026-07-13T12:46:39.890Z",
+      "ended": "2026-07-13T12:46:40.120Z",
+      "state": {
+        "url": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net/camera?facing=front",
+        "path": "/camera",
+        "search": "?facing=front",
+        "text": "20:46\n翻转\n闪光灯\n相册"
+      }
+    },
+    {
+      "id": 8,
+      "name": "使用照片进入明确审核加载态",
+      "status": "PASS",
+      "started": "2026-07-13T12:46:40.120Z",
+      "ended": "2026-07-13T12:46:40.596Z",
+      "state": {
+        "url": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net/moderating?mock=fail",
+        "path": "/moderating",
+        "search": "?mock=fail",
+        "text": "20:46\n照片审核中... (演示)"
+      }
+    },
+    {
+      "id": 9,
+      "name": "审核失败显示具体合规指导",
+      "status": "PASS",
+      "started": "2026-07-13T12:46:40.597Z",
+      "ended": "2026-07-13T12:46:42.230Z",
+      "state": {
+        "url": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net/?modal=result&status=fail",
+        "path": "/",
+        "search": "?modal=result&status=fail",
+        "text": "20:46\n穿搭\n直播\n推荐\n打开创建形象 (演示)\n首页\n朋友\n+\n消息\n我\n创建我的试穿形象\n上传1张\n面部清晰\n照片，即可开始试穿\n照片内容不符合规范，请重新上传\n重新上传\n完成"
+      }
+    },
+    {
+      "id": 10,
+      "name": "重新上传回到照片来源",
+      "status": "FAIL",
+      "started": "2026-07-13T12:46:42.231Z",
+      "ended": "2026-07-13T12:46:50.390Z",
+      "error": "Timed out: text 拍照",
+      "state": {
+        "url": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net/?modal=result&status=fail",
+        "path": "/",
+        "search": "?modal=result&status=fail",
+        "text": "20:46\n穿搭\n直播\n推荐\n打开创建形象 (演示)\n首页\n朋友\n+\n消息\n我\n创建我的试穿形象\n上传1张\n面部清晰\n照片，即可开始试穿\n照片内容不符合规范，请重新上传\n重新上传\n完成"
+      }
+    }
+  ],
+  "branchChecks": {
+    "success": "PASS",
+    "serviceErrorDisplayed": "PASS",
+    "serviceErrorReupload": "FAIL"
+  },
+  "consoleErrors": [],
+  "exceptions": []
+}

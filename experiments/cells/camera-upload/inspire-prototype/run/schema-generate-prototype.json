@@ -1,0 +1,6 @@
+{
+  "command": "generate prototype",
+  "schemaResolved": true,
+  "requiredArgumentsObserved": ["prompt"],
+  "outputMode": "json"
+}

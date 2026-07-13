@@ -1,0 +1,11 @@
+{
+  "kind": "inspire-prototype-remote-asset",
+  "assetId": "6a54dba21afe4f0267392504",
+  "inboxCanvasId": "6a1fbf72fc6413028e2870d7",
+  "previewUrl": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
+  "inboxUrl": "https://inspire.bytedance.net/prototype/inbox",
+  "status": "success",
+  "outputType": "react",
+  "compileStatus": "success",
+  "captureCount": 16
+}
