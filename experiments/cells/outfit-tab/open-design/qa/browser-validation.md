@@ -2,7 +2,7 @@
 
 Preview tested: `http://localhost:8289/opendesign/mockups/outfit-tab/index.html`
 
-Browser: Chrome, real local HTTP navigation. Console errors: 0.
+Browser: Chrome, real local HTTP navigation. Console/page errors: 0. Babel emits its expected prototype-only precompile warning; this is captured in the raw log and treated as a handoff concern rather than an application error.
 
 ## Fixed-task evidence
 
@@ -19,13 +19,24 @@ Browser: Chrome, real local HTTP navigation. Console errors: 0.
 - `qa/screenshots/01-entry.png` — entry/feed state.
 - `qa/screenshots/02-detail-guidance.png` — intermediate detail/guidance state.
 - `qa/screenshots/03-ai-try-on-result.png` — result/AI try-on entry state.
+- `qa/screenshots/04-react-entry.png` — React entry from the reproducible CDP run.
+- `qa/screenshots/05-react-detail.png` — React guidance state from the reproducible CDP run.
+- `qa/screenshots/06-react-ai-result.png` — React AI result from the reproducible CDP run.
+
+## Reproduction
+
+With the artifact served on port 8289, run:
+
+`node experiments/cells/outfit-tab/open-design/qa/run-browser-qa.mjs`
+
+The script launches an isolated headless Chrome, clears storage, follows all five fixed tasks continuously from entry, exercises AI failure/retry, refreshes the page, checks restored category/screen state, captures screenshots, and overwrites `qa/browser-qa-raw.json` with raw console/page events and assertions.
 
 ## Additional interaction coverage
 
 - Like produces positive recommendation feedback.
 - Dislike removes the card and shows a recoverable empty state.
 - Same-item and lower-cost alternative both open product sheets.
-- AI styling and AI try-on both provide loading and destination states.
+- AI styling provides a disabled loading task, a failure state, and retry; AI try-on provides disabled loading and a destination state.
 - Active category and current screen persist through `localStorage`; “重置演示” clears demo state.
 - All primary mobile controls meet or exceed the 44 px target.
 

@@ -1,34 +1,40 @@
 {
   "inputId": "outfit-tab",
   "skillId": "open-design",
-  "status": "PASS",
+  "status": "PASS_WITH_CONCERNS",
   "scores": {
     "fidelity": 18,
     "flowCoverage": 15,
-    "interaction": 19,
+    "interaction": 20,
     "visualHierarchy": 14,
-    "edgeStates": 9,
+    "edgeStates": 10,
     "stability": 10,
-    "handoff": 10
+    "handoff": 9
   },
-  "total": 95,
+  "total": 96,
   "artifacts": [
     "artifact/opendesign/index.html",
     "artifact/opendesign/manifest.json",
-    "artifact/opendesign/mockups/outfit-tab/index.html"
+    "artifact/opendesign/mockups/outfit-tab/index.html",
+    "artifact/opendesign/mockups/outfit-tab/DEPENDENCIES.md"
   ],
   "evidence": [
     "run/intake.md records all intake inferences and the no-NEEDS_CONTEXT decision.",
-    "qa/browser-validation.md records PASS evidence for all five fixed tasks in a real Chrome session with zero console errors.",
+    "qa/browser-validation.md records PASS evidence for all five fixed tasks in real Chrome with zero console/page errors.",
+    "qa/run-browser-qa.mjs is a reproducible isolated-Chrome harness covering continuous fixed tasks, AI failure/retry, screenshots, and refresh persistence.",
+    "qa/browser-qa-raw.json contains the raw browser assertions, console events, page events, and persisted localStorage values.",
     "qa/screenshots/01-entry.png captures the entry/feed state.",
     "qa/screenshots/02-detail-guidance.png captures the intermediate suitability/formula/avoidance state.",
     "qa/screenshots/03-ai-try-on-result.png captures the AI try-on destination state.",
     "qa/score-evidence.md provides dimension-by-dimension scoring evidence."
   ],
-  "deviations": [],
+  "deviations": [
+    "The Open Design setup/run/verifier subagents could not be derived in the assigned cell execution context; setup and serving were run directly, and verification used a separate reproducible headless Chrome process instead.",
+    "Babel Standalone is vendored for readable in-browser JSX and emits a prototype-only precompile warning; no console error or page exception occurs."
+  ],
   "runtime": {
     "startedAt": "2026-07-13T09:40:00.000Z",
-    "finishedAt": "2026-07-13T10:06:46.000Z",
-    "durationMs": 1606000
+    "finishedAt": "2026-07-13T10:20:00.000Z",
+    "durationMs": 2400000
   }
 }
