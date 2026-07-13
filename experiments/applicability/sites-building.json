@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "recordType": "skill-applicability",
+  "skillId": "sites-building",
+  "assessmentScope": "frozen-prd-to-interactive-prototype-experiment",
+  "status": "NOT_APPLICABLE",
+  "excludedFromRanking": true,
+  "decisionBasis": {
+    "canBuildRequestedInterfaces": true,
+    "nativePurpose": "Build, validate and normally publish complete websites and web applications through the Sites project and hosting workflow.",
+    "dedicatedPrdToPrototypeEvaluationFlow": false,
+    "comparisonRisk": "Using a general website builder would measure broad implementation and hosting capability rather than a purpose-built PRD-to-interactive-prototype skill workflow."
+  },
+  "inputs": [
+    {
+      "inputId": "outfit-tab",
+      "fixture": "experiments/cells/outfit-tab/pm-kakaxi/input/source.md",
+      "fixtureSha256": "e46b07945ac39e9c17ecf12b7b53a1963765830fb185bf77019f4d1555b9fc55",
+      "buildFeasibility": "FEASIBLE",
+      "experimentApplicability": "NOT_APPLICABLE",
+      "reason": "The interface could be implemented as a site, but the skill supplies no specialized frozen-PRD ingestion, prototype task contract, or comparable prototype scoring workflow."
+    },
+    {
+      "inputId": "camera-upload",
+      "fixture": "experiments/cells/camera-upload/pm-kakaxi/input/source.md",
+      "fixtureSha256": "01ac64112ba1d1868677d3e6dda657cbd7a682aad37431066f005b43fd888fce",
+      "buildFeasibility": "FEASIBLE",
+      "experimentApplicability": "NOT_APPLICABLE",
+      "reason": "The simulated camera journey could be implemented as a web application, but the skill supplies no specialized frozen-PRD ingestion, prototype task contract, or comparable prototype scoring workflow."
+    }
+  ],
+  "conclusion": "Sites remains a valid adjacent implementation capability, but it is excluded from this prototype-skill ranking because its native workflow evaluates building and publishing sites rather than PRD-to-prototype specialization."
+}

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "recordType": "skill-applicability",
+  "skillId": "figma-flow-to-html-demo",
+  "assessmentScope": "frozen-prd-to-interactive-prototype-experiment",
+  "status": "NOT_APPLICABLE",
+  "excludedFromRanking": true,
+  "decisionBasis": {
+    "skillTrigger": "Requires static flow diagrams plus corresponding UI cutouts and an intent to create a clickable HTML demo.",
+    "hardGates": [
+      {
+        "id": "gate-1-flow-confirmation",
+        "requirement": "A numbered page flow chain with transition triggers must be presented and explicitly confirmed before continuing.",
+        "satisfied": false
+      },
+      {
+        "id": "cutout-availability",
+        "requirement": "Corresponding independent UI cutouts must be supplied after Gate 1; full screenshots alone do not satisfy this requirement.",
+        "satisfied": false
+      },
+      {
+        "id": "coordinate-source",
+        "requirement": "Each overlay and hotspot needs coordinates from user CSS parameters, Figma nodes, or measurement after the required one-time coordinate-source question.",
+        "satisfied": false
+      },
+      {
+        "id": "gate-2-mapping-confirmation",
+        "requirement": "The complete asset-to-page mapping, coordinates, missing-assets list and motion plan must be explicitly confirmed before HTML is written.",
+        "satisfied": false
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "inputId": "outfit-tab",
+      "fixture": "experiments/cells/outfit-tab/pm-kakaxi/input/source.md",
+      "fixtureSha256": "e46b07945ac39e9c17ecf12b7b53a1963765830fb185bf77019f4d1555b9fc55",
+      "assetCount": 13,
+      "observed": {
+        "prdPresent": true,
+        "staticScreenshotsPresent": true,
+        "confirmedOrderedFlowChain": false,
+        "correspondingIndependentCutouts": false,
+        "figmaOrCssCoordinateSource": false,
+        "confirmedCoordinateMapping": false
+      },
+      "status": "NOT_APPLICABLE",
+      "missingRequirements": [
+        "Explicit confirmation of the numbered page flow and every transition trigger",
+        "Independent UI cutouts mapped to each visible region",
+        "A coordinate source for overlays and hotspots",
+        "Explicit confirmation of the coordinate-bearing asset mapping and missing-assets list"
+      ]
+    },
+    {
+      "inputId": "camera-upload",
+      "fixture": "experiments/cells/camera-upload/pm-kakaxi/input/source.md",
+      "fixtureSha256": "01ac64112ba1d1868677d3e6dda657cbd7a682aad37431066f005b43fd888fce",
+      "assetCount": 13,
+      "observed": {
+        "prdPresent": true,
+        "staticScreenshotsPresent": true,
+        "confirmedOrderedFlowChain": false,
+        "correspondingIndependentCutouts": false,
+        "figmaOrCssCoordinateSource": false,
+        "confirmedCoordinateMapping": false
+      },
+      "status": "NOT_APPLICABLE",
+      "missingRequirements": [
+        "Explicit confirmation of the numbered camera-state flow and every transition trigger",
+        "Independent UI cutouts rather than only full-state screenshots and reference images",
+        "A coordinate source for controls, overlays and transparent hotspots",
+        "Explicit confirmation of the coordinate-bearing asset mapping and missing-assets list"
+      ]
+    }
+  ],
+  "conclusion": "Neither frozen input can pass both mandatory confirmation gates. Generating HTML would violate the skill's explicit pre-code red line, so no execution or score is recorded."
+}
