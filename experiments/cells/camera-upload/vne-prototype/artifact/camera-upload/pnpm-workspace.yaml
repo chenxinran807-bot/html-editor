@@ -1,0 +1,7 @@
+allowBuilds:
+  '@cloud-materials/charts-common': true
+  '@cloud-materials/common': true
+  core-js-pure: true
+  es5-ext: true
+  esbuild: true
+  fsevents: true

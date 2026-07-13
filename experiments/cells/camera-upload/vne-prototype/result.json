@@ -1,0 +1,52 @@
+{
+  "inputId": "camera-upload",
+  "skillId": "vne-prototype",
+  "status": "PASS_WITH_CONCERNS",
+  "scores": {
+    "fidelity": 15,
+    "flowCoverage": 15,
+    "interaction": 18,
+    "visualHierarchy": 11,
+    "edgeStates": 7,
+    "stability": 10,
+    "handoff": 8
+  },
+  "total": 84,
+  "artifacts": [
+    "camera-upload-ui-spec.md",
+    "prototype.manifest.json",
+    "artifact/camera-upload/prototype.manifest.json",
+    "artifact/camera-upload/src/App.tsx",
+    "artifact/camera-upload/src/pages/HomePage.tsx",
+    "artifact/camera-upload/src/pages/camera-upload.css",
+    "artifact/camera-upload/dist/index.html",
+    "README.md"
+  ],
+  "evidence": [
+    "run/native-run.md",
+    "qa/quality-report.md",
+    "artifact/camera-upload/qa/browser-qa.spec.cjs",
+    "artifact/camera-upload/qa/browser-qa-raw.json",
+    "artifact/camera-upload/qa/browser-qa.stdout.txt",
+    "artifact/camera-upload/qa/browser-qa.exit-code.txt",
+    "artifact/camera-upload/qa/01-entry.png",
+    "artifact/camera-upload/qa/02-upload-choices.png",
+    "artifact/camera-upload/qa/03-camera.png",
+    "artifact/camera-upload/qa/04-album.png",
+    "artifact/camera-upload/qa/05-confirm.png",
+    "artifact/camera-upload/qa/06-reviewing.png",
+    "artifact/camera-upload/qa/07-review-failure.png"
+  ],
+  "deviations": [
+    "Camera capture and remote review are deterministic local simulations; no device permission request or review service is invoked.",
+    "The required VNE standard console shell frames a mobile interaction preview rather than reproducing the source application as a full-screen mobile product.",
+    "Supplied full-screen camera captures are used as preview media beneath generated camera controls, so some source chrome remains visible.",
+    "The official scaffold omitted the internal-registry .npmrc described by VNE build guidance; initialization required adding it and explicitly approving the six build-script dependencies reported by pnpm 11.",
+    "Browser QA validates the ten contracted failure-path tasks at 1280×900; a review-success branch and a second viewport are not asserted."
+  ],
+  "runtime": {
+    "startedAt": "2026-07-13T12:34:45.045Z",
+    "finishedAt": "2026-07-13T13:00:59.951Z",
+    "durationMs": 1574906
+  }
+}

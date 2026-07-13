@@ -1,0 +1,112 @@
+{
+  "startedAt": "2026-07-13T12:57:06.802Z",
+  "finishedAt": "2026-07-13T12:57:11.909Z",
+  "url": "http://127.0.0.1:5173/",
+  "browser": {
+    "name": "chromium",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/139.0.0.0 Safari/537.36",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  },
+  "steps": [
+    {
+      "taskId": "open-upload-choices",
+      "selector": "#upload-photo → #choose-camera + #choose-album",
+      "expected": true,
+      "observed": true,
+      "passed": true,
+      "at": "2026-07-13T12:57:07.627Z"
+    },
+    {
+      "taskId": "enter-camera",
+      "selector": "#choose-camera → .screen-camera",
+      "expected": true,
+      "observed": true,
+      "passed": true,
+      "at": "2026-07-13T12:57:08.118Z"
+    },
+    {
+      "taskId": "flip-camera",
+      "selector": "#flip-camera → [data-facing]",
+      "expected": "front",
+      "observed": "front",
+      "passed": true,
+      "at": "2026-07-13T12:57:08.624Z"
+    },
+    {
+      "taskId": "open-album",
+      "selector": "#open-album → .screen-album",
+      "expected": true,
+      "observed": true,
+      "passed": true,
+      "at": "2026-07-13T12:57:08.667Z"
+    },
+    {
+      "taskId": "close-camera",
+      "selector": "#close-camera → #choose-camera",
+      "expected": true,
+      "observed": true,
+      "passed": true,
+      "at": "2026-07-13T12:57:08.827Z"
+    },
+    {
+      "taskId": "shutter",
+      "selector": "#shutter → .screen-confirm",
+      "expected": true,
+      "observed": true,
+      "passed": true,
+      "at": "2026-07-13T12:57:10.698Z"
+    },
+    {
+      "taskId": "retake",
+      "selector": "#retake → .screen-camera",
+      "expected": true,
+      "observed": true,
+      "passed": true,
+      "at": "2026-07-13T12:57:10.826Z"
+    },
+    {
+      "taskId": "use-photo",
+      "selector": "#use-photo → .screen-reviewing",
+      "expected": true,
+      "observed": true,
+      "passed": true,
+      "at": "2026-07-13T12:57:10.895Z"
+    },
+    {
+      "taskId": "review-failure",
+      "selector": ".screen-reviewing → .screen-failed",
+      "expected": true,
+      "observed": true,
+      "passed": true,
+      "at": "2026-07-13T12:57:11.819Z"
+    },
+    {
+      "taskId": "retry",
+      "selector": "#retry → #choose-camera",
+      "expected": true,
+      "observed": true,
+      "passed": true,
+      "at": "2026-07-13T12:57:11.909Z"
+    }
+  ],
+  "taskPassCount": 10,
+  "consoleEvents": [
+    {
+      "type": "debug",
+      "text": "[vite] connecting..."
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected."
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold"
+    }
+  ],
+  "pageErrors": []
+}

@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "productId": "camera-upload",
+  "pages": [
+    {
+      "pageId": "camera-upload",
+      "title": "AI 试穿形象",
+      "bindings": [
+        { "key": "page.title", "type": "text", "label": "页标题", "default": "AI 试穿形象", "pageId": "camera-upload", "specRef": "§7" },
+        { "key": "upload.cta", "type": "text", "label": "上传按钮", "default": "上传 1 张照片", "pageId": "camera-upload", "specRef": "§7" },
+        { "key": "review.failureTitle", "type": "text", "label": "失败标题", "default": "照片暂时无法使用", "pageId": "camera-upload", "specRef": "§7" },
+        { "key": "token.primary", "type": "token", "label": "主色", "default": "#165DFF", "pageId": "camera-upload", "specRef": "§7" }
+      ]
+    }
+  ]
+}
