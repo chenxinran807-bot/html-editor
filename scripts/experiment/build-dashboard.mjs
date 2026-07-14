@@ -6,6 +6,55 @@ import { validateResult } from './validate-result.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const dimensions = ['fidelity', 'flowCoverage', 'interaction', 'visualHierarchy', 'edgeStates', 'stability', 'handoff'];
+const experimentSettings = [
+  {
+    id: 'inputs',
+    title: '输入',
+    items: [
+      '穿搭 Tab 迭代方案',
+      'AI 试穿相机上传 PRD',
+      '两份飞书文档均固化为独立本地输入，供各实验单元重复使用',
+    ],
+  },
+  {
+    id: 'skills',
+    title: '参测 Skill 及来源',
+    items: [
+      'Open Design：本机安装的 Open Design 桌面应用内置能力',
+      'huashu-design：下载到实验环境的本地 Skill 包',
+      'prd-generator：安装在本机 Codex Skills 目录中的本地 Skill',
+      'pm-kakaxi-skills：安装在本机 Codex Skills 目录中的本地 Skill，作者标记为 pengmingyu，版本 2.1.0',
+      'vne-prototype：安装在本机 Codex Skills 目录中的本地 Skill，版本 1.0.3',
+      'inspire-prototype：由全局安装的 @byted-inspire/prototype-cli 提供的内置 Skill',
+    ],
+  },
+  {
+    id: 'execution',
+    title: '执行主体与方式',
+    items: [
+      'Codex 主 Agent 负责编排、实验约束、汇总与统一验收',
+      '独立 Subagent 按“一个输入 × 一个 Skill”执行实验任务',
+      '平台型 Skill 通过各自原生 CLI、MCP 或托管生成流程产出原型',
+      '共设置 12 个隔离实验单元，即 2 份输入 × 6 个 Skill',
+      '每个单元只读取自身输入和对应 Skill 允许使用的资源，不读取其他实验单元的产物',
+      '按各 Skill 自身标准流程生成，不人为统一技术栈、页面数量或视觉风格',
+      '对实际产物执行固定任务和浏览器验证；失败、阻断或偏离均保留记录',
+    ],
+  },
+  {
+    id: 'dimensions',
+    title: '评分维度',
+    items: [
+      { label: '需求忠实度', points: 20 },
+      { label: '流程覆盖', points: 15 },
+      { label: '交互', points: 20 },
+      { label: '视觉层级', points: 15 },
+      { label: '边界状态', points: 10 },
+      { label: '稳定性', points: 10 },
+      { label: '交付质量', points: 10 },
+    ],
+  },
+];
 const args = process.argv.slice(2);
 const outputFlag = args.indexOf('--output');
 const output = outputFlag >= 0 ? path.resolve(root, args[outputFlag + 1]) : path.join(root, 'comparison/native-experiment');
@@ -244,6 +293,7 @@ async function build() {
   const data = {
     summary: { resultCount: results.length, scoredCount: results.filter((row) => Number.isFinite(row.effectScore)).length, blockedCount: results.filter((row) => row.status === 'BLOCKED').length, averageScore: Math.round(results.filter((row) => Number.isFinite(row.effectScore)).reduce((sum, row) => sum + row.effectScore, 0) / results.filter((row) => Number.isFinite(row.effectScore)).length) },
     dimensions,
+    experimentSettings,
     rankings,
     results,
     crossInput,
@@ -257,11 +307,22 @@ async function build() {
   console.log(`Validated ${results.length}/12 results; dashboard written to ${path.relative(root, output) || '.'}`);
 }
 
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+}[character]));
+
+const experimentSettingsHtml = () => experimentSettings.map((setting) => `<article class="card experiment-setting" data-setting-id="${escapeHtml(setting.id)}"><h3>${escapeHtml(setting.title)}</h3><ul>${setting.items.map((item) => `<li>${escapeHtml(typeof item === 'string' ? item : `${item.label}：${item.points} 分`)}</li>`).join('')}</ul></article>`).join('');
+
 function dashboardHtml() {
   return `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>原型能力实验对比</title>
-<style>:root{color-scheme:dark;--bg:#09111f;--panel:#111d31;--line:#263653;--text:#edf4ff;--muted:#9fb0ca;--accent:#69e4c4}*{box-sizing:border-box}body{margin:0;font:14px/1.5 ui-sans-serif,system-ui;background:radial-gradient(circle at 10% 0,#18345b,transparent 32%),var(--bg);color:var(--text)}main{max-width:1440px;margin:auto;padding:32px}h1{font-size:32px;margin:0 0 8px}h2{margin-top:42px}h3{margin:24px 0 12px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.card{background:rgba(17,29,49,.94);border:1px solid var(--line);border-radius:16px;padding:18px;overflow:auto}.metric{font-size:28px;font-weight:800;color:var(--accent)}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}.bar{height:8px;background:#263653;border-radius:8px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#6f8cff,var(--accent))}.prototype-effect{min-width:250px}.prototype-effect div{margin:4px 0 8px;color:var(--muted)}.prototype-effect a{display:inline-block;padding:5px 10px;border:1px solid #4d729a;border-radius:8px;color:#8fdcff;text-decoration:none}.deviation{border-left:3px solid #ffb86b;padding-left:10px;margin:8px 0}@media(max-width:700px){main{padding:18px}table{font-size:12px}}</style></head>
+<style>:root{color-scheme:dark;--bg:#09111f;--panel:#111d31;--line:#263653;--text:#edf4ff;--muted:#9fb0ca;--accent:#69e4c4}*{box-sizing:border-box}body{margin:0;font:14px/1.5 ui-sans-serif,system-ui;background:radial-gradient(circle at 10% 0,#18345b,transparent 32%),var(--bg);color:var(--text)}main{max-width:1440px;margin:auto;padding:32px}h1{font-size:32px;margin:0 0 8px}h2{margin-top:42px}h3{margin:24px 0 12px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{background:rgba(17,29,49,.94);border:1px solid var(--line);border-radius:16px;padding:18px;overflow:auto}.experiment-setting h3{margin:0 0 12px;color:var(--accent)}.experiment-setting ul{margin:0;padding-left:20px}.experiment-setting li+li{margin-top:7px}.metric{font-size:28px;font-weight:800;color:var(--accent)}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}.bar{height:8px;background:#263653;border-radius:8px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#6f8cff,var(--accent))}.prototype-effect{min-width:250px}.prototype-effect div{margin:4px 0 8px;color:var(--muted)}.prototype-effect a{display:inline-block;padding:5px 10px;border:1px solid #4d729a;border-radius:8px;color:#8fdcff;text-decoration:none}.deviation{border-left:3px solid #ffb86b;padding-left:10px;margin:8px 0}@media(max-width:700px){main{padding:18px}.settings-grid{grid-template-columns:1fr}table{font-size:12px}}</style></head>
 <body><main><h1>原型能力实验对比</h1><p class="muted">聚焦不同 Skill 在两份 PRD 下实际生成的原型效果；未产出可评估原型的实验不参与排名。</p>
+<section><h2>实验设置</h2><div id="settings" class="settings-grid">${experimentSettingsHtml()}</div></section>
 <section><h2>跨输入比较</h2><div id="cross" class="card"></div></section>
 <section><h2>概览</h2><div id="overview" class="grid"></div></section>
 <section><h2>相机上传排名</h2><div id="rank-camera" class="card"></div></section>
@@ -276,6 +337,7 @@ const inputLabel={"camera-upload":'相机上传',"outfit-tab":'穿搭 Tab'};
 const dimensionLabel={fidelity:'还原度',flowCoverage:'流程覆盖',interaction:'交互',visualHierarchy:'视觉层级',edgeStates:'边界状态',stability:'稳定性',handoff:'交付质量'};
 const effectLevel=total=>total==null?'未生成可评估原型':total>=85?'优秀':total>=80?'良好':total>=70?'可用，仍需改进':'较弱';
 fetch('data.json').then(r=>r.json()).then(d=>{
+ settings.innerHTML=d.experimentSettings.map(setting=>'<article class="card experiment-setting" data-setting-id="'+esc(setting.id)+'"><h3>'+esc(setting.title)+'</h3><ul>'+setting.items.map(item=>'<li>'+esc(typeof item==='string'?item:item.label+'：'+item.points+' 分')+'</li>').join('')+'</ul></article>').join('');
  overview.innerHTML=[['实验结果',d.summary.resultCount],['可评估原型',d.summary.scoredCount],['平均效果分',d.summary.averageScore]].map(x=>'<div class="card"><div class="metric">'+x[1]+'</div>'+x[0]+'</div>').join('');
  const ranking=id=>table(['排名','技能正式名称','原型生成效果','效果分'],d.rankings[id].map(x=>[x.rank,esc(x.capabilityName),esc(effectLevel(x.effectScore)+'：'+x.effectZh),x.effectScore]));
  document.querySelector('#rank-camera').innerHTML=ranking('camera-upload');document.querySelector('#rank-outfit').innerHTML=ranking('outfit-tab');
