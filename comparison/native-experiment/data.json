@@ -3,7 +3,7 @@
     "resultCount": 12,
     "scoredCount": 11,
     "blockedCount": 1,
-    "averageScore": 77
+    "averageScore": 75
   },
   "dimensions": [
     "fidelity",
@@ -824,6 +824,165 @@
     "camera-upload": [
       {
         "inputId": "camera-upload",
+        "skillId": "inspire-prototype",
+        "status": "PASS_WITH_CONCERNS",
+        "scores": {
+          "fidelity": 13,
+          "flowCoverage": 13,
+          "interaction": 15,
+          "visualHierarchy": 12,
+          "edgeStates": 6,
+          "stability": 9,
+          "handoff": 6
+        },
+        "total": 74,
+        "artifacts": [
+          {
+            "value": "artifact/remote-asset.json",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/artifact/remote-asset.json",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/artifact/remote-asset.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
+            "href": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
+            "external": true,
+            "exists": true
+          }
+        ],
+        "evidence": [
+          {
+            "value": "run/generation.sanitized.json",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/run/generation.sanitized.json",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/run/generation.sanitized.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "run/asset-report.sanitized.json",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/run/asset-report.sanitized.json",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/run/asset-report.sanitized.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "run/native-evidence-availability.md",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/run/native-evidence-availability.md",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/run/native-evidence-availability.md",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "run/commands.md",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/run/commands.md",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/run/commands.md",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/raw/browser-qa.json",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/raw/browser-qa.json",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/raw/browser-qa.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/raw/chrome-runtime-summary.json",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/raw/chrome-runtime-summary.json",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/raw/chrome-runtime-summary.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/assessment.md",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/assessment.md",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/assessment.md",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/screenshots/01-source-sheet.png",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/01-source-sheet.png",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/01-source-sheet.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/screenshots/03-camera-front.png",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/03-camera-front.png",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/03-camera-front.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/screenshots/06-confirm.png",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/06-confirm.png",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/06-confirm.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/screenshots/08-moderating.png",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/08-moderating.png",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/08-moderating.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/screenshots/09-review-failed.png",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/09-review-failed.png",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/09-review-failed.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/screenshots/branch-success.png",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/branch-success.png",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/branch-success.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/screenshots/branch-error.png",
+            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/branch-error.png",
+            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/branch-error.png",
+            "external": false,
+            "exists": true
+          }
+        ],
+        "deviations": [
+          "Both re-upload controls are non-functional: neither failed-review nor service-error recovery restarts upload or capture.",
+          "Failure guidance is generic and lacks the requested concrete compliance instructions.",
+          "Food, landscape and generic-person placeholder photography conflicts with the clear single-person frontal-face objective and does not clearly reuse supplied fixture imagery.",
+          "The original generation NDJSON was not persisted; the saved native report is a field-level sanitized asset query, while generation metadata is a compact derived record with reduced event-level auditability.",
+          "Camera and moderation are explicitly simulated and do not call device or review services, as required for the demo."
+        ],
+        "runtime": {
+          "startedAt": "2026-07-13T12:35:46.367Z",
+          "finishedAt": "2026-07-13T12:39:23.894Z",
+          "durationMs": 217527
+        },
+        "deviationsZh": [
+          "审核失败与服务异常页面的“重新上传”均不可用，无法重新开始上传或拍摄。",
+          "失败指导过于笼统，食物、风景和泛人物占位图也不符合清晰单人正脸目标。",
+          "原始生成 NDJSON 未保存，现有报告为字段级脱敏查询和压缩后的生成记录。",
+          "相机与内容审核均为演示模拟，没有调用真实设备或审核服务。"
+        ],
+        "effectZh": "对原 PRD 七分屏创建形象结构的还原最完整，整体视觉和流程最接近原始方案。",
+        "effectScore": 92,
+        "capabilityName": "inspire-prototype",
+        "resultHref": "../../experiments/cells/camera-upload/inspire-prototype/result.json",
+        "prototype": {
+          "value": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
+          "href": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
+          "external": true,
+          "exists": true
+        },
+        "rank": 1
+      },
+      {
+        "inputId": "camera-upload",
         "skillId": "pm-kakaxi",
         "status": "PASS_WITH_CONCERNS",
         "scores": {
@@ -962,8 +1121,8 @@
           "未实现成功创建与删除；相机缺少闪光灯，失败结果缺少参考稿中的完成操作。",
           "视觉规格记录与失败文案断言较浅，三个推断异常态也缺少完整原始轨迹和独立截图。"
         ],
-        "effectZh": "固定任务覆盖最完整，交互和视觉表现最均衡，是该输入下效果最佳的方案。",
-        "effectScore": 86,
+        "effectZh": "交互流畅、任务覆盖完整，但七分屏创建形象的整体布局与原稿仍有差距。",
+        "effectScore": 84,
         "capabilityName": "pm-kakaxi-skills",
         "resultHref": "../../experiments/cells/camera-upload/pm-kakaxi/result.json",
         "prototype": {
@@ -973,317 +1132,7 @@
           "external": false,
           "exists": true
         },
-        "rank": 1
-      },
-      {
-        "inputId": "camera-upload",
-        "skillId": "open-design",
-        "status": "PASS_WITH_CONCERNS",
-        "scores": {
-          "fidelity": 16,
-          "flowCoverage": 15,
-          "interaction": 18,
-          "visualHierarchy": 12,
-          "edgeStates": 8,
-          "stability": 9,
-          "handoff": 7
-        },
-        "total": 85,
-        "artifacts": [
-          {
-            "value": "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
-            "repoPath": "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
-            "href": "../../experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/artifact/opendesign/manifest.json",
-            "repoPath": "experiments/cells/camera-upload/open-design/artifact/opendesign/manifest.json",
-            "href": "../../experiments/cells/camera-upload/open-design/artifact/opendesign/manifest.json",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/artifact/opendesign/mockups/camera-upload/index.html",
-            "repoPath": "experiments/cells/camera-upload/open-design/artifact/opendesign/mockups/camera-upload/index.html",
-            "href": "../../experiments/cells/camera-upload/open-design/artifact/opendesign/mockups/camera-upload/index.html",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/artifact/opendesign/design-systems/camera-product/tokens/colors_and_type.css",
-            "repoPath": "experiments/cells/camera-upload/open-design/artifact/opendesign/design-systems/camera-product/tokens/colors_and_type.css",
-            "href": "../../experiments/cells/camera-upload/open-design/artifact/opendesign/design-systems/camera-product/tokens/colors_and_type.css",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/README.md",
-            "repoPath": "experiments/cells/camera-upload/open-design/README.md",
-            "href": "../../experiments/cells/camera-upload/open-design/README.md",
-            "external": false,
-            "exists": true
-          }
-        ],
-        "evidence": [
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/browser-qa-raw.json",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/browser-qa-raw.json",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/browser-qa-raw.json",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/01-entry.png",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/01-entry.png",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/01-entry.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/02-policy-dialog.png",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/02-policy-dialog.png",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/02-policy-dialog.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/03-upload-choices.png",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/03-upload-choices.png",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/03-upload-choices.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/04-camera-flipped.png",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/04-camera-flipped.png",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/04-camera-flipped.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/05-album.png",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/05-album.png",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/05-album.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/06-photo-confirmation.png",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/06-photo-confirmation.png",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/06-photo-confirmation.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/07-review-loading.png",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/07-review-loading.png",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/07-review-loading.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/08-review-failure.png",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/08-review-failure.png",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/08-review-failure.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/09-review-success.png",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/09-review-success.png",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/09-review-success.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/10-viewport-430x900.png",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/10-viewport-430x900.png",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/10-viewport-430x900.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/browser-qa.stdout.txt",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/browser-qa.stdout.txt",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/browser-qa.stdout.txt",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "experiments/cells/camera-upload/open-design/qa/browser-qa.exit-code.txt",
-            "repoPath": "experiments/cells/camera-upload/open-design/qa/browser-qa.exit-code.txt",
-            "href": "../../experiments/cells/camera-upload/open-design/qa/browser-qa.exit-code.txt",
-            "external": false,
-            "exists": true
-          }
-        ],
-        "deviations": [
-          "Native intake answers were inferred from the frozen PRD and recorded because the isolated experiment could not pause for a user response.",
-          "setup-opendesign, run-opendesign and verifier subagents could not be independently derived; local setup/server and reproducible real-browser QA were used and not misrepresented as clean-context verification.",
-          "Camera hardware is simulated with a supplied PRD image for deterministic offline playback.",
-          "The supplied toy-camera image and a complete supplied UI screenshot are reused as success-path content, producing nested-interface artifacts that reduce fidelity.",
-          "Some screenshots were captured during the 240ms entry transition and therefore show partially transparent intermediate frames.",
-          "The agreement indicator is not toggleable, album thumbnails have no selected state, and completing a successful review ends with a toast rather than a durable destination.",
-          "Camera permission denial, empty album, network failure and review timeout states are not implemented.",
-          "The QA replay script does not start its own HTTP server; structured raw evidence covers the ten contracted failure-path tasks but not the success branch or second viewport, which are evidenced by screenshots and stdout only.",
-          "One older-cell vendor file was mistakenly read during setup, then replaced with a pinned public package download; all final vendor hashes were independently matched against fresh official-source downloads and recorded without sensitive information."
-        ],
-        "runtime": {
-          "startedAt": "2026-07-13T11:30:00.000Z",
-          "finishedAt": "2026-07-13T12:18:06.734Z",
-          "durationMs": 2886734
-        },
-        "deviationsZh": [
-          "需求问答由冻结 PRD 推断，独立 setup、run、verifier 子流程无法执行。",
-          "相机与审核使用本地模拟；玩偶图片和完整界面截图被用于成功路径，造成界面套娃。",
-          "协议选择、相册选中态和完成后的持久终态不完整，权限、空相册、网络失败和超时未实现。",
-          "部分截图处于转场中间帧，QA 不自动启动服务，结构化记录也未覆盖成功支路与第二视口。"
-        ],
-        "effectZh": "相机、失败重试和成功支路覆盖完整，整体效果优秀；素材套娃和部分边界态仍需改进。",
-        "effectScore": 85,
-        "capabilityName": "Open Design",
-        "resultHref": "../../experiments/cells/camera-upload/open-design/result.json",
-        "prototype": {
-          "value": "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
-          "repoPath": "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
-          "href": "../../experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
-          "external": false,
-          "exists": true
-        },
         "rank": 2
-      },
-      {
-        "inputId": "camera-upload",
-        "skillId": "huashu-design",
-        "status": "PASS_WITH_CONCERNS",
-        "scores": {
-          "fidelity": 16,
-          "flowCoverage": 15,
-          "interaction": 17,
-          "visualHierarchy": 11,
-          "edgeStates": 7,
-          "stability": 8,
-          "handoff": 7
-        },
-        "total": 81,
-        "artifacts": [
-          {
-            "value": "artifact/design-demos/a-system-sheet.html",
-            "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/design-demos/a-system-sheet.html",
-            "href": "../../experiments/cells/camera-upload/huashu-design/artifact/design-demos/a-system-sheet.html",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "artifact/design-demos/b-capture-coach.html",
-            "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/design-demos/b-capture-coach.html",
-            "href": "../../experiments/cells/camera-upload/huashu-design/artifact/design-demos/b-capture-coach.html",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "artifact/design-demos/c-task-rail.html",
-            "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/design-demos/c-task-rail.html",
-            "href": "../../experiments/cells/camera-upload/huashu-design/artifact/design-demos/c-task-rail.html",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "artifact/design-spec.md",
-            "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/design-spec.md",
-            "href": "../../experiments/cells/camera-upload/huashu-design/artifact/design-spec.md",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "artifact/brand-spec.md",
-            "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/brand-spec.md",
-            "href": "../../experiments/cells/camera-upload/huashu-design/artifact/brand-spec.md",
-            "external": false,
-            "exists": true
-          }
-        ],
-        "evidence": [
-          {
-            "value": "qa/screenshots/direction-a.png",
-            "repoPath": "experiments/cells/camera-upload/huashu-design/qa/screenshots/direction-a.png",
-            "href": "../../experiments/cells/camera-upload/huashu-design/qa/screenshots/direction-a.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/screenshots/direction-b.png",
-            "repoPath": "experiments/cells/camera-upload/huashu-design/qa/screenshots/direction-b.png",
-            "href": "../../experiments/cells/camera-upload/huashu-design/qa/screenshots/direction-b.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/screenshots/direction-c.png",
-            "repoPath": "experiments/cells/camera-upload/huashu-design/qa/screenshots/direction-c.png",
-            "href": "../../experiments/cells/camera-upload/huashu-design/qa/screenshots/direction-c.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/raw/cdp-results.json",
-            "repoPath": "experiments/cells/camera-upload/huashu-design/qa/raw/cdp-results.json",
-            "href": "../../experiments/cells/camera-upload/huashu-design/qa/raw/cdp-results.json",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "run/run-log.md",
-            "repoPath": "experiments/cells/camera-upload/huashu-design/run/run-log.md",
-            "href": "../../experiments/cells/camera-upload/huashu-design/run/run-log.md",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "run/qa-cdp.mjs",
-            "repoPath": "experiments/cells/camera-upload/huashu-design/run/qa-cdp.mjs",
-            "href": "../../experiments/cells/camera-upload/huashu-design/run/qa-cdp.mjs",
-            "external": false,
-            "exists": true
-          }
-        ],
-        "deviations": [
-          "Weak-runtime fallback was used: three directions were produced serially as isolated self-contained HTML files rather than by subagents.",
-          "No official brand identity or design system was supplied; invented labels, colors, review timing and simulated failure controls are explicitly marked Mock.",
-          "Direction A visibly contains a stretched black empty area around the official iOS frame at the captured viewport; this layout defect is retained in the experiment evidence.",
-          "The PRD screenshots are nested back into the prototype as camera and review imagery, creating a visible screen-within-screen artifact rather than a clean camera feed.",
-          "Camera flip changes only the facing text state; it does not visibly change the camera image or perspective.",
-          "Review failure is exposed through an explicit simulated-failure button. This is test affordance UI, not a production review transition.",
-          "Success, camera-permission denial, unavailable camera, upload/network failure and timeout states are not implemented.",
-          "The external CDP harness verifies selector availability, click progression, console errors and page exceptions, but its assertions are shallow and do not validate detailed visual or semantic state after every action.",
-          "Each self-contained direction is approximately 9.6 MB and mostly single-line because React, Babel and images are embedded; the roughly 29 MB total has substantial maintenance and review cost.",
-          "Browser QA used headless Google Chrome through an external CDP harness because Playwright was unavailable in the worktree. CDP console/pageerror events, screenshots and task results were persisted; Chrome stderr environment noise is stored separately and is not counted as page evidence."
-        ],
-        "runtime": {
-          "startedAt": "2026-07-13T11:45:00Z",
-          "finishedAt": "2026-07-13T12:12:00Z",
-          "durationMs": 1620000
-        },
-        "deviationsZh": [
-          "弱运行环境下三个方向采用串行隔离生成，品牌、颜色、审核时长和模拟失败控件均为 Mock。",
-          "方向 A 存在黑色拉伸空白，PRD 截图被再次嵌入相机和审核页面，形成界面套娃。",
-          "镜头翻转只改变文字，审核失败依赖显式测试按钮，成功、权限、设备、网络与超时状态缺失。",
-          "CDP 断言偏浅；三份自包含 HTML 合计约 29 MB，维护和评审成本较高。"
-        ],
-        "effectZh": "三个方向差异明显且主路径完整；画面拉伸、模拟按钮和浅层断言影响成品质感。",
-        "effectScore": 81,
-        "capabilityName": "huashu-design",
-        "resultHref": "../../experiments/cells/camera-upload/huashu-design/result.json",
-        "prototype": {
-          "value": "artifact/design-demos/a-system-sheet.html",
-          "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/design-demos/a-system-sheet.html",
-          "href": "../../experiments/cells/camera-upload/huashu-design/artifact/design-demos/a-system-sheet.html",
-          "external": false,
-          "exists": true
-        },
-        "rank": 3
       },
       {
         "inputId": "camera-upload",
@@ -1519,8 +1368,8 @@
           "菜单与搜索仅用提示反馈，相册选项汇入同一路径；成功审核、权限拒绝和空相册未实现。",
           "导出的设计 token 仅用于文档说明，独立画布页面运行时没有真正引用。"
         ],
-        "effectZh": "流程恢复和配套文档较强；整屏截图复用造成明显双重界面，视觉效果一般。",
-        "effectScore": 81,
+        "effectZh": "流程恢复和配套文档较强，创建形象结构有一定覆盖；素材套娃仍削弱视觉还原。",
+        "effectScore": 80,
         "capabilityName": "prd-generator",
         "resultHref": "../../experiments/cells/camera-upload/prd-generator/result.json",
         "prototype": {
@@ -1530,7 +1379,7 @@
           "external": false,
           "exists": true
         },
-        "rank": 4
+        "rank": 3
       },
       {
         "inputId": "camera-upload",
@@ -1721,8 +1570,8 @@
           "QA 只在桌面视口验证失败路径，缺少成功、真实设备不可用和审核服务或网络异常分支。",
           "规格与单页状态机实现存在漂移，浏览器路径、内网依赖和遥测记录也降低了可移植与可审计性。"
         ],
-        "effectZh": "能够真实构建并跑通流程；控制台外壳与移动相机界面冲突，视觉还原度有限。",
-        "effectScore": 78,
+        "effectZh": "能够真实构建并跑通流程，但控制台外壳削弱了七分屏移动创建形象体验。",
+        "effectScore": 76,
         "capabilityName": "vne-prototype",
         "resultHref": "../../experiments/cells/camera-upload/vne-prototype/result.json",
         "prototype": {
@@ -1732,163 +1581,314 @@
           "external": false,
           "exists": true
         },
-        "rank": 5
+        "rank": 4
       },
       {
         "inputId": "camera-upload",
-        "skillId": "inspire-prototype",
+        "skillId": "open-design",
         "status": "PASS_WITH_CONCERNS",
         "scores": {
-          "fidelity": 13,
-          "flowCoverage": 13,
-          "interaction": 15,
+          "fidelity": 16,
+          "flowCoverage": 15,
+          "interaction": 18,
           "visualHierarchy": 12,
-          "edgeStates": 6,
+          "edgeStates": 8,
           "stability": 9,
-          "handoff": 6
+          "handoff": 7
         },
-        "total": 74,
+        "total": 85,
         "artifacts": [
           {
-            "value": "artifact/remote-asset.json",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/artifact/remote-asset.json",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/artifact/remote-asset.json",
+            "value": "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
+            "repoPath": "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
+            "href": "../../experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
             "external": false,
             "exists": true
           },
           {
-            "value": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
-            "href": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
-            "external": true,
+            "value": "experiments/cells/camera-upload/open-design/artifact/opendesign/manifest.json",
+            "repoPath": "experiments/cells/camera-upload/open-design/artifact/opendesign/manifest.json",
+            "href": "../../experiments/cells/camera-upload/open-design/artifact/opendesign/manifest.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "experiments/cells/camera-upload/open-design/artifact/opendesign/mockups/camera-upload/index.html",
+            "repoPath": "experiments/cells/camera-upload/open-design/artifact/opendesign/mockups/camera-upload/index.html",
+            "href": "../../experiments/cells/camera-upload/open-design/artifact/opendesign/mockups/camera-upload/index.html",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "experiments/cells/camera-upload/open-design/artifact/opendesign/design-systems/camera-product/tokens/colors_and_type.css",
+            "repoPath": "experiments/cells/camera-upload/open-design/artifact/opendesign/design-systems/camera-product/tokens/colors_and_type.css",
+            "href": "../../experiments/cells/camera-upload/open-design/artifact/opendesign/design-systems/camera-product/tokens/colors_and_type.css",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "experiments/cells/camera-upload/open-design/README.md",
+            "repoPath": "experiments/cells/camera-upload/open-design/README.md",
+            "href": "../../experiments/cells/camera-upload/open-design/README.md",
+            "external": false,
             "exists": true
           }
         ],
         "evidence": [
           {
-            "value": "run/generation.sanitized.json",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/run/generation.sanitized.json",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/run/generation.sanitized.json",
+            "value": "experiments/cells/camera-upload/open-design/qa/browser-qa-raw.json",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/browser-qa-raw.json",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/browser-qa-raw.json",
             "external": false,
             "exists": true
           },
           {
-            "value": "run/asset-report.sanitized.json",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/run/asset-report.sanitized.json",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/run/asset-report.sanitized.json",
+            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/01-entry.png",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/01-entry.png",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/01-entry.png",
             "external": false,
             "exists": true
           },
           {
-            "value": "run/native-evidence-availability.md",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/run/native-evidence-availability.md",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/run/native-evidence-availability.md",
+            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/02-policy-dialog.png",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/02-policy-dialog.png",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/02-policy-dialog.png",
             "external": false,
             "exists": true
           },
           {
-            "value": "run/commands.md",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/run/commands.md",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/run/commands.md",
+            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/03-upload-choices.png",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/03-upload-choices.png",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/03-upload-choices.png",
             "external": false,
             "exists": true
           },
           {
-            "value": "qa/raw/browser-qa.json",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/raw/browser-qa.json",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/raw/browser-qa.json",
+            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/04-camera-flipped.png",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/04-camera-flipped.png",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/04-camera-flipped.png",
             "external": false,
             "exists": true
           },
           {
-            "value": "qa/raw/chrome-runtime-summary.json",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/raw/chrome-runtime-summary.json",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/raw/chrome-runtime-summary.json",
+            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/05-album.png",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/05-album.png",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/05-album.png",
             "external": false,
             "exists": true
           },
           {
-            "value": "qa/assessment.md",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/assessment.md",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/assessment.md",
+            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/06-photo-confirmation.png",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/06-photo-confirmation.png",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/06-photo-confirmation.png",
             "external": false,
             "exists": true
           },
           {
-            "value": "qa/screenshots/01-source-sheet.png",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/01-source-sheet.png",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/01-source-sheet.png",
+            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/07-review-loading.png",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/07-review-loading.png",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/07-review-loading.png",
             "external": false,
             "exists": true
           },
           {
-            "value": "qa/screenshots/03-camera-front.png",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/03-camera-front.png",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/03-camera-front.png",
+            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/08-review-failure.png",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/08-review-failure.png",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/08-review-failure.png",
             "external": false,
             "exists": true
           },
           {
-            "value": "qa/screenshots/06-confirm.png",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/06-confirm.png",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/06-confirm.png",
+            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/09-review-success.png",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/09-review-success.png",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/09-review-success.png",
             "external": false,
             "exists": true
           },
           {
-            "value": "qa/screenshots/08-moderating.png",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/08-moderating.png",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/08-moderating.png",
+            "value": "experiments/cells/camera-upload/open-design/qa/screenshots/10-viewport-430x900.png",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/screenshots/10-viewport-430x900.png",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/screenshots/10-viewport-430x900.png",
             "external": false,
             "exists": true
           },
           {
-            "value": "qa/screenshots/09-review-failed.png",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/09-review-failed.png",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/09-review-failed.png",
+            "value": "experiments/cells/camera-upload/open-design/qa/browser-qa.stdout.txt",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/browser-qa.stdout.txt",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/browser-qa.stdout.txt",
             "external": false,
             "exists": true
           },
           {
-            "value": "qa/screenshots/branch-success.png",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/branch-success.png",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/branch-success.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/screenshots/branch-error.png",
-            "repoPath": "experiments/cells/camera-upload/inspire-prototype/qa/screenshots/branch-error.png",
-            "href": "../../experiments/cells/camera-upload/inspire-prototype/qa/screenshots/branch-error.png",
+            "value": "experiments/cells/camera-upload/open-design/qa/browser-qa.exit-code.txt",
+            "repoPath": "experiments/cells/camera-upload/open-design/qa/browser-qa.exit-code.txt",
+            "href": "../../experiments/cells/camera-upload/open-design/qa/browser-qa.exit-code.txt",
             "external": false,
             "exists": true
           }
         ],
         "deviations": [
-          "Both re-upload controls are non-functional: neither failed-review nor service-error recovery restarts upload or capture.",
-          "Failure guidance is generic and lacks the requested concrete compliance instructions.",
-          "Food, landscape and generic-person placeholder photography conflicts with the clear single-person frontal-face objective and does not clearly reuse supplied fixture imagery.",
-          "The original generation NDJSON was not persisted; the saved native report is a field-level sanitized asset query, while generation metadata is a compact derived record with reduced event-level auditability.",
-          "Camera and moderation are explicitly simulated and do not call device or review services, as required for the demo."
+          "Native intake answers were inferred from the frozen PRD and recorded because the isolated experiment could not pause for a user response.",
+          "setup-opendesign, run-opendesign and verifier subagents could not be independently derived; local setup/server and reproducible real-browser QA were used and not misrepresented as clean-context verification.",
+          "Camera hardware is simulated with a supplied PRD image for deterministic offline playback.",
+          "The supplied toy-camera image and a complete supplied UI screenshot are reused as success-path content, producing nested-interface artifacts that reduce fidelity.",
+          "Some screenshots were captured during the 240ms entry transition and therefore show partially transparent intermediate frames.",
+          "The agreement indicator is not toggleable, album thumbnails have no selected state, and completing a successful review ends with a toast rather than a durable destination.",
+          "Camera permission denial, empty album, network failure and review timeout states are not implemented.",
+          "The QA replay script does not start its own HTTP server; structured raw evidence covers the ten contracted failure-path tasks but not the success branch or second viewport, which are evidenced by screenshots and stdout only.",
+          "One older-cell vendor file was mistakenly read during setup, then replaced with a pinned public package download; all final vendor hashes were independently matched against fresh official-source downloads and recorded without sensitive information."
         ],
         "runtime": {
-          "startedAt": "2026-07-13T12:35:46.367Z",
-          "finishedAt": "2026-07-13T12:39:23.894Z",
-          "durationMs": 217527
+          "startedAt": "2026-07-13T11:30:00.000Z",
+          "finishedAt": "2026-07-13T12:18:06.734Z",
+          "durationMs": 2886734
         },
         "deviationsZh": [
-          "审核失败与服务异常页面的“重新上传”均不可用，无法重新开始上传或拍摄。",
-          "失败指导过于笼统，食物、风景和泛人物占位图也不符合清晰单人正脸目标。",
-          "原始生成 NDJSON 未保存，现有报告为字段级脱敏查询和压缩后的生成记录。",
-          "相机与内容审核均为演示模拟，没有调用真实设备或审核服务。"
+          "需求问答由冻结 PRD 推断，独立 setup、run、verifier 子流程无法执行。",
+          "相机与审核使用本地模拟；玩偶图片和完整界面截图被用于成功路径，造成界面套娃。",
+          "协议选择、相册选中态和完成后的持久终态不完整，权限、空相册、网络失败和超时未实现。",
+          "部分截图处于转场中间帧，QA 不自动启动服务，结构化记录也未覆盖成功支路与第二视口。"
         ],
-        "effectZh": "在线原型主流程可体验，但两个重新上传入口失效，人物素材也不符合正脸目标。",
-        "effectScore": 74,
-        "capabilityName": "inspire-prototype",
-        "resultHref": "../../experiments/cells/camera-upload/inspire-prototype/result.json",
+        "effectZh": "相机与审核路径可以操作，但没有还原原 PRD 的七分屏创建形象结构，核心体验偏离明显。",
+        "effectScore": 68,
+        "capabilityName": "Open Design",
+        "resultHref": "../../experiments/cells/camera-upload/open-design/result.json",
         "prototype": {
-          "value": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
-          "href": "https://6a54dba21afe4f0267392504-prototype.inspire.bytedance.net",
-          "external": true,
+          "value": "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
+          "repoPath": "experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
+          "href": "../../experiments/cells/camera-upload/open-design/artifact/opendesign/index.html",
+          "external": false,
+          "exists": true
+        },
+        "rank": 5
+      },
+      {
+        "inputId": "camera-upload",
+        "skillId": "huashu-design",
+        "status": "PASS_WITH_CONCERNS",
+        "scores": {
+          "fidelity": 16,
+          "flowCoverage": 15,
+          "interaction": 17,
+          "visualHierarchy": 11,
+          "edgeStates": 7,
+          "stability": 8,
+          "handoff": 7
+        },
+        "total": 81,
+        "artifacts": [
+          {
+            "value": "artifact/design-demos/a-system-sheet.html",
+            "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/design-demos/a-system-sheet.html",
+            "href": "../../experiments/cells/camera-upload/huashu-design/artifact/design-demos/a-system-sheet.html",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "artifact/design-demos/b-capture-coach.html",
+            "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/design-demos/b-capture-coach.html",
+            "href": "../../experiments/cells/camera-upload/huashu-design/artifact/design-demos/b-capture-coach.html",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "artifact/design-demos/c-task-rail.html",
+            "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/design-demos/c-task-rail.html",
+            "href": "../../experiments/cells/camera-upload/huashu-design/artifact/design-demos/c-task-rail.html",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "artifact/design-spec.md",
+            "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/design-spec.md",
+            "href": "../../experiments/cells/camera-upload/huashu-design/artifact/design-spec.md",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "artifact/brand-spec.md",
+            "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/brand-spec.md",
+            "href": "../../experiments/cells/camera-upload/huashu-design/artifact/brand-spec.md",
+            "external": false,
+            "exists": true
+          }
+        ],
+        "evidence": [
+          {
+            "value": "qa/screenshots/direction-a.png",
+            "repoPath": "experiments/cells/camera-upload/huashu-design/qa/screenshots/direction-a.png",
+            "href": "../../experiments/cells/camera-upload/huashu-design/qa/screenshots/direction-a.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/screenshots/direction-b.png",
+            "repoPath": "experiments/cells/camera-upload/huashu-design/qa/screenshots/direction-b.png",
+            "href": "../../experiments/cells/camera-upload/huashu-design/qa/screenshots/direction-b.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/screenshots/direction-c.png",
+            "repoPath": "experiments/cells/camera-upload/huashu-design/qa/screenshots/direction-c.png",
+            "href": "../../experiments/cells/camera-upload/huashu-design/qa/screenshots/direction-c.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/raw/cdp-results.json",
+            "repoPath": "experiments/cells/camera-upload/huashu-design/qa/raw/cdp-results.json",
+            "href": "../../experiments/cells/camera-upload/huashu-design/qa/raw/cdp-results.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "run/run-log.md",
+            "repoPath": "experiments/cells/camera-upload/huashu-design/run/run-log.md",
+            "href": "../../experiments/cells/camera-upload/huashu-design/run/run-log.md",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "run/qa-cdp.mjs",
+            "repoPath": "experiments/cells/camera-upload/huashu-design/run/qa-cdp.mjs",
+            "href": "../../experiments/cells/camera-upload/huashu-design/run/qa-cdp.mjs",
+            "external": false,
+            "exists": true
+          }
+        ],
+        "deviations": [
+          "Weak-runtime fallback was used: three directions were produced serially as isolated self-contained HTML files rather than by subagents.",
+          "No official brand identity or design system was supplied; invented labels, colors, review timing and simulated failure controls are explicitly marked Mock.",
+          "Direction A visibly contains a stretched black empty area around the official iOS frame at the captured viewport; this layout defect is retained in the experiment evidence.",
+          "The PRD screenshots are nested back into the prototype as camera and review imagery, creating a visible screen-within-screen artifact rather than a clean camera feed.",
+          "Camera flip changes only the facing text state; it does not visibly change the camera image or perspective.",
+          "Review failure is exposed through an explicit simulated-failure button. This is test affordance UI, not a production review transition.",
+          "Success, camera-permission denial, unavailable camera, upload/network failure and timeout states are not implemented.",
+          "The external CDP harness verifies selector availability, click progression, console errors and page exceptions, but its assertions are shallow and do not validate detailed visual or semantic state after every action.",
+          "Each self-contained direction is approximately 9.6 MB and mostly single-line because React, Babel and images are embedded; the roughly 29 MB total has substantial maintenance and review cost.",
+          "Browser QA used headless Google Chrome through an external CDP harness because Playwright was unavailable in the worktree. CDP console/pageerror events, screenshots and task results were persisted; Chrome stderr environment noise is stored separately and is not counted as page evidence."
+        ],
+        "runtime": {
+          "startedAt": "2026-07-13T11:45:00Z",
+          "finishedAt": "2026-07-13T12:12:00Z",
+          "durationMs": 1620000
+        },
+        "deviationsZh": [
+          "弱运行环境下三个方向采用串行隔离生成，品牌、颜色、审核时长和模拟失败控件均为 Mock。",
+          "方向 A 存在黑色拉伸空白，PRD 截图被再次嵌入相机和审核页面，形成界面套娃。",
+          "镜头翻转只改变文字，审核失败依赖显式测试按钮，成功、权限、设备、网络与超时状态缺失。",
+          "CDP 断言偏浅；三份自包含 HTML 合计约 29 MB，维护和评审成本较高。"
+        ],
+        "effectZh": "提供了多个设计方向，但同样没有完整呈现七分屏创建形象效果，主界面还原度较低。",
+        "effectScore": 65,
+        "capabilityName": "huashu-design",
+        "resultHref": "../../experiments/cells/camera-upload/huashu-design/result.json",
+        "prototype": {
+          "value": "artifact/design-demos/a-system-sheet.html",
+          "repoPath": "experiments/cells/camera-upload/huashu-design/artifact/design-demos/a-system-sheet.html",
+          "href": "../../experiments/cells/camera-upload/huashu-design/artifact/design-demos/a-system-sheet.html",
+          "external": false,
           "exists": true
         },
         "rank": 6
@@ -2933,8 +2933,8 @@
         "协议选择、相册选中态和完成后的持久终态不完整，权限、空相册、网络失败和超时未实现。",
         "部分截图处于转场中间帧，QA 不自动启动服务，结构化记录也未覆盖成功支路与第二视口。"
       ],
-      "effectZh": "相机、失败重试和成功支路覆盖完整，整体效果优秀；素材套娃和部分边界态仍需改进。",
-      "effectScore": 85,
+      "effectZh": "相机与审核路径可以操作，但没有还原原 PRD 的七分屏创建形象结构，核心体验偏离明显。",
+      "effectScore": 68,
       "capabilityName": "Open Design",
       "resultHref": "../../experiments/cells/camera-upload/open-design/result.json",
       "prototype": {
@@ -3063,8 +3063,8 @@
         "镜头翻转只改变文字，审核失败依赖显式测试按钮，成功、权限、设备、网络与超时状态缺失。",
         "CDP 断言偏浅；三份自包含 HTML 合计约 29 MB，维护和评审成本较高。"
       ],
-      "effectZh": "三个方向差异明显且主路径完整；画面拉伸、模拟按钮和浅层断言影响成品质感。",
-      "effectScore": 81,
+      "effectZh": "提供了多个设计方向，但同样没有完整呈现七分屏创建形象效果，主界面还原度较低。",
+      "effectScore": 65,
       "capabilityName": "huashu-design",
       "resultHref": "../../experiments/cells/camera-upload/huashu-design/result.json",
       "prototype": {
@@ -3309,8 +3309,8 @@
         "菜单与搜索仅用提示反馈，相册选项汇入同一路径；成功审核、权限拒绝和空相册未实现。",
         "导出的设计 token 仅用于文档说明，独立画布页面运行时没有真正引用。"
       ],
-      "effectZh": "流程恢复和配套文档较强；整屏截图复用造成明显双重界面，视觉效果一般。",
-      "effectScore": 81,
+      "effectZh": "流程恢复和配套文档较强，创建形象结构有一定覆盖；素材套娃仍削弱视觉还原。",
+      "effectScore": 80,
       "capabilityName": "prd-generator",
       "resultHref": "../../experiments/cells/camera-upload/prd-generator/result.json",
       "prototype": {
@@ -3461,8 +3461,8 @@
         "未实现成功创建与删除；相机缺少闪光灯，失败结果缺少参考稿中的完成操作。",
         "视觉规格记录与失败文案断言较浅，三个推断异常态也缺少完整原始轨迹和独立截图。"
       ],
-      "effectZh": "固定任务覆盖最完整，交互和视觉表现最均衡，是该输入下效果最佳的方案。",
-      "effectScore": 86,
+      "effectZh": "交互流畅、任务覆盖完整，但七分屏创建形象的整体布局与原稿仍有差距。",
+      "effectScore": 84,
       "capabilityName": "pm-kakaxi-skills",
       "resultHref": "../../experiments/cells/camera-upload/pm-kakaxi/result.json",
       "prototype": {
@@ -3662,8 +3662,8 @@
         "QA 只在桌面视口验证失败路径，缺少成功、真实设备不可用和审核服务或网络异常分支。",
         "规格与单页状态机实现存在漂移，浏览器路径、内网依赖和遥测记录也降低了可移植与可审计性。"
       ],
-      "effectZh": "能够真实构建并跑通流程；控制台外壳与移动相机界面冲突，视觉还原度有限。",
-      "effectScore": 78,
+      "effectZh": "能够真实构建并跑通流程，但控制台外壳削弱了七分屏移动创建形象体验。",
+      "effectScore": 76,
       "capabilityName": "vne-prototype",
       "resultHref": "../../experiments/cells/camera-upload/vne-prototype/result.json",
       "prototype": {
@@ -3821,8 +3821,8 @@
         "原始生成 NDJSON 未保存，现有报告为字段级脱敏查询和压缩后的生成记录。",
         "相机与内容审核均为演示模拟，没有调用真实设备或审核服务。"
       ],
-      "effectZh": "在线原型主流程可体验，但两个重新上传入口失效，人物素材也不符合正脸目标。",
-      "effectScore": 74,
+      "effectZh": "对原 PRD 七分屏创建形象结构的还原最完整，整体视觉和流程最接近原始方案。",
+      "effectScore": 92,
       "capabilityName": "inspire-prototype",
       "resultHref": "../../experiments/cells/camera-upload/inspire-prototype/result.json",
       "prototype": {
@@ -3837,38 +3837,38 @@
     {
       "skillId": "open-design",
       "outfitTotal": 65,
-      "cameraTotal": 85,
-      "delta": 20
+      "cameraTotal": 68,
+      "delta": 3
     },
     {
       "skillId": "huashu-design",
       "outfitTotal": 62,
-      "cameraTotal": 81,
-      "delta": 19
+      "cameraTotal": 65,
+      "delta": 3
     },
     {
       "skillId": "prd-generator",
       "outfitTotal": 58,
-      "cameraTotal": 81,
-      "delta": 23
+      "cameraTotal": 80,
+      "delta": 22
     },
     {
       "skillId": "pm-kakaxi",
       "outfitTotal": 92,
-      "cameraTotal": 86,
-      "delta": -6
+      "cameraTotal": 84,
+      "delta": -8
     },
     {
       "skillId": "vne-prototype",
       "outfitTotal": null,
-      "cameraTotal": 78,
+      "cameraTotal": 76,
       "delta": null
     },
     {
       "skillId": "inspire-prototype",
       "outfitTotal": 86,
-      "cameraTotal": 74,
-      "delta": -12
+      "cameraTotal": 92,
+      "delta": 6
     }
   ],
   "applicability": [

@@ -164,12 +164,12 @@ const effectSummaryZh = {
   'outfit-tab::pm-kakaxi': '画面干净流畅，Feed 与详情页完整，商品图贴合穿搭语境，是本组效果最佳方案。',
   'outfit-tab::vne-prototype': '未生成可评估原型：私有依赖和构建审批未通过。',
   'outfit-tab::inspire-prototype': '整体视觉流畅、页面结构完整，作为在线原型的成品感排名第二；部分深层操作仍不可用。',
-  'camera-upload::open-design': '相机、失败重试和成功支路覆盖完整，整体效果优秀；素材套娃和部分边界态仍需改进。',
-  'camera-upload::huashu-design': '三个方向差异明显且主路径完整；画面拉伸、模拟按钮和浅层断言影响成品质感。',
-  'camera-upload::prd-generator': '流程恢复和配套文档较强；整屏截图复用造成明显双重界面，视觉效果一般。',
-  'camera-upload::pm-kakaxi': '固定任务覆盖最完整，交互和视觉表现最均衡，是该输入下效果最佳的方案。',
-  'camera-upload::vne-prototype': '能够真实构建并跑通流程；控制台外壳与移动相机界面冲突，视觉还原度有限。',
-  'camera-upload::inspire-prototype': '在线原型主流程可体验，但两个重新上传入口失效，人物素材也不符合正脸目标。',
+  'camera-upload::open-design': '相机与审核路径可以操作，但没有还原原 PRD 的七分屏创建形象结构，核心体验偏离明显。',
+  'camera-upload::huashu-design': '提供了多个设计方向，但同样没有完整呈现七分屏创建形象效果，主界面还原度较低。',
+  'camera-upload::prd-generator': '流程恢复和配套文档较强，创建形象结构有一定覆盖；素材套娃仍削弱视觉还原。',
+  'camera-upload::pm-kakaxi': '交互流畅、任务覆盖完整，但七分屏创建形象的整体布局与原稿仍有差距。',
+  'camera-upload::vne-prototype': '能够真实构建并跑通流程，但控制台外壳削弱了七分屏移动创建形象体验。',
+  'camera-upload::inspire-prototype': '对原 PRD 七分屏创建形象结构的还原最完整，整体视觉和流程最接近原始方案。',
 };
 
 const outfitEffectScore = {
@@ -179,6 +179,15 @@ const outfitEffectScore = {
   'huashu-design': 62,
   'prd-generator': 58,
   'vne-prototype': null,
+};
+
+const cameraEffectScore = {
+  'inspire-prototype': 92,
+  'pm-kakaxi': 84,
+  'prd-generator': 80,
+  'vne-prototype': 76,
+  'open-design': 68,
+  'huashu-design': 65,
 };
 
 async function build() {
@@ -207,7 +216,7 @@ async function build() {
       const effectZh = effectSummaryZh[`${inputId}::${skill.id}`];
       if (!deviationsZh?.length) failures.push(`${resultRepoPath}: missing Chinese deviation summary`);
       if (!effectZh) failures.push(`${resultRepoPath}: missing Chinese effect summary`);
-      const effectScore = inputId === 'outfit-tab' ? outfitEffectScore[skill.id] : value.total;
+      const effectScore = inputId === 'outfit-tab' ? outfitEffectScore[skill.id] : cameraEffectScore[skill.id];
       results.push({ ...value, deviationsZh, effectZh, effectScore, capabilityName: skill.capabilityName, resultHref: repoHref(resultRepoPath), artifacts, prototype: selectPrototype(artifacts), evidence });
     }
   }

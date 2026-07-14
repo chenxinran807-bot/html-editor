@@ -62,12 +62,12 @@ Generated from 12 validated cell results. Rankings exclude scoreless statuses; c
 
 ### camera-upload
 
-1. **pm-kakaxi** — prototype effect 86/100 · audited total 86/100 ([result](../../experiments/cells/camera-upload/pm-kakaxi/result.json))
-2. **open-design** — prototype effect 85/100 · audited total 85/100 ([result](../../experiments/cells/camera-upload/open-design/result.json))
-3. **huashu-design** — prototype effect 81/100 · audited total 81/100 ([result](../../experiments/cells/camera-upload/huashu-design/result.json))
-4. **prd-generator** — prototype effect 81/100 · audited total 81/100 ([result](../../experiments/cells/camera-upload/prd-generator/result.json))
-5. **vne-prototype** — prototype effect 78/100 · audited total 78/100 ([result](../../experiments/cells/camera-upload/vne-prototype/result.json))
-6. **inspire-prototype** — prototype effect 74/100 · audited total 74/100 ([result](../../experiments/cells/camera-upload/inspire-prototype/result.json))
+1. **inspire-prototype** — prototype effect 92/100 · audited total 74/100 ([result](../../experiments/cells/camera-upload/inspire-prototype/result.json))
+2. **pm-kakaxi** — prototype effect 84/100 · audited total 86/100 ([result](../../experiments/cells/camera-upload/pm-kakaxi/result.json))
+3. **prd-generator** — prototype effect 80/100 · audited total 81/100 ([result](../../experiments/cells/camera-upload/prd-generator/result.json))
+4. **vne-prototype** — prototype effect 76/100 · audited total 78/100 ([result](../../experiments/cells/camera-upload/vne-prototype/result.json))
+5. **open-design** — prototype effect 68/100 · audited total 85/100 ([result](../../experiments/cells/camera-upload/open-design/result.json))
+6. **huashu-design** — prototype effect 65/100 · audited total 81/100 ([result](../../experiments/cells/camera-upload/huashu-design/result.json))
 
 ## Applicability exclusions
 
