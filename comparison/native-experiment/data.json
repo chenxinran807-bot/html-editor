@@ -34,7 +34,8 @@
         "pm-kakaxi-skills：安装在本机 Codex Skills 目录中的本地 Skill，作者标记为 pengmingyu，版本 2.1.0",
         "vne-prototype：安装在本机 Codex Skills 目录中的本地 Skill，版本 1.0.3",
         "inspire-prototype：由全局安装的 @byted-inspire/prototype-cli 提供的内置 Skill"
-      ]
+      ],
+      "note": "本批六个参测项中没有直接从 GitHub 仓库运行的 Skill；来源按实际安装形态展示，不把依赖包的 GitHub 地址误记为 Skill 来源。"
     },
     {
       "id": "execution",

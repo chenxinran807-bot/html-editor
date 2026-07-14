@@ -105,6 +105,7 @@ test('publishes the dashboard experiment settings', async () => {
         'vne-prototype：安装在本机 Codex Skills 目录中的本地 Skill，版本 1.0.3',
         'inspire-prototype：由全局安装的 @byted-inspire/prototype-cli 提供的内置 Skill',
       ],
+      note: '本批六个参测项中没有直接从 GitHub 仓库运行的 Skill；来源按实际安装形态展示，不把依赖包的 GitHub 地址误记为 Skill 来源。',
     },
     {
       id: 'execution',
@@ -190,16 +191,16 @@ test('publishes the Chinese dashboard sections without an evidence gallery', asy
   const { output, data } = await buildFixture();
   const html = await readFile(path.join(output, 'index.html'), 'utf8');
 
-  for (const label of ['原型能力实验对比', '实验设置', '输入', '参测 Skill 及来源', '执行主体与方式', '评分维度', '相机上传排名', '穿搭 Tab 排名', '未完全按 Skill 标准执行的部分', '跨输入比较', '适用性']) {
+  for (const label of ['原型能力实验对比', '实验设置', '相机上传排名', '穿搭 Tab 排名', '未完全按 Skill 标准执行的部分', '跨输入比较', '适用性']) {
     assert.match(html, new RegExp(label));
   }
+  assert.match(html, /<section><h2>实验设置<\/h2><div id="settings" class="settings-grid"><\/div><\/section>/);
+  assert.doesNotMatch(html, /参测 Skill 及来源|本批六个参测项中没有直接从 GitHub 仓库运行的 Skill/);
   assert.doesNotMatch(html, /原生流程偏离/);
   assert.match(html, /技能正式名称/);
   assert.doesNotMatch(html, /Skill 正式名称/);
   assert.doesNotMatch(html, /证据画廊/);
-  for (const label of ['实验设置', '输入', '参测 Skill 及来源', '执行主体与方式', '评分维度']) {
-    assert.ok(html.indexOf(label) < html.indexOf('跨输入比较'), `${label} must appear before cross-input comparison`);
-  }
+  assert.ok(html.indexOf('实验设置') < html.indexOf('跨输入比较'), 'experiment settings must appear before cross-input comparison');
   assert.ok(html.indexOf('跨输入比较') < html.indexOf('概览'), 'cross-input comparison must appear before overview');
   assert.doesNotMatch(html, /\['排名','技能正式名称','总分','状态'\]/);
   assert.doesNotMatch(html, /id=["']gallery["']/);
@@ -229,7 +230,9 @@ test('renders twelve effect cells with direct prototype links in the cross-input
       const expected = typeof item === 'string' ? item : `${item.label}：${item.points} 分`;
       assert.ok(text.includes(expected), `missing rendered experiment setting text: ${expected}`);
     }
+    if (setting.note) assert.ok(text.includes(setting.note), `missing rendered experiment setting note: ${setting.note}`);
   }
+  assert.equal(data.experimentSettings.find((setting) => setting.id === 'skills').items.length, 6, 'the source note must not be counted as a seventh Skill');
   assert.equal(await settingCards.first().evaluate((card, cross) => {
     const settingsSection = card.closest('section');
     const crossSection = cross.closest('section');
