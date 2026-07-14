@@ -98,14 +98,15 @@ test('production entry resolver rejects local paths that can escape the reposito
   }
 });
 
-test('ranks each input by total then fidelity, interaction, and stability', async () => {
+test('ranks each input by prototype effect score with audited dimensions as tie-breakers', async () => {
   const { data } = await buildFixture();
   assert.deepEqual(data.rankings['camera-upload'].map((row) => row.skillId), [
     'pm-kakaxi', 'open-design', 'huashu-design', 'prd-generator', 'vne-prototype', 'inspire-prototype',
   ]);
   assert.deepEqual(data.rankings['outfit-tab'].map((row) => row.skillId), [
-    'open-design', 'huashu-design', 'prd-generator', 'pm-kakaxi', 'inspire-prototype',
+    'pm-kakaxi', 'inspire-prototype', 'open-design', 'huashu-design', 'prd-generator',
   ]);
+  assert.deepEqual(data.rankings['outfit-tab'].map((row) => row.effectScore), [92, 86, 65, 62, 58]);
 });
 
 test('keeps blocked results scoreless and excludes them from ranking', async () => {
@@ -120,8 +121,8 @@ test('keeps blocked results scoreless and excludes them from ranking', async () 
 
 test('computes cross-input deltas only when both inputs have scores', async () => {
   const { data } = await buildFixture();
-  assert.equal(data.crossInput.find((row) => row.skillId === 'pm-kakaxi').delta, 10);
-  assert.equal(data.crossInput.find((row) => row.skillId === 'open-design').delta, 2);
+  assert.equal(data.crossInput.find((row) => row.skillId === 'pm-kakaxi').delta, -6);
+  assert.equal(data.crossInput.find((row) => row.skillId === 'open-design').delta, 20);
   assert.equal(data.crossInput.find((row) => row.skillId === 'vne-prototype').delta, null);
 });
 

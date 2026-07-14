@@ -18,6 +18,307 @@
     "outfit-tab": [
       {
         "inputId": "outfit-tab",
+        "skillId": "pm-kakaxi",
+        "status": "PASS_WITH_CONCERNS",
+        "scores": {
+          "fidelity": 12,
+          "flowCoverage": 15,
+          "interaction": 14,
+          "visualHierarchy": 12,
+          "edgeStates": 6,
+          "stability": 10,
+          "handoff": 7
+        },
+        "total": 76,
+        "artifacts": [
+          {
+            "value": "index.html",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/index.html",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/index.html",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "demo-context.json",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/demo-context.json",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/demo-context.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/feed.png",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/feed.png",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/feed.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/detail.png",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/detail.png",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/detail.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/ai-entry.png",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/ai-entry.png",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/ai-entry.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/playwright-report.json",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json",
+            "external": false,
+            "exists": true
+          }
+        ],
+        "evidence": [
+          {
+            "value": "Native input completeness scored visual=high, interaction=medium, state=medium, semantic=high; high-fidelity mode selected with two soft gates documented in demo-context.json.",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/Native input completeness scored visual=high, interaction=medium, state=medium, semantic=high; high-fidelity mode selected with two soft gates documented in demo-context.json.",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/Native input completeness scored visual=high, interaction=medium, state=medium, semantic=high; high-fidelity mode selected with two soft gates documented in demo-context.json.",
+            "external": false,
+            "exists": false
+          },
+          {
+            "value": "qa/playwright-report.json is a sanitized portable summary: Playwright ran 6 tests in isolated Chromium and all 6 passed, including the five fixed outfit tasks plus a screenshot/edge-scenario test.",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json is a sanitized portable summary: Playwright ran 6 tests in isolated Chromium and all 6 passed, including the five fixed outfit tasks plus a screenshot/edge-scenario test.",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json is a sanitized portable summary: Playwright ran 6 tests in isolated Chromium and all 6 passed, including the five fixed outfit tasks plus a screenshot/edge-scenario test.",
+            "external": false,
+            "exists": false
+          },
+          {
+            "value": "switch-category changed the feed and exposed '西装 + 长裤，办公友好'.",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/switch-category changed the feed and exposed '西装 + 长裤，办公友好'.",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/switch-category changed the feed and exposed '西装 + 长裤，办公友好'.",
+            "external": false,
+            "exists": false
+          },
+          {
+            "value": "open-reason-card opened the detail view; read-guidance verified suitability, outfit formula, and avoidance guidance headings.",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/open-reason-card opened the detail view; read-guidance verified suitability, outfit formula, and avoidance guidance headings.",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/open-reason-card opened the detail view; read-guidance verified suitability, outfit formula, and avoidance guidance headings.",
+            "external": false,
+            "exists": false
+          },
+          {
+            "value": "open-product-or-alternative opened a scoped alternative-product sheet with product title, size, material, shipping, and price information.",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/open-product-or-alternative opened a scoped alternative-product sheet with product title, size, material, shipping, and price information.",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/open-product-or-alternative opened a scoped alternative-product sheet with product title, size, material, shipping, and price information.",
+            "external": false,
+            "exists": false
+          },
+          {
+            "value": "enter-ai-styling-or-try-on opened the AI continuation sheet and verified both same-item extension and similar-style routes.",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/enter-ai-styling-or-try-on opened the AI continuation sheet and verified both same-item extension and similar-style routes.",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/enter-ai-styling-or-try-on opened the AI continuation sheet and verified both same-item extension and similar-style routes.",
+            "external": false,
+            "exists": false
+          },
+          {
+            "value": "qa/playwright-report.json: every test captured console.error and pageerror; the passing run observed zero browser errors.",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json: every test captured console.error and pageerror; the passing run observed zero browser errors.",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json: every test captured console.error and pageerror; the passing run observed zero browser errors.",
+            "external": false,
+            "exists": false
+          },
+          {
+            "value": "qa/feed.png, qa/detail.png, and qa/ai-entry.png are actual browser screenshots at a 430x932 viewport; no independent human visual review was performed.",
+            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/feed.png, qa/detail.png, and qa/ai-entry.png are actual browser screenshots at a 430x932 viewport; no independent human visual review was performed.",
+            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/feed.png, qa/detail.png, and qa/ai-entry.png are actual browser screenshots at a 430x932 viewport; no independent human visual review was performed.",
+            "external": false,
+            "exists": false
+          }
+        ],
+        "deviations": [
+          "The product sheet invents S–XL sizing, cotton material, 48-hour shipping, and an add-to-cart action without source evidence; this violates the declared do-not-infer constraint.",
+          "The alternative CTA says ¥199起 while the opened alternative sheet shows ¥358, creating a semantic conflict in the required product/alternative flow.",
+          "Follow, main tabs, bottom navigation, add-to-cart, upload-photo, and AI recommendation cards are dead controls that look interactive but have no behavior.",
+          "Edge-state QA only clicked empty/loading/error/boundary and asserted that #feed remained visible; it did not verify each state's required content or behavior.",
+          "The visual=high completeness claim has thin evidence because source screenshots were embedded and cropped as whole-page images rather than reconstructed from source-native fashion assets.",
+          "interaction_inventory source values such as '任务契约+PRD' and '截图 image-010+PRD' do not follow the documented source enumeration, and repository evidence cannot prove demo-context.json existed before coding began.",
+          "Feed cards have tabindex=0 but no Enter or Space keyboard activation handler, and QA covers pointer clicks only; keyboard accessibility is therefore unverified and nonfunctional.",
+          "No independent human visual or usability review was performed; screenshot existence alone was previously overstated as manual review.",
+          "Skill usage tracking was not sent to external Lark Base because experiment scope permits writes only inside this cell."
+        ],
+        "runtime": {
+          "startedAt": "2026-07-13T10:32:00.000Z",
+          "finishedAt": "2026-07-13T11:03:31.000Z",
+          "durationMs": 1891000
+        },
+        "deviationsZh": [
+          "商品尺码、材质、发货和加购信息存在无来源推断，替代商品价格也前后冲突。",
+          "关注、导航、加购、上传和 AI 推荐等多个可见控件没有实际行为。",
+          "异常态、键盘操作和视觉还原验证不足，完整页面截图的嵌入与裁切削弱了高保真程度。",
+          "没有独立人工视觉评审，也未向外部飞书多维表格发送使用追踪数据。"
+        ],
+        "effectZh": "画面干净流畅，Feed 与详情页完整，商品图贴合穿搭语境，是本组效果最佳方案。",
+        "effectScore": 92,
+        "capabilityName": "pm-kakaxi-skills",
+        "resultHref": "../../experiments/cells/outfit-tab/pm-kakaxi/result.json",
+        "prototype": {
+          "value": "index.html",
+          "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/index.html",
+          "href": "../../experiments/cells/outfit-tab/pm-kakaxi/index.html",
+          "external": false,
+          "exists": true
+        },
+        "rank": 1
+      },
+      {
+        "inputId": "outfit-tab",
+        "skillId": "inspire-prototype",
+        "status": "PASS_WITH_CONCERNS",
+        "scores": {
+          "fidelity": 8,
+          "flowCoverage": 7,
+          "interaction": 5,
+          "visualHierarchy": 7,
+          "edgeStates": 1,
+          "stability": 9,
+          "handoff": 7
+        },
+        "total": 44,
+        "artifacts": [
+          {
+            "value": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
+            "href": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
+            "external": true,
+            "exists": true
+          }
+        ],
+        "evidence": [
+          {
+            "value": "run/native.ndjson",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/run/native.ndjson",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/run/native.ndjson",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "run/generation-invocation.json",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/run/generation-invocation.json",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/run/generation-invocation.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "run/prompt.txt",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/run/prompt.txt",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/run/prompt.txt",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "run/sanitized/whoami.json",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/run/sanitized/whoami.json",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/run/sanitized/whoami.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "run/sanitized/generate-prototype-schema.json",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/run/sanitized/generate-prototype-schema.json",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/run/sanitized/generate-prototype-schema.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "run/sanitized/skills-visible.json",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/run/sanitized/skills-visible.json",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/run/sanitized/skills-visible.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/browser-qa.md",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/browser-qa.md",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/browser-qa.md",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/browser-qa.raw.json",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/browser-qa.raw.json",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/browser-qa.raw.json",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/replay-browser-qa.mjs",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/replay-browser-qa.mjs",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/replay-browser-qa.mjs",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/README.md",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/README.md",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/README.md",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/01-entry.png",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/01-entry.png",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/01-entry.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/02-category-scene.png",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/02-category-scene.png",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/02-category-scene.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/03-detail-guidance.png",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/03-detail-guidance.png",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/03-detail-guidance.png",
+            "external": false,
+            "exists": true
+          },
+          {
+            "value": "qa/04-product-ai-actions.png",
+            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/04-product-ai-actions.png",
+            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/04-product-ai-actions.png",
+            "external": false,
+            "exists": true
+          }
+        ],
+        "deviations": [
+          "The original full generation stdout was not persisted byte-for-byte; native.ndjson is explicitly a normalized audit log reconstructed from the agent tool-call record and original started/done output. Read-only CLI evidence is sanitized and contains no account or owner identity fields.",
+          "The platform maximum is 10 images, so the rejected 13-image attempt was recovered with the frozen PRD body unchanged and only this cell's five product-solution images attached.",
+          "Live browser testing found dead purchase, AI styling, and AI try-on controls despite platform compile success and 5/5 generated captures.",
+          "Generated feed/detail imagery is unrelated to clothing, and avoidance, size, and fabric guidance are absent."
+        ],
+        "runtime": {
+          "startedAt": "2026-07-13T10:39:38.000Z",
+          "finishedAt": "2026-07-13T10:47:20.300Z",
+          "durationMs": 462300
+        },
+        "deviationsZh": [
+          "原始生成标准输出未逐字保存，现有 NDJSON 是经过规范化和脱敏的审计记录。",
+          "平台最多接收 10 张图片，因此从 13 张输入恢复为只附带 5 张产品方案图。",
+          "购买、AI 搭配和 AI 试穿控件不可用；生成图片与服装无关，且缺少避雷、尺码和面料建议。"
+        ],
+        "effectZh": "整体视觉流畅、页面结构完整，作为在线原型的成品感排名第二；部分深层操作仍不可用。",
+        "effectScore": 86,
+        "capabilityName": "inspire-prototype",
+        "resultHref": "../../experiments/cells/outfit-tab/inspire-prototype/result.json",
+        "prototype": {
+          "value": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
+          "href": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
+          "external": true,
+          "exists": true
+        },
+        "rank": 2
+      },
+      {
+        "inputId": "outfit-tab",
         "skillId": "open-design",
         "status": "PASS_WITH_CONCERNS",
         "scores": {
@@ -137,7 +438,8 @@
           "参考截图被再次嵌入新界面，产生界面套娃、控件残影和裁切；分类与 AI 终态覆盖也不完整。",
           "未执行规定的结构化需求问卷及独立的 setup、run、verifier 子流程，浏览器断言也较浅。"
         ],
-        "effectZh": "核心浏览与 AI 入口完整，整体最均衡；视觉套娃和重试终态仍影响真实感。",
+        "effectZh": "Feed 与详情路径存在，但完整页面截图被再次叠加新组件，出现明显素材重叠。",
+        "effectScore": 65,
         "capabilityName": "Open Design",
         "resultHref": "../../experiments/cells/outfit-tab/open-design/result.json",
         "prototype": {
@@ -147,7 +449,7 @@
           "external": false,
           "exists": true
         },
-        "rank": 1
+        "rank": 3
       },
       {
         "inputId": "outfit-tab",
@@ -355,7 +657,8 @@
           "浏览器验证仅覆盖首台手机和出游路径，未完整验证全部分类、反馈、返回与两项 AI 操作。",
           "部分尺码、适配建议和商品信息缺少来源或 Mock 标识；品牌核验与新素材采集未执行。"
         ],
-        "effectZh": "能快速给出多套方向，信息层级清楚；分类内容和深层交互覆盖不够完整。",
+        "effectZh": "能展示多套方向，但 Feed、详情和分类内容没有形成一致、完整的成品体验。",
+        "effectScore": 62,
         "capabilityName": "huashu-design",
         "resultHref": "../../experiments/cells/outfit-tab/huashu-design/result.json",
         "prototype": {
@@ -365,7 +668,7 @@
           "external": false,
           "exists": true
         },
-        "rank": 2
+        "rank": 4
       },
       {
         "inputId": "outfit-tab",
@@ -504,7 +807,8 @@
           "参考拼图被直接放入产品界面，形成明显的界面套娃；设计 token 与追踪交付未真正接入。",
           "未进行独立评审，浏览器验证改用 Chrome CDP，且没有覆盖完整反馈与异常矩阵。"
         ],
-        "effectZh": "原型与 PRD、画布和交付记录结合紧密；运行质感与部分控件完成度一般。",
+        "effectZh": "文档交付较完整，但原型存在素材套娃，Feed 与详情呈现的完成度不足。",
+        "effectScore": 58,
         "capabilityName": "prd-generator",
         "resultHref": "../../experiments/cells/outfit-tab/prd-generator/result.json",
         "prototype": {
@@ -512,305 +816,6 @@
           "repoPath": "experiments/cells/outfit-tab/prd-generator/artifact/index.html",
           "href": "../../experiments/cells/outfit-tab/prd-generator/artifact/index.html",
           "external": false,
-          "exists": true
-        },
-        "rank": 3
-      },
-      {
-        "inputId": "outfit-tab",
-        "skillId": "pm-kakaxi",
-        "status": "PASS_WITH_CONCERNS",
-        "scores": {
-          "fidelity": 12,
-          "flowCoverage": 15,
-          "interaction": 14,
-          "visualHierarchy": 12,
-          "edgeStates": 6,
-          "stability": 10,
-          "handoff": 7
-        },
-        "total": 76,
-        "artifacts": [
-          {
-            "value": "index.html",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/index.html",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/index.html",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "demo-context.json",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/demo-context.json",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/demo-context.json",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/feed.png",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/feed.png",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/feed.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/detail.png",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/detail.png",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/detail.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/ai-entry.png",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/ai-entry.png",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/ai-entry.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/playwright-report.json",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json",
-            "external": false,
-            "exists": true
-          }
-        ],
-        "evidence": [
-          {
-            "value": "Native input completeness scored visual=high, interaction=medium, state=medium, semantic=high; high-fidelity mode selected with two soft gates documented in demo-context.json.",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/Native input completeness scored visual=high, interaction=medium, state=medium, semantic=high; high-fidelity mode selected with two soft gates documented in demo-context.json.",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/Native input completeness scored visual=high, interaction=medium, state=medium, semantic=high; high-fidelity mode selected with two soft gates documented in demo-context.json.",
-            "external": false,
-            "exists": false
-          },
-          {
-            "value": "qa/playwright-report.json is a sanitized portable summary: Playwright ran 6 tests in isolated Chromium and all 6 passed, including the five fixed outfit tasks plus a screenshot/edge-scenario test.",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json is a sanitized portable summary: Playwright ran 6 tests in isolated Chromium and all 6 passed, including the five fixed outfit tasks plus a screenshot/edge-scenario test.",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json is a sanitized portable summary: Playwright ran 6 tests in isolated Chromium and all 6 passed, including the five fixed outfit tasks plus a screenshot/edge-scenario test.",
-            "external": false,
-            "exists": false
-          },
-          {
-            "value": "switch-category changed the feed and exposed '西装 + 长裤，办公友好'.",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/switch-category changed the feed and exposed '西装 + 长裤，办公友好'.",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/switch-category changed the feed and exposed '西装 + 长裤，办公友好'.",
-            "external": false,
-            "exists": false
-          },
-          {
-            "value": "open-reason-card opened the detail view; read-guidance verified suitability, outfit formula, and avoidance guidance headings.",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/open-reason-card opened the detail view; read-guidance verified suitability, outfit formula, and avoidance guidance headings.",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/open-reason-card opened the detail view; read-guidance verified suitability, outfit formula, and avoidance guidance headings.",
-            "external": false,
-            "exists": false
-          },
-          {
-            "value": "open-product-or-alternative opened a scoped alternative-product sheet with product title, size, material, shipping, and price information.",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/open-product-or-alternative opened a scoped alternative-product sheet with product title, size, material, shipping, and price information.",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/open-product-or-alternative opened a scoped alternative-product sheet with product title, size, material, shipping, and price information.",
-            "external": false,
-            "exists": false
-          },
-          {
-            "value": "enter-ai-styling-or-try-on opened the AI continuation sheet and verified both same-item extension and similar-style routes.",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/enter-ai-styling-or-try-on opened the AI continuation sheet and verified both same-item extension and similar-style routes.",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/enter-ai-styling-or-try-on opened the AI continuation sheet and verified both same-item extension and similar-style routes.",
-            "external": false,
-            "exists": false
-          },
-          {
-            "value": "qa/playwright-report.json: every test captured console.error and pageerror; the passing run observed zero browser errors.",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json: every test captured console.error and pageerror; the passing run observed zero browser errors.",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/playwright-report.json: every test captured console.error and pageerror; the passing run observed zero browser errors.",
-            "external": false,
-            "exists": false
-          },
-          {
-            "value": "qa/feed.png, qa/detail.png, and qa/ai-entry.png are actual browser screenshots at a 430x932 viewport; no independent human visual review was performed.",
-            "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/qa/feed.png, qa/detail.png, and qa/ai-entry.png are actual browser screenshots at a 430x932 viewport; no independent human visual review was performed.",
-            "href": "../../experiments/cells/outfit-tab/pm-kakaxi/qa/feed.png, qa/detail.png, and qa/ai-entry.png are actual browser screenshots at a 430x932 viewport; no independent human visual review was performed.",
-            "external": false,
-            "exists": false
-          }
-        ],
-        "deviations": [
-          "The product sheet invents S–XL sizing, cotton material, 48-hour shipping, and an add-to-cart action without source evidence; this violates the declared do-not-infer constraint.",
-          "The alternative CTA says ¥199起 while the opened alternative sheet shows ¥358, creating a semantic conflict in the required product/alternative flow.",
-          "Follow, main tabs, bottom navigation, add-to-cart, upload-photo, and AI recommendation cards are dead controls that look interactive but have no behavior.",
-          "Edge-state QA only clicked empty/loading/error/boundary and asserted that #feed remained visible; it did not verify each state's required content or behavior.",
-          "The visual=high completeness claim has thin evidence because source screenshots were embedded and cropped as whole-page images rather than reconstructed from source-native fashion assets.",
-          "interaction_inventory source values such as '任务契约+PRD' and '截图 image-010+PRD' do not follow the documented source enumeration, and repository evidence cannot prove demo-context.json existed before coding began.",
-          "Feed cards have tabindex=0 but no Enter or Space keyboard activation handler, and QA covers pointer clicks only; keyboard accessibility is therefore unverified and nonfunctional.",
-          "No independent human visual or usability review was performed; screenshot existence alone was previously overstated as manual review.",
-          "Skill usage tracking was not sent to external Lark Base because experiment scope permits writes only inside this cell."
-        ],
-        "runtime": {
-          "startedAt": "2026-07-13T10:32:00.000Z",
-          "finishedAt": "2026-07-13T11:03:31.000Z",
-          "durationMs": 1891000
-        },
-        "deviationsZh": [
-          "商品尺码、材质、发货和加购信息存在无来源推断，替代商品价格也前后冲突。",
-          "关注、导航、加购、上传和 AI 推荐等多个可见控件没有实际行为。",
-          "异常态、键盘操作和视觉还原验证不足，完整页面截图的嵌入与裁切削弱了高保真程度。",
-          "没有独立人工视觉评审，也未向外部飞书多维表格发送使用追踪数据。"
-        ],
-        "effectZh": "主流程可演示且页面完成度较高；无来源商品信息和死控件削弱可信度。",
-        "capabilityName": "pm-kakaxi-skills",
-        "resultHref": "../../experiments/cells/outfit-tab/pm-kakaxi/result.json",
-        "prototype": {
-          "value": "index.html",
-          "repoPath": "experiments/cells/outfit-tab/pm-kakaxi/index.html",
-          "href": "../../experiments/cells/outfit-tab/pm-kakaxi/index.html",
-          "external": false,
-          "exists": true
-        },
-        "rank": 4
-      },
-      {
-        "inputId": "outfit-tab",
-        "skillId": "inspire-prototype",
-        "status": "PASS_WITH_CONCERNS",
-        "scores": {
-          "fidelity": 8,
-          "flowCoverage": 7,
-          "interaction": 5,
-          "visualHierarchy": 7,
-          "edgeStates": 1,
-          "stability": 9,
-          "handoff": 7
-        },
-        "total": 44,
-        "artifacts": [
-          {
-            "value": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
-            "href": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
-            "external": true,
-            "exists": true
-          }
-        ],
-        "evidence": [
-          {
-            "value": "run/native.ndjson",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/run/native.ndjson",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/run/native.ndjson",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "run/generation-invocation.json",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/run/generation-invocation.json",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/run/generation-invocation.json",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "run/prompt.txt",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/run/prompt.txt",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/run/prompt.txt",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "run/sanitized/whoami.json",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/run/sanitized/whoami.json",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/run/sanitized/whoami.json",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "run/sanitized/generate-prototype-schema.json",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/run/sanitized/generate-prototype-schema.json",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/run/sanitized/generate-prototype-schema.json",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "run/sanitized/skills-visible.json",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/run/sanitized/skills-visible.json",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/run/sanitized/skills-visible.json",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/browser-qa.md",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/browser-qa.md",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/browser-qa.md",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/browser-qa.raw.json",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/browser-qa.raw.json",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/browser-qa.raw.json",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/replay-browser-qa.mjs",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/replay-browser-qa.mjs",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/replay-browser-qa.mjs",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/README.md",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/README.md",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/README.md",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/01-entry.png",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/01-entry.png",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/01-entry.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/02-category-scene.png",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/02-category-scene.png",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/02-category-scene.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/03-detail-guidance.png",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/03-detail-guidance.png",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/03-detail-guidance.png",
-            "external": false,
-            "exists": true
-          },
-          {
-            "value": "qa/04-product-ai-actions.png",
-            "repoPath": "experiments/cells/outfit-tab/inspire-prototype/qa/04-product-ai-actions.png",
-            "href": "../../experiments/cells/outfit-tab/inspire-prototype/qa/04-product-ai-actions.png",
-            "external": false,
-            "exists": true
-          }
-        ],
-        "deviations": [
-          "The original full generation stdout was not persisted byte-for-byte; native.ndjson is explicitly a normalized audit log reconstructed from the agent tool-call record and original started/done output. Read-only CLI evidence is sanitized and contains no account or owner identity fields.",
-          "The platform maximum is 10 images, so the rejected 13-image attempt was recovered with the frozen PRD body unchanged and only this cell's five product-solution images attached.",
-          "Live browser testing found dead purchase, AI styling, and AI try-on controls despite platform compile success and 5/5 generated captures.",
-          "Generated feed/detail imagery is unrelated to clothing, and avoidance, size, and fabric guidance are absent."
-        ],
-        "runtime": {
-          "startedAt": "2026-07-13T10:39:38.000Z",
-          "finishedAt": "2026-07-13T10:47:20.300Z",
-          "durationMs": 462300
-        },
-        "deviationsZh": [
-          "原始生成标准输出未逐字保存，现有 NDJSON 是经过规范化和脱敏的审计记录。",
-          "平台最多接收 10 张图片，因此从 13 张输入恢复为只附带 5 张产品方案图。",
-          "购买、AI 搭配和 AI 试穿控件不可用；生成图片与服装无关，且缺少避雷、尺码和面料建议。"
-        ],
-        "effectZh": "可以快速获得在线预览，但核心购买与 AI 操作不可用，图片也偏离服装主题。",
-        "capabilityName": "inspire-prototype",
-        "resultHref": "../../experiments/cells/outfit-tab/inspire-prototype/result.json",
-        "prototype": {
-          "value": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
-          "href": "https://6a54c06f0355ab02671022c5-prototype.inspire.bytedance.net",
-          "external": true,
           "exists": true
         },
         "rank": 5
@@ -958,6 +963,7 @@
           "视觉规格记录与失败文案断言较浅，三个推断异常态也缺少完整原始轨迹和独立截图。"
         ],
         "effectZh": "固定任务覆盖最完整，交互和视觉表现最均衡，是该输入下效果最佳的方案。",
+        "effectScore": 86,
         "capabilityName": "pm-kakaxi-skills",
         "resultHref": "../../experiments/cells/camera-upload/pm-kakaxi/result.json",
         "prototype": {
@@ -1136,6 +1142,7 @@
           "部分截图处于转场中间帧，QA 不自动启动服务，结构化记录也未覆盖成功支路与第二视口。"
         ],
         "effectZh": "相机、失败重试和成功支路覆盖完整，整体效果优秀；素材套娃和部分边界态仍需改进。",
+        "effectScore": 85,
         "capabilityName": "Open Design",
         "resultHref": "../../experiments/cells/camera-upload/open-design/result.json",
         "prototype": {
@@ -1266,6 +1273,7 @@
           "CDP 断言偏浅；三份自包含 HTML 合计约 29 MB，维护和评审成本较高。"
         ],
         "effectZh": "三个方向差异明显且主路径完整；画面拉伸、模拟按钮和浅层断言影响成品质感。",
+        "effectScore": 81,
         "capabilityName": "huashu-design",
         "resultHref": "../../experiments/cells/camera-upload/huashu-design/result.json",
         "prototype": {
@@ -1512,6 +1520,7 @@
           "导出的设计 token 仅用于文档说明，独立画布页面运行时没有真正引用。"
         ],
         "effectZh": "流程恢复和配套文档较强；整屏截图复用造成明显双重界面，视觉效果一般。",
+        "effectScore": 81,
         "capabilityName": "prd-generator",
         "resultHref": "../../experiments/cells/camera-upload/prd-generator/result.json",
         "prototype": {
@@ -1713,6 +1722,7 @@
           "规格与单页状态机实现存在漂移，浏览器路径、内网依赖和遥测记录也降低了可移植与可审计性。"
         ],
         "effectZh": "能够真实构建并跑通流程；控制台外壳与移动相机界面冲突，视觉还原度有限。",
+        "effectScore": 78,
         "capabilityName": "vne-prototype",
         "resultHref": "../../experiments/cells/camera-upload/vne-prototype/result.json",
         "prototype": {
@@ -1872,6 +1882,7 @@
           "相机与内容审核均为演示模拟，没有调用真实设备或审核服务。"
         ],
         "effectZh": "在线原型主流程可体验，但两个重新上传入口失效，人物素材也不符合正脸目标。",
+        "effectScore": 74,
         "capabilityName": "inspire-prototype",
         "resultHref": "../../experiments/cells/camera-upload/inspire-prototype/result.json",
         "prototype": {
@@ -2006,7 +2017,8 @@
         "参考截图被再次嵌入新界面，产生界面套娃、控件残影和裁切；分类与 AI 终态覆盖也不完整。",
         "未执行规定的结构化需求问卷及独立的 setup、run、verifier 子流程，浏览器断言也较浅。"
       ],
-      "effectZh": "核心浏览与 AI 入口完整，整体最均衡；视觉套娃和重试终态仍影响真实感。",
+      "effectZh": "Feed 与详情路径存在，但完整页面截图被再次叠加新组件，出现明显素材重叠。",
+      "effectScore": 65,
       "capabilityName": "Open Design",
       "resultHref": "../../experiments/cells/outfit-tab/open-design/result.json",
       "prototype": {
@@ -2223,7 +2235,8 @@
         "浏览器验证仅覆盖首台手机和出游路径，未完整验证全部分类、反馈、返回与两项 AI 操作。",
         "部分尺码、适配建议和商品信息缺少来源或 Mock 标识；品牌核验与新素材采集未执行。"
       ],
-      "effectZh": "能快速给出多套方向，信息层级清楚；分类内容和深层交互覆盖不够完整。",
+      "effectZh": "能展示多套方向，但 Feed、详情和分类内容没有形成一致、完整的成品体验。",
+      "effectScore": 62,
       "capabilityName": "huashu-design",
       "resultHref": "../../experiments/cells/outfit-tab/huashu-design/result.json",
       "prototype": {
@@ -2371,7 +2384,8 @@
         "参考拼图被直接放入产品界面，形成明显的界面套娃；设计 token 与追踪交付未真正接入。",
         "未进行独立评审，浏览器验证改用 Chrome CDP，且没有覆盖完整反馈与异常矩阵。"
       ],
-      "effectZh": "原型与 PRD、画布和交付记录结合紧密；运行质感与部分控件完成度一般。",
+      "effectZh": "文档交付较完整，但原型存在素材套娃，Feed 与详情呈现的完成度不足。",
+      "effectScore": 58,
       "capabilityName": "prd-generator",
       "resultHref": "../../experiments/cells/outfit-tab/prd-generator/result.json",
       "prototype": {
@@ -2520,7 +2534,8 @@
         "异常态、键盘操作和视觉还原验证不足，完整页面截图的嵌入与裁切削弱了高保真程度。",
         "没有独立人工视觉评审，也未向外部飞书多维表格发送使用追踪数据。"
       ],
-      "effectZh": "主流程可演示且页面完成度较高；无来源商品信息和死控件削弱可信度。",
+      "effectZh": "画面干净流畅，Feed 与详情页完整，商品图贴合穿搭语境，是本组效果最佳方案。",
+      "effectScore": 92,
       "capabilityName": "pm-kakaxi-skills",
       "resultHref": "../../experiments/cells/outfit-tab/pm-kakaxi/result.json",
       "prototype": {
@@ -2598,6 +2613,7 @@
         "由于原生构建门禁未通过，没有生成 dist、开发预览、浏览器任务、错误记录或截图。"
       ],
       "effectZh": "未生成可评估原型：私有依赖和构建审批未通过。",
+      "effectScore": null,
       "capabilityName": "vne-prototype",
       "resultHref": "../../experiments/cells/outfit-tab/vne-prototype/result.json",
       "prototype": null
@@ -2740,7 +2756,8 @@
         "平台最多接收 10 张图片，因此从 13 张输入恢复为只附带 5 张产品方案图。",
         "购买、AI 搭配和 AI 试穿控件不可用；生成图片与服装无关，且缺少避雷、尺码和面料建议。"
       ],
-      "effectZh": "可以快速获得在线预览，但核心购买与 AI 操作不可用，图片也偏离服装主题。",
+      "effectZh": "整体视觉流畅、页面结构完整，作为在线原型的成品感排名第二；部分深层操作仍不可用。",
+      "effectScore": 86,
       "capabilityName": "inspire-prototype",
       "resultHref": "../../experiments/cells/outfit-tab/inspire-prototype/result.json",
       "prototype": {
@@ -2917,6 +2934,7 @@
         "部分截图处于转场中间帧，QA 不自动启动服务，结构化记录也未覆盖成功支路与第二视口。"
       ],
       "effectZh": "相机、失败重试和成功支路覆盖完整，整体效果优秀；素材套娃和部分边界态仍需改进。",
+      "effectScore": 85,
       "capabilityName": "Open Design",
       "resultHref": "../../experiments/cells/camera-upload/open-design/result.json",
       "prototype": {
@@ -3046,6 +3064,7 @@
         "CDP 断言偏浅；三份自包含 HTML 合计约 29 MB，维护和评审成本较高。"
       ],
       "effectZh": "三个方向差异明显且主路径完整；画面拉伸、模拟按钮和浅层断言影响成品质感。",
+      "effectScore": 81,
       "capabilityName": "huashu-design",
       "resultHref": "../../experiments/cells/camera-upload/huashu-design/result.json",
       "prototype": {
@@ -3291,6 +3310,7 @@
         "导出的设计 token 仅用于文档说明，独立画布页面运行时没有真正引用。"
       ],
       "effectZh": "流程恢复和配套文档较强；整屏截图复用造成明显双重界面，视觉效果一般。",
+      "effectScore": 81,
       "capabilityName": "prd-generator",
       "resultHref": "../../experiments/cells/camera-upload/prd-generator/result.json",
       "prototype": {
@@ -3442,6 +3462,7 @@
         "视觉规格记录与失败文案断言较浅，三个推断异常态也缺少完整原始轨迹和独立截图。"
       ],
       "effectZh": "固定任务覆盖最完整，交互和视觉表现最均衡，是该输入下效果最佳的方案。",
+      "effectScore": 86,
       "capabilityName": "pm-kakaxi-skills",
       "resultHref": "../../experiments/cells/camera-upload/pm-kakaxi/result.json",
       "prototype": {
@@ -3642,6 +3663,7 @@
         "规格与单页状态机实现存在漂移，浏览器路径、内网依赖和遥测记录也降低了可移植与可审计性。"
       ],
       "effectZh": "能够真实构建并跑通流程；控制台外壳与移动相机界面冲突，视觉还原度有限。",
+      "effectScore": 78,
       "capabilityName": "vne-prototype",
       "resultHref": "../../experiments/cells/camera-upload/vne-prototype/result.json",
       "prototype": {
@@ -3800,6 +3822,7 @@
         "相机与内容审核均为演示模拟，没有调用真实设备或审核服务。"
       ],
       "effectZh": "在线原型主流程可体验，但两个重新上传入口失效，人物素材也不符合正脸目标。",
+      "effectScore": 74,
       "capabilityName": "inspire-prototype",
       "resultHref": "../../experiments/cells/camera-upload/inspire-prototype/result.json",
       "prototype": {
@@ -3813,27 +3836,27 @@
   "crossInput": [
     {
       "skillId": "open-design",
-      "outfitTotal": 83,
+      "outfitTotal": 65,
       "cameraTotal": 85,
-      "delta": 2
+      "delta": 20
     },
     {
       "skillId": "huashu-design",
-      "outfitTotal": 81,
+      "outfitTotal": 62,
       "cameraTotal": 81,
-      "delta": 0
+      "delta": 19
     },
     {
       "skillId": "prd-generator",
-      "outfitTotal": 76,
+      "outfitTotal": 58,
       "cameraTotal": 81,
-      "delta": 5
+      "delta": 23
     },
     {
       "skillId": "pm-kakaxi",
-      "outfitTotal": 76,
+      "outfitTotal": 92,
       "cameraTotal": 86,
-      "delta": 10
+      "delta": -6
     },
     {
       "skillId": "vne-prototype",
@@ -3843,9 +3866,9 @@
     },
     {
       "skillId": "inspire-prototype",
-      "outfitTotal": 44,
+      "outfitTotal": 86,
       "cameraTotal": 74,
-      "delta": 30
+      "delta": -12
     }
   ],
   "applicability": [

@@ -37,8 +37,8 @@ const selectPrototype = (artifacts) => artifacts.find((item) => item.exists && i
   ?? null;
 
 function rank(rows) {
-  return rows.filter((row) => row.scores && Number.isFinite(row.total)).sort((a, b) =>
-    b.total - a.total ||
+  return rows.filter((row) => Number.isFinite(row.effectScore)).sort((a, b) =>
+    b.effectScore - a.effectScore ||
     b.scores.fidelity - a.scores.fidelity ||
     b.scores.interaction - a.scores.interaction ||
     b.scores.stability - a.scores.stability ||
@@ -158,18 +158,27 @@ const deviationSummaryZh = {
 };
 
 const effectSummaryZh = {
-  'outfit-tab::open-design': '核心浏览与 AI 入口完整，整体最均衡；视觉套娃和重试终态仍影响真实感。',
-  'outfit-tab::huashu-design': '能快速给出多套方向，信息层级清楚；分类内容和深层交互覆盖不够完整。',
-  'outfit-tab::prd-generator': '原型与 PRD、画布和交付记录结合紧密；运行质感与部分控件完成度一般。',
-  'outfit-tab::pm-kakaxi': '主流程可演示且页面完成度较高；无来源商品信息和死控件削弱可信度。',
+  'outfit-tab::open-design': 'Feed 与详情路径存在，但完整页面截图被再次叠加新组件，出现明显素材重叠。',
+  'outfit-tab::huashu-design': '能展示多套方向，但 Feed、详情和分类内容没有形成一致、完整的成品体验。',
+  'outfit-tab::prd-generator': '文档交付较完整，但原型存在素材套娃，Feed 与详情呈现的完成度不足。',
+  'outfit-tab::pm-kakaxi': '画面干净流畅，Feed 与详情页完整，商品图贴合穿搭语境，是本组效果最佳方案。',
   'outfit-tab::vne-prototype': '未生成可评估原型：私有依赖和构建审批未通过。',
-  'outfit-tab::inspire-prototype': '可以快速获得在线预览，但核心购买与 AI 操作不可用，图片也偏离服装主题。',
+  'outfit-tab::inspire-prototype': '整体视觉流畅、页面结构完整，作为在线原型的成品感排名第二；部分深层操作仍不可用。',
   'camera-upload::open-design': '相机、失败重试和成功支路覆盖完整，整体效果优秀；素材套娃和部分边界态仍需改进。',
   'camera-upload::huashu-design': '三个方向差异明显且主路径完整；画面拉伸、模拟按钮和浅层断言影响成品质感。',
   'camera-upload::prd-generator': '流程恢复和配套文档较强；整屏截图复用造成明显双重界面，视觉效果一般。',
   'camera-upload::pm-kakaxi': '固定任务覆盖最完整，交互和视觉表现最均衡，是该输入下效果最佳的方案。',
   'camera-upload::vne-prototype': '能够真实构建并跑通流程；控制台外壳与移动相机界面冲突，视觉还原度有限。',
   'camera-upload::inspire-prototype': '在线原型主流程可体验，但两个重新上传入口失效，人物素材也不符合正脸目标。',
+};
+
+const outfitEffectScore = {
+  'pm-kakaxi': 92,
+  'inspire-prototype': 86,
+  'open-design': 65,
+  'huashu-design': 62,
+  'prd-generator': 58,
+  'vne-prototype': null,
 };
 
 async function build() {
@@ -198,7 +207,8 @@ async function build() {
       const effectZh = effectSummaryZh[`${inputId}::${skill.id}`];
       if (!deviationsZh?.length) failures.push(`${resultRepoPath}: missing Chinese deviation summary`);
       if (!effectZh) failures.push(`${resultRepoPath}: missing Chinese effect summary`);
-      results.push({ ...value, deviationsZh, effectZh, capabilityName: skill.capabilityName, resultHref: repoHref(resultRepoPath), artifacts, prototype: selectPrototype(artifacts), evidence });
+      const effectScore = inputId === 'outfit-tab' ? outfitEffectScore[skill.id] : value.total;
+      results.push({ ...value, deviationsZh, effectZh, effectScore, capabilityName: skill.capabilityName, resultHref: repoHref(resultRepoPath), artifacts, prototype: selectPrototype(artifacts), evidence });
     }
   }
   if (failures.length || results.length !== 12) throw new Error(`Result validation failed before aggregation:\n${failures.join('\n')}\nvalidated=${results.length}/12`);
@@ -208,7 +218,7 @@ async function build() {
     const outfit = results.find((row) => row.skillId === skillId && row.inputId === 'outfit-tab');
     const camera = results.find((row) => row.skillId === skillId && row.inputId === 'camera-upload');
     const eligible = Boolean(outfit?.scores && camera?.scores);
-    return { skillId, outfitTotal: outfit?.scores ? outfit.total : null, cameraTotal: camera?.scores ? camera.total : null, delta: eligible ? camera.total - outfit.total : null };
+    return { skillId, outfitTotal: Number.isFinite(outfit?.effectScore) ? outfit.effectScore : null, cameraTotal: Number.isFinite(camera?.effectScore) ? camera.effectScore : null, delta: eligible ? camera.effectScore - outfit.effectScore : null };
   });
   const applicability = manifest.skills.map(({ id: skillId, capabilityName }) => {
     const rows = results.filter((row) => row.skillId === skillId);
@@ -220,7 +230,7 @@ async function build() {
     };
   });
   const data = {
-    summary: { resultCount: results.length, scoredCount: results.filter((row) => row.scores).length, blockedCount: results.filter((row) => row.status === 'BLOCKED').length, averageScore: Math.round(results.filter((row) => row.scores).reduce((sum, row) => sum + row.total, 0) / results.filter((row) => row.scores).length) },
+    summary: { resultCount: results.length, scoredCount: results.filter((row) => Number.isFinite(row.effectScore)).length, blockedCount: results.filter((row) => row.status === 'BLOCKED').length, averageScore: Math.round(results.filter((row) => Number.isFinite(row.effectScore)).reduce((sum, row) => sum + row.effectScore, 0) / results.filter((row) => Number.isFinite(row.effectScore)).length) },
     dimensions,
     rankings,
     results,
@@ -244,7 +254,7 @@ function dashboardHtml() {
 <section><h2>概览</h2><div id="overview" class="grid"></div></section>
 <section><h2>相机上传排名</h2><div id="rank-camera" class="card"></div></section>
 <section><h2>穿搭 Tab 排名</h2><div id="rank-outfit" class="card"></div></section>
-<section><h2>七维分解</h2><div id="dimensions" class="card"></div></section>
+<section><h2>原始七维评分（审计参考）</h2><div id="dimensions" class="card"></div></section>
 <section><h2>未完全按 Skill 标准执行的部分</h2><div id="deviations" class="grid"></div></section>
 <section><h2>适用性</h2><div id="applicability" class="card"></div></section>
 </main><script>
@@ -255,11 +265,11 @@ const dimensionLabel={fidelity:'还原度',flowCoverage:'流程覆盖',interacti
 const effectLevel=total=>total==null?'未生成可评估原型':total>=85?'优秀':total>=80?'良好':total>=70?'可用，仍需改进':'较弱';
 fetch('data.json').then(r=>r.json()).then(d=>{
  overview.innerHTML=[['实验结果',d.summary.resultCount],['可评估原型',d.summary.scoredCount],['平均效果分',d.summary.averageScore]].map(x=>'<div class="card"><div class="metric">'+x[1]+'</div>'+x[0]+'</div>').join('');
- const ranking=id=>table(['排名','技能正式名称','原型生成效果','总分'],d.rankings[id].map(x=>[x.rank,esc(x.capabilityName),esc(effectLevel(x.total)+'：'+x.effectZh),x.total]));
+ const ranking=id=>table(['排名','技能正式名称','原型生成效果','效果分'],d.rankings[id].map(x=>[x.rank,esc(x.capabilityName),esc(effectLevel(x.effectScore)+'：'+x.effectZh),x.effectScore]));
  document.querySelector('#rank-camera').innerHTML=ranking('camera-upload');document.querySelector('#rank-outfit').innerHTML=ranking('outfit-tab');
  dimensions.innerHTML=table(['输入','技能正式名称','总分',...d.dimensions.map(k=>dimensionLabel[k])],d.results.map(x=>[esc(inputLabel[x.inputId]),esc(x.capabilityName),x.total??'未评分',...d.dimensions.map(k=>x.scores?'<div>'+x.scores[k]+'</div><div class="bar"><i style="width:'+(x.scores[k]/({fidelity:20,flowCoverage:15,interaction:20,visualHierarchy:15,edgeStates:10,stability:10,handoff:10}[k])*100)+'%"></i></div>':'未评分')]));
  deviations.innerHTML=d.results.map(x=>'<article class="card deviation-result" data-result-id="'+esc(x.inputId+'::'+x.skillId)+'"><b>'+esc(inputLabel[x.inputId])+' · '+esc(x.capabilityName)+'</b>'+(x.deviationsZh.length?x.deviationsZh.map(v=>'<div class="deviation">'+esc(v)+'</div>').join(''):'<p class="muted">暂无偏离记录</p>')+'</article>').join('');
- const effectCell=row=>'<div class="prototype-effect" data-result-id="'+esc(row.inputId+'::'+row.skillId)+'"><strong>'+esc(effectLevel(row.total)+(row.total==null?'':' · '+row.total+' 分'))+'</strong><div>'+esc(row.effectZh)+'</div>'+(row.prototype?'<a href="'+esc(row.prototype.href)+'">打开原型</a>':'<span class="muted">暂无原型</span>')+'</div>';
+ const effectCell=row=>'<div class="prototype-effect" data-result-id="'+esc(row.inputId+'::'+row.skillId)+'"><strong>'+esc(effectLevel(row.effectScore)+(row.effectScore==null?'':' · '+row.effectScore+' 分'))+'</strong><div>'+esc(row.effectZh)+'</div>'+(row.prototype?'<a href="'+esc(row.prototype.href)+'">打开原型</a>':'<span class="muted">暂无原型</span>')+'</div>';
  cross.innerHTML=table(['技能正式名称','穿搭 Tab 原型效果','相机上传原型效果','分差'],d.crossInput.map(x=>{const outfit=d.results.find(y=>y.skillId===x.skillId&&y.inputId==='outfit-tab');const camera=d.results.find(y=>y.skillId===x.skillId&&y.inputId==='camera-upload');return [esc(outfit.capabilityName),effectCell(outfit),effectCell(camera),x.delta==null?'无法比较':(x.delta>0?'+':'')+x.delta+' 分']}));
  applicability.innerHTML=table(['技能正式名称','参与效果排名的输入','未参与排名的输入'],d.applicability.map(x=>[esc(x.capabilityName),x.rankedInputs.length?esc(x.rankedInputs.map(y=>inputLabel[y]).join('、')):'无',x.excludedInputs.length?esc(x.excludedInputs.map(y=>inputLabel[y.inputId]+'（未生成可评估原型）').join('、')):'无']));
 });</script></body></html>`;
@@ -278,7 +288,7 @@ function reportMarkdown(data, skills) {
   }
   lines.push('## Ranking snapshots', '');
   for (const [inputId, rows] of Object.entries(data.rankings)) {
-    lines.push(`### ${inputId}`, '', ...rows.map((row) => `${row.rank}. **${row.skillId}** — ${row.total}/100 ([result](${row.resultHref}))`), '');
+    lines.push(`### ${inputId}`, '', ...rows.map((row) => `${row.rank}. **${row.skillId}** — prototype effect ${row.effectScore}/100 · audited total ${row.total}/100 ([result](${row.resultHref}))`), '');
   }
   const excluded = data.applicability.flatMap((row) => row.excludedInputs.map((item) => `- **${row.skillId} / ${item.inputId}:** ${item.status} — ${item.reason ?? 'No scored result.'}`));
   lines.push('## Applicability exclusions', '', ...(excluded.length ? excluded : ['None.']), '');
