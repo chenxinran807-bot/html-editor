@@ -122,6 +122,11 @@ test('keeps blocked results scoreless and excludes them from ranking', async () 
 
 test('computes cross-input deltas only when both inputs have scores', async () => {
   const { data } = await buildFixture();
+  assert.deepEqual(data.crossInput.map((row) => row.skillId), [
+    'inspire-prototype', 'pm-kakaxi', 'prd-generator', 'open-design', 'huashu-design', 'vne-prototype',
+  ]);
+  assert.deepEqual(data.crossInput.map((row) => row.overallRank), [1, 2, 3, 4, 5, 6]);
+  assert.deepEqual(data.crossInput.slice(0, 5).map((row) => row.combinedEffectScore), [89, 88, 69, 66.5, 63.5]);
   assert.equal(data.crossInput.find((row) => row.skillId === 'pm-kakaxi').delta, -8);
   assert.equal(data.crossInput.find((row) => row.skillId === 'open-design').delta, 3);
   assert.equal(data.crossInput.find((row) => row.skillId === 'inspire-prototype').delta, 6);

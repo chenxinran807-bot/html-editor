@@ -3835,40 +3835,58 @@
   ],
   "crossInput": [
     {
-      "skillId": "open-design",
-      "outfitTotal": 65,
-      "cameraTotal": 68,
-      "delta": 3
-    },
-    {
-      "skillId": "huashu-design",
-      "outfitTotal": 62,
-      "cameraTotal": 65,
-      "delta": 3
-    },
-    {
-      "skillId": "prd-generator",
-      "outfitTotal": 58,
-      "cameraTotal": 80,
-      "delta": 22
+      "skillId": "inspire-prototype",
+      "outfitTotal": 86,
+      "cameraTotal": 92,
+      "delta": 6,
+      "scoredInputCount": 2,
+      "combinedEffectScore": 89,
+      "overallRank": 1
     },
     {
       "skillId": "pm-kakaxi",
       "outfitTotal": 92,
       "cameraTotal": 84,
-      "delta": -8
+      "delta": -8,
+      "scoredInputCount": 2,
+      "combinedEffectScore": 88,
+      "overallRank": 2
+    },
+    {
+      "skillId": "prd-generator",
+      "outfitTotal": 58,
+      "cameraTotal": 80,
+      "delta": 22,
+      "scoredInputCount": 2,
+      "combinedEffectScore": 69,
+      "overallRank": 3
+    },
+    {
+      "skillId": "open-design",
+      "outfitTotal": 65,
+      "cameraTotal": 68,
+      "delta": 3,
+      "scoredInputCount": 2,
+      "combinedEffectScore": 66.5,
+      "overallRank": 4
+    },
+    {
+      "skillId": "huashu-design",
+      "outfitTotal": 62,
+      "cameraTotal": 65,
+      "delta": 3,
+      "scoredInputCount": 2,
+      "combinedEffectScore": 63.5,
+      "overallRank": 5
     },
     {
       "skillId": "vne-prototype",
       "outfitTotal": null,
       "cameraTotal": 76,
-      "delta": null
-    },
-    {
-      "skillId": "inspire-prototype",
-      "outfitTotal": 86,
-      "cameraTotal": 92,
-      "delta": 6
+      "delta": null,
+      "scoredInputCount": 1,
+      "combinedEffectScore": 76,
+      "overallRank": 6
     }
   ],
   "applicability": [
