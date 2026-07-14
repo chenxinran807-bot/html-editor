@@ -82,6 +82,59 @@ test('validates and aggregates exactly twelve experiment results', async () => {
   assert.deepEqual(data.dimensions, ['fidelity', 'flowCoverage', 'interaction', 'visualHierarchy', 'edgeStates', 'stability', 'handoff']);
 });
 
+test('publishes the dashboard experiment settings', async () => {
+  const { data } = await buildFixture();
+  assert.deepEqual(data.experimentSettings, [
+    {
+      id: 'inputs',
+      title: '输入',
+      items: [
+        '穿搭 Tab 迭代方案',
+        'AI 试穿相机上传 PRD',
+        '两份飞书文档均固化为独立本地输入，供各实验单元重复使用',
+      ],
+    },
+    {
+      id: 'skills',
+      title: '参测 Skill 及来源',
+      items: [
+        'Open Design：本机安装的 Open Design 桌面应用内置能力',
+        'huashu-design：下载到实验环境的本地 Skill 包',
+        'prd-generator：安装在本机 Codex Skills 目录中的本地 Skill',
+        'pm-kakaxi-skills：安装在本机 Codex Skills 目录中的本地 Skill，作者标记为 pengmingyu，版本 2.1.0',
+        'vne-prototype：安装在本机 Codex Skills 目录中的本地 Skill，版本 1.0.3',
+        'inspire-prototype：由全局安装的 @byted-inspire/prototype-cli 提供的内置 Skill',
+      ],
+    },
+    {
+      id: 'execution',
+      title: '执行主体与方式',
+      items: [
+        'Codex 主 Agent 负责编排、实验约束、汇总与统一验收',
+        '独立 Subagent 按“一个输入 × 一个 Skill”执行实验任务',
+        '平台型 Skill 通过各自原生 CLI、MCP 或托管生成流程产出原型',
+        '共设置 12 个隔离实验单元，即 2 份输入 × 6 个 Skill',
+        '每个单元只读取自身输入和对应 Skill 允许使用的资源，不读取其他实验单元的产物',
+        '按各 Skill 自身标准流程生成，不人为统一技术栈、页面数量或视觉风格',
+        '对实际产物执行固定任务和浏览器验证；失败、阻断或偏离均保留记录',
+      ],
+    },
+    {
+      id: 'dimensions',
+      title: '评分维度',
+      items: [
+        { label: '需求忠实度', points: 20 },
+        { label: '流程覆盖', points: 15 },
+        { label: '交互', points: 20 },
+        { label: '视觉层级', points: 15 },
+        { label: '边界状态', points: 10 },
+        { label: '稳定性', points: 10 },
+        { label: '交付质量', points: 10 },
+      ],
+    },
+  ]);
+});
+
 test('production entry resolver rejects local paths that can escape the repository', async () => {
   const { resolveLocalEntry } = await import('../scripts/experiment/build-dashboard.mjs');
   for (const value of [
@@ -137,13 +190,16 @@ test('publishes the Chinese dashboard sections without an evidence gallery', asy
   const { output, data } = await buildFixture();
   const html = await readFile(path.join(output, 'index.html'), 'utf8');
 
-  for (const label of ['原型能力实验对比', '相机上传排名', '穿搭 Tab 排名', '未完全按 Skill 标准执行的部分', '跨输入比较', '适用性']) {
+  for (const label of ['原型能力实验对比', '实验设置', '输入', '参测 Skill 及来源', '执行主体与方式', '评分维度', '相机上传排名', '穿搭 Tab 排名', '未完全按 Skill 标准执行的部分', '跨输入比较', '适用性']) {
     assert.match(html, new RegExp(label));
   }
   assert.doesNotMatch(html, /原生流程偏离/);
   assert.match(html, /技能正式名称/);
   assert.doesNotMatch(html, /Skill 正式名称/);
   assert.doesNotMatch(html, /证据画廊/);
+  for (const label of ['实验设置', '输入', '参测 Skill 及来源', '执行主体与方式', '评分维度']) {
+    assert.ok(html.indexOf(label) < html.indexOf('跨输入比较'), `${label} must appear before cross-input comparison`);
+  }
   assert.ok(html.indexOf('跨输入比较') < html.indexOf('概览'), 'cross-input comparison must appear before overview');
   assert.doesNotMatch(html, /\['排名','技能正式名称','总分','状态'\]/);
   assert.doesNotMatch(html, /id=["']gallery["']/);
@@ -164,6 +220,21 @@ test('renders twelve effect cells with direct prototype links in the cross-input
   const page = await browser.newPage();
   await page.goto(url, { waitUntil: 'networkidle' });
 
+  const settingCards = page.locator('.experiment-setting');
+  assert.equal(await settingCards.count(), 4);
+  for (const [index, setting] of data.experimentSettings.entries()) {
+    const text = await settingCards.nth(index).innerText();
+    assert.match(text, new RegExp(setting.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+    for (const item of setting.items) {
+      const expected = typeof item === 'string' ? item : `${item.label}：${item.points} 分`;
+      assert.ok(text.includes(expected), `missing rendered experiment setting text: ${expected}`);
+    }
+  }
+  assert.equal(await settingCards.first().evaluate((card, cross) => {
+    const settingsSection = card.closest('section');
+    const crossSection = cross.closest('section');
+    return Boolean(settingsSection.compareDocumentPosition(crossSection) & Node.DOCUMENT_POSITION_FOLLOWING);
+  }, await page.locator('#cross').elementHandle()), true, 'experiment settings section must precede cross-input section in the DOM');
   assert.equal(await page.locator('.prototype-effect').count(), 12);
   assert.equal(await page.locator('.deviation-result').count(), 12);
   for (const result of data.results) {
