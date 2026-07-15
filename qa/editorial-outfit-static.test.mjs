@@ -34,6 +34,7 @@ test('visual foundation exposes the approved semantic aliases', async () => {
     '--surface-subtle': '#F5F6F9',
     '--divider': '#E1E4E8',
     '--brand-primary': '#FF003C',
+    '--stroke-divider': '1px',
     '--radius-xs': '4px',
     '--radius-card': '8px',
     '--radius-medium': '12px',
@@ -74,12 +75,17 @@ test('layout styles consume tokens and contain no raw hex colors', async () => {
 
 test('visual declarations in layout styles use aliases', async () => {
   const css = await readFile(stylesUrl, 'utf8');
-  const tokenOnly = /^(?:var\(\s*--[\w-]+\s*\)|0|none|transparent|inherit|initial|unset|auto)$/i;
-  const visualProperties = /^(?:color|background-color|border-color|font-size|line-height|gap|row-gap|column-gap|padding(?:-(?:top|right|bottom|left|inline|block)(?:-(?:start|end))?)?|margin(?:-(?:top|right|bottom|left|inline|block)(?:-(?:start|end))?)?|border-radius)$/;
+  const pureVars = /^(?:var\(\s*--[\w-]+\s*\)(?:\s+|$))+$/i;
+  const allowedLiteral = /^(?:0|none|transparent|inherit|initial|unset|auto)$/i;
+  const visualProperties = /^(?:color|background-color|border-color|border-(?:top|right|bottom|left)-(?:color|width)|font-size|line-height|gap|row-gap|column-gap|padding(?:-(?:top|right|bottom|left|inline|block)(?:-(?:start|end))?)?|margin(?:-(?:top|right|bottom|left|inline|block)(?:-(?:start|end))?)?|border-radius)$/;
+
+  assert.match('var(--gap-4) var(--gap-8)', pureVars);
+  assert.doesNotMatch('var(--gap-4) 8px', pureVars);
+  assert.doesNotMatch('var(--gap-4, 8px)', pureVars);
 
   for (const [property, value] of declarations(css)) {
     if (visualProperties.test(property)) {
-      assert.match(value, tokenOnly, `${property}: ${value} must use a registered alias`);
+      assert.ok(pureVars.test(value) || allowedLiteral.test(value), `${property}: ${value} must use only registered aliases`);
     }
   }
 });
@@ -117,6 +123,24 @@ test('feed and channel spacing follow component authorization', async () => {
   assert.doesNotMatch(channelTabs, /(?:^|;)\s*(?:gap|column-gap|row-gap)\s*:/);
   assert.match(css, /\.feed\s*\{[^}]*column-gap:\s*var\(--gap-4\)/s);
   assert.match(css, /\.story-card\s*\{[^}]*margin-bottom:\s*var\(--gap-4\)/s);
+});
+
+test('fixed checkout stays inside the mobile shell and dividers are rendered', async () => {
+  const css = withoutComments(await readFile(stylesUrl, 'utf8'));
+  const checkout = css.match(/\.checkout-bar\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.match(checkout, /width:\s*100%\s*;/);
+  assert.match(checkout, /max-width:\s*430px\s*;/);
+  assert.match(checkout, /margin-inline:\s*auto\s*;/);
+  assert.match(checkout, /left:\s*0\s*;/);
+  assert.match(checkout, /right:\s*0\s*;/);
+
+  const productRow = css.match(/\.product-row\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.match(productRow, /border-bottom-style:\s*solid\s*;/);
+  assert.match(productRow, /border-bottom-width:\s*var\(--stroke-divider\)\s*;/);
+  assert.match(productRow, /border-bottom-color:\s*var\(--divider\)\s*;/);
+  assert.match(checkout, /border-top-style:\s*solid\s*;/);
+  assert.match(checkout, /border-top-width:\s*var\(--stroke-divider\)\s*;/);
+  assert.match(checkout, /border-top-color:\s*var\(--divider\)\s*;/);
 });
 
 test('locks the approved editorial outfit demo context', async () => {

@@ -147,7 +147,9 @@
   gap: var(--gap-12);
   align-items: center;
   padding-bottom: var(--gap-12);
-  border-color: var(--divider);
+  border-bottom-color: var(--divider);
+  border-bottom-style: solid;
+  border-bottom-width: var(--stroke-divider);
 }
 
 .product-row__price {
@@ -169,12 +171,17 @@
   right: 0; /* Structural viewport anchoring. */
   bottom: 0; /* Structural viewport anchoring. */
   left: 0; /* Structural viewport anchoring. */
+  width: 100%; /* Structural responsive width. */
+  max-width: 430px; /* Matches the supported app-shell boundary. */
+  margin-inline: auto;
   display: flex;
   gap: var(--gap-12);
   align-items: center;
   padding: var(--gap-16);
   background-color: var(--surface-primary);
-  border-color: var(--divider);
+  border-top-color: var(--divider);
+  border-top-style: solid;
+  border-top-width: var(--stroke-divider);
 }
 
 .toast {

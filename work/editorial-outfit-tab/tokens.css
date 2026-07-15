@@ -17,6 +17,8 @@
   --divider: #E1E4E8;
   /* Text/Functional/PrimaryColor */
   --brand-primary: #FF003C;
+  /* stroke/M */
+  --stroke-divider: 1px;
 
   /* radius/Xs */
   --radius-xs: 4px;
