@@ -332,6 +332,32 @@ test('keeps prototype state controls hidden in detail and preserves failed media
   assert.match(html, /media\.dataset\.imageState='failed'/);
 });
 
+test('completes browsing entrances, loading continuity, and prototype failure recovery', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  for (const key of ['search-open', 'search-panel', 'search-input', 'search-close', 'featured-open', 'state-action-failure', 'retry-action']) {
+    assert.match(html, new RegExp(`data-proto-key=["']${key}["']`), `missing browsing hook ${key}`);
+  }
+  assert.match(html, /id="search-panel"[^>]*role="search"[^>]*hidden/);
+  assert.match(html, /searchOpen\.onclick=.*searchPanel\.hidden=false.*searchInput\.focus\(\)/s);
+  assert.match(html, /searchClose\.onclick=.*searchPanel\.hidden=true.*searchOpen\.focus\(\)/s);
+  assert.match(html, /data-featured-id="collection-1"/);
+  assert.match(html, /data-featured-id.*showDetail\(featured\)/s);
+  assert.match(html, /function skeletonCards\(\)/);
+  assert.match(html, /feedStatus==='loading'.*feed\.innerHTML=skeletonCards\(\)/s);
+  assert.match(html, /\.skeleton-media\{[^}]*aspect-ratio:3\/4/);
+  assert.match(html, /\.collection-card \.skeleton-media\{aspect-ratio:1\/1\}/);
+  assert.match(html, /\.outfit-card \.skeleton-media\{aspect-ratio:4\/5\}/);
+  assert.match(html, /feedStatus==='error'.*hasRenderedFeed.*data-retry-feed/s);
+  assert.match(html, /failNextAction=true/);
+  assert.match(html, /const previous=state;state=toggleReaction.*if\(failNextAction\).*state=previous/s);
+  assert.match(html, /data-proto-key="retry-action"/);
+  assert.match(html, /穿搭作者 \$\{escapeText\(card\.authorId\.replace\('author-',''\)\)\}/);
+  assert.match(html, /场景：\$\{escapeText\(card\.tags\[0\]\)\} · 风格：\$\{escapeText\(card\.tags\[1\]\)\}/);
+  for (const key of ['bottom-nav-home', 'bottom-nav-cart', 'bottom-nav-profile']) {
+    assert.match(html, new RegExp(`<button[^>]*data-proto-key="${key}"[^>]*disabled[^>]*aria-label="[^"]*暂未开放`));
+  }
+});
+
 test('all required local SVG assets physically exist and are self-contained', async () => {
   const assetsDirectory = `${root}/assets`;
   const names = await readdir(assetsDirectory);
