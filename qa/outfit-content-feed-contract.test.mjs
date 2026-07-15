@@ -322,6 +322,7 @@ test('keeps prototype state controls hidden in detail and preserves failed media
   const style = html.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? '';
 
   assert.match(style, /\.state-menu\[hidden\]\{display:none\}/);
+  assert.match(style, /\.status\[hidden\]\{display:none\}/, 'inactive status panel must override its authored grid display');
   assert.match(style, /\.image-failure\{[^}]*aspect-ratio:3\/4/);
   assert.match(style, /\.collection-card \.image-failure\{aspect-ratio:1\/1\}/);
   assert.match(style, /\.outfit-card \.image-failure\{aspect-ratio:4\/5\}/);
