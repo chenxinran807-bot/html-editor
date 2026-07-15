@@ -5,6 +5,19 @@ import { createCatalog } from '../work/douyin-outfit-content-feed/catalog.js';
 
 const root = 'work/douyin-outfit-content-feed';
 
+function extractNamedFunction(source, name) {
+  const start = source.indexOf(`function ${name}(`);
+  assert.notEqual(start, -1, `missing function ${name}`);
+  const braceStart = source.indexOf('{', start);
+  let depth = 0;
+  for (let index = braceStart; index < source.length; index += 1) {
+    if (source[index] === '{') depth += 1;
+    if (source[index] === '}') depth -= 1;
+    if (depth === 0) return source.slice(start, index + 1);
+  }
+  throw new Error(`unterminated function ${name}`);
+}
+
 test('ships a versioned, safe editable runtime and complete delivery artifacts', async () => {
   const [html, prd, contextSource, profileSource, manifestSource, patchesSource, commentsSource, summary, assumptions] = await Promise.all([
     readFile(`${root}/index.html`, 'utf8'),
@@ -46,7 +59,7 @@ test('ships a versioned, safe editable runtime and complete delivery artifacts',
     assert.match(html, new RegExp(`id=["']${id}["']`), `missing authoring control ${id}`);
   }
   assert.match(html, /outfit-content-feed:v1/);
-  assert.match(html, /localStorage\.setItem/);
+  assert.match(html, /writeEditableStorage\(editableStorage/);
   assert.match(html, /URL\.createObjectURL/);
   assert.match(html, /SAFE_IMAGE_PATH/);
   assert.match(html, /document\.createTextNode|textContent/);
@@ -98,6 +111,43 @@ test('undo and redo persist the restored patch snapshot', async () => {
   assert.match(html, /function\s+restoreEditable\([^)]*\)\{[^}]*editablePatches=structuredClone\([^)]*\);persistEditable\(\);bindEditableRegions\(\)/s);
 });
 
+test('editable patches reset immutable element baselines before applying snapshots', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  assert.match(html, /const editableBaselines=new WeakMap\(\)/);
+  assert.match(html, /function\s+captureEditableBaseline\s*\(/);
+  assert.match(html, /function\s+resetEditableToBaseline\s*\(/);
+  assert.match(html, /function\s+applyEditablePatch\([^)]*\)\{resetEditableToBaseline\(element\);if\(!patch\)\{[^}]*return\}/);
+  assert.match(html, /image\.setAttribute\('src',baseline\.imageSrc\)/);
+  assert.match(html, /captureEditableBaseline\(element\);const patch=editablePatches/);
+});
+
+test('storage failures are non-throwing and report through the editor status', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  const writeStorage = new Function(`return (${extractNamedFunction(html, 'writeEditableStorage')})`)();
+  const readStorage = new Function(`return (${extractNamedFunction(html, 'readEditableStorage')})`)();
+  const notices = [];
+  const throwingStorage = {
+    getItem() { throw new DOMException('blocked', 'SecurityError'); },
+    setItem() { throw new DOMException('full', 'QuotaExceededError'); },
+  };
+  assert.doesNotThrow(() => writeStorage(throwingStorage, 'key', '{}', (message) => notices.push(message)));
+  assert.equal(writeStorage(throwingStorage, 'key', '{}', (message) => notices.push(message)), false);
+  assert.equal(readStorage(throwingStorage, 'key', (message) => notices.push(message)), null);
+  assert.ok(notices.every(Boolean));
+  assert.match(html, /function\s+persistEditable\([^)]*\)\{return writeEditableStorage/);
+  assert.match(html, /export-comments[^;]*persistEditable\(\)/s);
+});
+
+test('parent text editing never crosses into a separately keyed child', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  const ownsEditableNode = new Function(`return (${extractNamedFunction(html, 'ownsEditableNode')})`)();
+  const parent = { id: 'parent' };
+  const child = { id: 'child' };
+  assert.equal(ownsEditableNode(parent, { closest: () => parent }), true);
+  assert.equal(ownsEditableNode(parent, { closest: () => child }), false);
+  assert.match(html, /editableTextNode\([^)]*\)[^{]*\{[^}]*\.find\(node=>ownsEditableNode\(element,node\)\)/s);
+});
+
 test('manifest inventories static and catalog-generated editable regions and state flows', async () => {
   const [html, manifestSource] = await Promise.all([
     readFile(`${root}/index.html`, 'utf8'),
@@ -108,7 +158,7 @@ test('manifest inventories static and catalog-generated editable regions and sta
   const staticKeys = [...html.matchAll(/data-proto-key="([^"$]+)"/g)].map((match) => match[1]);
   for (const key of staticKeys) assert.ok(manifestKeys.has(key), `manifest misses static key ${key}`);
   const patternNames = new Set(manifest.dynamicElements.map((item) => item.name));
-  for (const name of ['filter', 'strip-card', 'card', 'card-open', 'card-like', 'card-collect', 'card-follow', 'card-hide', 'detail-action', 'detail-heading', 'collection-content', 'collection-content-heading', 'state-control']) {
+  for (const name of ['filter', 'strip-card', 'card', 'card-open', 'card-like', 'card-collect', 'card-follow', 'card-hide', 'detail-follow', 'detail-reaction', 'creator-detail-heading', 'collection-detail-heading', 'outfit-detail-heading', 'collection-content', 'collection-content-heading', 'state-control']) {
     assert.ok(patternNames.has(name), `manifest misses dynamic pattern ${name}`);
   }
   const catalog = createCatalog();
@@ -123,6 +173,16 @@ test('manifest inventories static and catalog-generated editable regions and sta
   assert.ok(manifest.flows.some((flow) => flow.id === 'retry-error'));
   assert.ok(manifest.flows.some((flow) => flow.id === 'clear-empty'));
   assert.ok(manifest.flows.some((flow) => flow.id === 'detail-return'));
+
+  const pages = new Map(manifest.pages.map((page) => [page.id, page]));
+  for (const pageId of ['creator-detail', 'collection-detail', 'outfit-detail']) {
+    assert.ok(pages.get(pageId).elements.some((element) => element.key === 'back-to-feed'), `${pageId} misses back inventory`);
+  }
+  const patterns = new Map(manifest.dynamicElements.map((item) => [item.name, item]));
+  assert.equal(patterns.get('detail-follow').pages.join(','), 'creator-detail');
+  assert.deepEqual(patterns.get('creator-detail-heading').pages, ['creator-detail']);
+  assert.deepEqual(patterns.get('collection-detail-heading').pages, ['collection-detail']);
+  assert.deepEqual(patterns.get('outfit-detail-heading').pages, ['outfit-detail']);
 });
 
 test('mobile feed exposes stable prototype hooks and remains locally self-contained', async () => {

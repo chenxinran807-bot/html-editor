@@ -45,12 +45,12 @@
     {
       "id": "collection-detail",
       "title": "主题合集详情",
-      "elements": [{ "key": "collection-detail", "type": "page" }, { "key": "adjacent-collection", "type": "navigation" }]
+      "elements": [{ "key": "collection-detail", "type": "page" }, { "key": "back-to-feed", "type": "navigation" }, { "key": "adjacent-collection", "type": "navigation" }]
     },
     {
       "id": "outfit-detail",
       "title": "商品搭配详情",
-      "elements": [{ "key": "outfit-detail", "type": "page" }, { "key": "outfit-commerce-feedback", "type": "action" }]
+      "elements": [{ "key": "outfit-detail", "type": "page" }, { "key": "back-to-feed", "type": "navigation" }, { "key": "outfit-commerce-feedback", "type": "action" }]
     }
   ],
   "dynamicElements": [
@@ -62,8 +62,11 @@
     { "name": "card-collect", "pattern": "{cardId}-collect", "source": "catalog.cards" },
     { "name": "card-follow", "pattern": "{cardId}-follow", "source": "catalog.cards[type=creator]" },
     { "name": "card-hide", "pattern": "{cardId}-hide", "source": "catalog.cards" },
-    { "name": "detail-action", "pattern": "{cardId}-detail-{follow|like|collect|hide}", "source": "active detail card" },
-    { "name": "detail-heading", "pattern": "{cardId}-detail-{header|title|author|related-heading|idea-heading|fit-heading|items-heading}", "source": "active detail card" },
+    { "name": "detail-follow", "pattern": "{cardId}-detail-follow", "source": "creator detail active card", "pages": ["creator-detail"] },
+    { "name": "detail-reaction", "pattern": "{cardId}-detail-{like|collect|hide}", "source": "active detail card", "pages": ["creator-detail", "collection-detail", "outfit-detail"] },
+    { "name": "creator-detail-heading", "pattern": "{cardId}-detail-{header|title|author|related-heading}", "source": "creator detail active card", "pages": ["creator-detail"] },
+    { "name": "collection-detail-heading", "pattern": "{cardId}-detail-{header|title}", "source": "collection detail active card", "pages": ["collection-detail"] },
+    { "name": "outfit-detail-heading", "pattern": "{cardId}-detail-{header|title|idea-heading|fit-heading|items-heading}", "source": "outfit detail active card", "pages": ["outfit-detail"] },
     { "name": "collection-content", "pattern": "collection-content-{cardId}", "source": "collection related cards" },
     { "name": "collection-content-heading", "pattern": "collection-content-{cardId}-heading", "source": "collection related cards" },
     { "name": "state-control", "pattern": "state-{feedState}", "source": "states.feed" }
