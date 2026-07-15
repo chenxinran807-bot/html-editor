@@ -16,17 +16,53 @@ function declarations(css) {
     .map(([, property, value]) => [property.toLowerCase(), value.trim()]);
 }
 
+function customProperties(css) {
+  return new Map(
+    declarations(css).filter(([property]) => property.startsWith('--')),
+  );
+}
+
 test('visual foundation exposes the approved semantic aliases', async () => {
   const css = withoutComments(await readFile(tokensUrl, 'utf8'));
-  for (const [name, value] of Object.entries({
+  const expected = {
     '--text-primary': '#161823',
+    '--text-secondary': '#5C5D65',
+    '--text-tertiary': '#8A8B91',
+    '--text-disabled': '#B9BABD',
+    '--text-on-dark': '#FFFFFF',
+    '--surface-primary': '#FFFFFF',
+    '--surface-subtle': '#F5F6F9',
+    '--divider': '#E1E4E8',
     '--brand-primary': '#FF003C',
+    '--radius-xs': '4px',
     '--radius-card': '8px',
+    '--radius-medium': '12px',
+    '--radius-large': '16px',
+    '--radius-xl': '20px',
+    '--gap-4': '4px',
+    '--gap-8': '8px',
+    '--gap-12': '12px',
+    '--gap-16': '16px',
+    '--gap-20': '20px',
+    '--gap-24': '24px',
+    '--gap-32': '32px',
+    '--font-page-title': '20px',
+    '--line-page-title': '28px',
     '--font-card-title': '16px',
     '--line-card-title': '22px',
-  })) {
-    assert.match(css, new RegExp(`${name}\\s*:\\s*${value.replace('.', '\\.') }\\s*;`, 'i'));
-  }
+    '--font-body-large': '16px',
+    '--line-body-large': '22px',
+    '--font-body': '14px',
+    '--line-body': '20px',
+    '--line-body-multi': '22px',
+    '--font-caption': '12px',
+    '--line-caption': '17px',
+    '--font-price-major': '18px',
+    '--line-price-major': '19px',
+    '--font-price-minor': '13px',
+    '--line-price-minor': '17px',
+  };
+  assert.deepEqual(Object.fromEntries(customProperties(css)), expected);
 });
 
 test('layout styles consume tokens and contain no raw hex colors', async () => {
@@ -38,7 +74,7 @@ test('layout styles consume tokens and contain no raw hex colors', async () => {
 
 test('visual declarations in layout styles use aliases', async () => {
   const css = await readFile(stylesUrl, 'utf8');
-  const tokenOnly = /^(?:var\(\s*--[\w-]+\s*(?:,[^)]+)?\)|0|none|transparent|inherit|initial|unset|auto)$/i;
+  const tokenOnly = /^(?:var\(\s*--[\w-]+\s*\)|0|none|transparent|inherit|initial|unset|auto)$/i;
   const visualProperties = /^(?:color|background-color|border-color|font-size|line-height|gap|row-gap|column-gap|padding(?:-(?:top|right|bottom|left|inline|block)(?:-(?:start|end))?)?|margin(?:-(?:top|right|bottom|left|inline|block)(?:-(?:start|end))?)?|border-radius)$/;
 
   for (const [property, value] of declarations(css)) {
@@ -46,6 +82,41 @@ test('visual declarations in layout styles use aliases', async () => {
       assert.match(value, tokenOnly, `${property}: ${value} must use a registered alias`);
     }
   }
+});
+
+test('every style alias is declared and var fallbacks are forbidden', async () => {
+  const tokens = customProperties(await readFile(tokensUrl, 'utf8'));
+  const css = withoutComments(await readFile(stylesUrl, 'utf8'));
+  const references = [...css.matchAll(/var\(\s*(--[\w-]+)([^)]*)\)/g)];
+
+  for (const [, name, suffix] of references) {
+    assert.equal(suffix.trim(), '', `fallback is forbidden for ${name}`);
+    assert.ok(tokens.has(name), `${name} must be declared in tokens.css`);
+  }
+});
+
+test('styles provide every required visual primitive and state hook', async () => {
+  const css = withoutComments(await readFile(stylesUrl, 'utf8'));
+  const selectors = [
+    '.app-shell', '.app-header', '.channel-tabs', '.feed', '.feature-card',
+    '.story-gallery', '.segmented-view', '.product-row', '.checkout-bar',
+    '.toast', '.skeleton', '.state-panel--empty', '.state-panel--error',
+    '.image-fallback', ':focus-visible',
+  ];
+  for (const selector of selectors) {
+    assert.match(css, new RegExp(`${selector.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}\\s*(?:,|\\{)`), `missing ${selector}`);
+  }
+  assert.match(css, /@media\s*\(\s*prefers-reduced-motion\s*:\s*reduce\s*\)\s*\{/);
+  assert.match(css, /\.product-row__price-major\s*\{[^}]*font-size:\s*var\(--font-price-major\)[^}]*line-height:\s*var\(--line-price-major\)/s);
+  assert.match(css, /\.product-row__price-minor\s*\{[^}]*font-size:\s*var\(--font-price-minor\)[^}]*line-height:\s*var\(--line-price-minor\)/s);
+});
+
+test('feed and channel spacing follow component authorization', async () => {
+  const css = withoutComments(await readFile(stylesUrl, 'utf8'));
+  const channelTabs = css.match(/\.channel-tabs\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.doesNotMatch(channelTabs, /(?:^|;)\s*(?:gap|column-gap|row-gap)\s*:/);
+  assert.match(css, /\.feed\s*\{[^}]*column-gap:\s*var\(--gap-4\)/s);
+  assert.match(css, /\.story-card\s*\{[^}]*margin-bottom:\s*var\(--gap-4\)/s);
 });
 
 test('locks the approved editorial outfit demo context', async () => {

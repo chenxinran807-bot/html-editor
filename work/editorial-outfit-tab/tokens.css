@@ -68,8 +68,10 @@
   --line-caption: 17px;
   /* 货币数字/18+13: fontsize/18 */
   --font-price-major: 18px;
+  /* 货币数字/18+13: lineheight/lh19 */
+  --line-price-major: 19px;
   /* 货币数字/18+13: fontsize/13 */
   --font-price-minor: 13px;
-  /* font/18/Title: lineheight/25 */
-  --line-price: 25px;
+  /* 货币数字/18+13: lineheight/lh17 */
+  --line-price-minor: 17px;
 }

@@ -30,7 +30,6 @@
 
 .channel-tabs {
   display: flex;
-  gap: var(--gap-20);
   overflow-x: auto;
   padding-inline: var(--gap-16);
   background-color: var(--surface-primary);
@@ -53,13 +52,13 @@
 
 .feed {
   columns: 2;
-  column-gap: var(--gap-8);
+  column-gap: var(--gap-4);
   padding: var(--gap-8);
 }
 
 .story-card {
   break-inside: avoid;
-  margin-bottom: var(--gap-8);
+  margin-bottom: var(--gap-4);
   overflow: hidden;
   background-color: var(--surface-primary);
   border-radius: var(--radius-card);
@@ -153,8 +152,16 @@
 
 .product-row__price {
   color: var(--brand-primary);
+}
+
+.product-row__price-major {
   font-size: var(--font-price-major);
-  line-height: var(--line-price);
+  line-height: var(--line-price-major);
+}
+
+.product-row__price-minor {
+  font-size: var(--font-price-minor);
+  line-height: var(--line-price-minor);
 }
 
 .checkout-bar {
@@ -211,6 +218,10 @@
 
 .state-panel--error {
   color: var(--brand-primary);
+}
+
+.state-panel--empty {
+  color: var(--text-secondary);
 }
 
 .image-fallback {
