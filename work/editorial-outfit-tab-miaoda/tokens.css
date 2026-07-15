@@ -1,0 +1,79 @@
+:root {
+  /* Text/Normal/Primary */
+  --text-primary: #161823;
+  /* Text/Normal/Second */
+  --text-secondary: #5C5D65;
+  /* Text/Normal/Tertiary */
+  --text-tertiary: #8A8B91;
+  /* Text/Normal/Disable */
+  --text-disabled: #B9BABD;
+  /* Text/Normal/White */
+  --text-on-dark: #FFFFFF;
+  /* Background/Normal/White */
+  --surface-primary: #FFFFFF;
+  /* Background/Normal/Gray2 */
+  --surface-subtle: #F5F6F9;
+  /* Shape/Normal/Gray4 */
+  --divider: #E1E4E8;
+  /* Text/Functional/PrimaryColor */
+  --brand-primary: #FF003C;
+  /* stroke/M */
+  --stroke-divider: 1px;
+
+  /* radius/Xs */
+  --radius-xs: 4px;
+  /* radius/Sm */
+  --radius-card: 8px;
+  /* radius/M */
+  --radius-medium: 12px;
+  /* radius/Lg */
+  --radius-large: 16px;
+  /* radius/Xl */
+  --radius-xl: 20px;
+
+  /* gap/4 */
+  --gap-4: 4px;
+  /* gap/8 */
+  --gap-8: 8px;
+  /* gap/12 */
+  --gap-12: 12px;
+  /* gap/16 */
+  --gap-16: 16px;
+  /* gap/20 */
+  --gap-20: 20px;
+  /* gap/24 */
+  --gap-24: 24px;
+  /* gap/32 */
+  --gap-32: 32px;
+
+  /* font/20/Title: fontsize/20 */
+  --font-page-title: 20px;
+  /* font/20/Title: lineheight/28 */
+  --line-page-title: 28px;
+  /* font/16/Title: fontsize/16 */
+  --font-card-title: 16px;
+  /* font/16/Title: lineheight/22 */
+  --line-card-title: 22px;
+  /* font/16/body: fontsize/16 */
+  --font-body-large: 16px;
+  /* font/16/body: lineheight/22 */
+  --line-body-large: 22px;
+  /* font/14/body: fontsize/14 */
+  --font-body: 14px;
+  /* font/14/body: lineheight/20 */
+  --line-body: 20px;
+  /* font/14/multi-body: lineheight/22 */
+  --line-body-multi: 22px;
+  /* font/12/body: fontsize/12 */
+  --font-caption: 12px;
+  /* font/12/body: lineheight/17 */
+  --line-caption: 17px;
+  /* 货币数字/18+13: fontsize/18 */
+  --font-price-major: 18px;
+  /* 货币数字/18+13: lineheight/lh19 */
+  --line-price-major: 19px;
+  /* 货币数字/18+13: fontsize/13 */
+  --font-price-minor: 13px;
+  /* 货币数字/18+13: lineheight/lh17 */
+  --line-price-minor: 17px;
+}
