@@ -441,6 +441,13 @@ test('renders actionable content-end recommendations only for populated ready co
   assert.match(html, /returnToFeed\(state\).*restoreFeedScroll\(\)/s);
 });
 
+test('retained-content error removes ready-only end recommendation until retry', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  assert.match(html, /feedStatus==='error'.*feed\.querySelector\('\.feed-end'\)\?\.remove\(\).*status\.hidden=false/s);
+  assert.match(html, /data-retry-feed.*startLoading\(\)/s);
+  assert.match(html, /setFeedStatus\(state,'ready'\);renderFeed\(\)/);
+});
+
 test('all required local SVG assets physically exist and are self-contained', async () => {
   const assetsDirectory = `${root}/assets`;
   const names = await readdir(assetsDirectory);
