@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 
 const root = 'work/douyin-outfit-content-feed';
 
@@ -56,6 +56,40 @@ test('all structural CSS dimensions are named in the root token registry', async
     /(?:\d*\.)?\d+(?:px|vh)\b/,
     'raw structural px/vh dimensions must be declared once as named root constants',
   );
+});
+
+test('feed controls are semantic, accessible, and race-safe', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+
+  assert.doesNotMatch(html, /<button[^>]*>\s*<div\b/i, 'detail controls must not wrap block card markup');
+  assert.match(html, /aria-label="查看\$\{escapeAttr\(card\.title\)\}详情"/);
+  assert.match(html, /aria-pressed="\$\{[^}]+\}"/);
+  assert.match(html, /role="tablist"/);
+  assert.match(html, /aria-selected=/);
+  assert.match(html, /let loadGeneration=0/);
+  assert.match(html, /clearTimeout\(loadTimer\)/);
+  assert.match(html, /generation!==loadGeneration/);
+  assert.match(html, /cancelAnimationFrame\(restoreFrame\)/);
+  assert.match(html, /function escapeText\(/);
+  assert.match(html, /function escapeAttr\(/);
+});
+
+test('all required local SVG assets physically exist and are self-contained', async () => {
+  const assetsDirectory = `${root}/assets`;
+  const names = await readdir(assetsDirectory);
+  const required = [
+    ...['creator', 'collection', 'outfit'].flatMap((type) => [1, 2, 3, 4].map((number) => `${type}-${number}.svg`)),
+    ...['search', 'back', 'more', 'like', 'collect', 'follow', 'retry', 'home', 'outfit', 'cart', 'profile'].map((name) => `${name}.svg`),
+  ];
+
+  for (const name of required) {
+    assert.ok(names.includes(name), `missing physical SVG asset: ${name}`);
+    const svg = await readFile(`${assetsDirectory}/${name}`, 'utf8');
+    assert.match(svg, /<svg\b/);
+    assert.match(svg, /viewBox="[^"]+"/);
+    assert.doesNotMatch(svg, /(?:https?:)?\/\/(?!www\.w3\.org\/2000\/svg)/i, `remote dependency in ${name}`);
+    assert.doesNotMatch(svg, /<text\b|<image\b|<font\b/i, `non-abstract or external content in ${name}`);
+  }
 });
 
 const acceptedStatements = [
