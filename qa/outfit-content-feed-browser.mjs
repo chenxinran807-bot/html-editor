@@ -81,6 +81,7 @@ async function exerciseViewport(browser, url, viewport, full = false) {
   await waitReady(page);
 
   check(`${viewport.width}: entered through index UI`, await page.locator('h2').first().isVisible());
+  check(`${viewport.width}: inactive status panel removed from layout`, await page.locator('#status').evaluate(node => node.hidden && getComputedStyle(node).display === 'none' && node.getBoundingClientRect().height === 0));
   const channelFilters = {
     '按场景': ['推荐', '日常', '通勤', '约会', '出游', '运动', '校园'],
     '适合我': ['不限性别', '男生', '女生', '小个子', '高个子', '梨形', '宽肩', '暖肤色', '冷肤色'],

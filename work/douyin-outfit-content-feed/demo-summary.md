@@ -10,9 +10,9 @@
 
 ## Task 6 最终 QA（2026-07-15）
 
-结论：`DONE_WITH_CONCERNS`。功能和确定性门禁通过，但人工截图审查发现内容流在“为你推荐”标题与卡片之间存在约 1600px 的异常空白。原因可定位为 `#status` 虽有 `hidden` 属性，`.status { display:grid; min-height:1600px }` 仍使其参与布局。该问题损害信息密度与移动端原生节奏，因此不声明达到专业视觉基线；Task 6 仅提交验收文件，未越权修改产品实现。
+结论：`DONE`。首次截图审查发现隐藏的 `#status` 仍参与布局并产生约 1600px 异常空白；产品修复 `90bc2614d73d9d1e9adfee04a524ecb4a9be3fea` 增加 `.status[hidden] { display:none }` 后，已重新执行全量浏览器验收、替换全部截图并人工复核。异常空白在两个视口均已消失，视觉门禁通过。
 
-浏览器验收：使用仓库外的 bundled Playwright，从 `index.html` 入口 UI 在 390×844 与 320×700 两个视口执行，最终结果为 `86 browser checks passed`、退出码 0。覆盖三个频道及其全部筛选、三类卡片详情与返回上下文、喜欢/收藏/关注/不感兴趣/撤销、状态菜单的加载/空/失败/图片失败/正常及清除筛选和重试、按卡片类型保持图片失败占比、编辑标题/应用/撤销/预览隐藏且 inert、快速切换 latest-wins、加载中打开详情不被覆盖，以及横向溢出、固定栏空间、图片 natural dimensions、页面错误和控制台错误。
+浏览器验收：使用仓库外的 bundled Playwright，从 `index.html` 入口 UI 在 390×844 与 320×700 两个视口执行。修复后最终结果为 `88 browser checks passed`、退出码 0；新增两个视口下 `#status` 隐藏、计算样式为 `display:none` 且布局高度为 0 的回归断言。覆盖三个频道及其全部筛选、三类卡片详情与返回上下文、喜欢/收藏/关注/不感兴趣/撤销、状态菜单的加载/空/失败/图片失败/正常及清除筛选和重试、按卡片类型保持图片失败占比、编辑标题/应用/撤销/预览隐藏且 inert、快速切换 latest-wins、加载中打开详情不被覆盖，以及横向溢出、固定栏空间、图片 natural dimensions、页面错误和控制台错误。
 
 Task 1–5 自动测试：`node --test qa/outfit-content-feed-state.test.mjs qa/outfit-content-feed-contract.test.mjs`，31/31 通过，0 失败，退出码 0。
 
@@ -29,4 +29,4 @@ Task 1–5 自动测试：`node --test qa/outfit-content-feed-state.test.mjs qa/
 - `qa/evidence/outfit-content-feed/feed-320x700.png`
 - `qa/evidence/outfit-content-feed/detail-320x700.png`
 
-视觉审查：频道、筛选、主题头图、三类业务卡片与详情层级清楚；图标、触控尺寸、底部导航和卡片表达接近原生移动电商。详情信息密度与节奏可评审，但上述内容流异常空白在两个视口都清晰可见，故整体视觉结论保持有条件通过。
+视觉审查：修复后截图中频道、筛选、主题头图、灵感合集、推荐卡片连续呈现，无异常空白；信息层级清楚，双列密度、留白节奏和内容露出符合移动内容流。图标、44px 触控目标、固定底部导航、卡片与详情表达接近原生移动电商；390px 与 320px 视口均具备可评审的层级、密度和原生感，视觉门禁通过。
