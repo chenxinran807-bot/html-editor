@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "title": "抖音商城独立端穿搭 Tab",
+  "completeness": { "semantic": "complete", "interaction": "complete", "state": "complete", "visual": "complete" },
+  "pageUnits": ["穿搭内容流", "真人穿搭详情", "主题合集详情", "商品搭配详情"],
+  "visualInventory": ["顶部标题栏", "三个平行频道", "筛选胶囊", "主题首屏", "横滑灵感合集", "双列混合内容流", "四项底部导航", "三类详情页", "原型编辑面板"],
+  "interactionInventory": ["切换频道与筛选", "横滑合集", "打开三类详情并返回", "喜欢、收藏、关注", "不感兴趣与撤销", "状态菜单与重试", "选中元素并编辑文字、颜色、图片、显隐、禁用和跳转", "撤销、重做、持久化及导出"],
+  "stateMatrix": {
+    "feed": ["loading", "empty", "error", "image-failure", "ready"],
+    "navigation": ["feed", "creator-detail", "collection-detail", "outfit-detail"],
+    "authoring": ["preview", "edit", "selected", "patched", "undo", "redo"]
+  },
+  "assumptions": ["作者、主题和服装图均为中性演示内容", "筛选标签由已确认场景和适合我维度推断", "推荐反馈仅在本地状态中模拟"],
+  "openQuestions": ["真实商品、真人素材和主题合集的数据来源与接口是什么？"],
+  "doNotInfer": ["真实价格、库存、销量、品牌和交易能力", "用户真实画像或推荐效果"],
+  "evidenceSources": ["prd.md", "semantic-requirements.json", "catalog.js"],
+  "sourcePrd": "# 抖音商城独立端穿搭 Tab\n首要目标是提升穿搭内容浏览时长和连续浏览意愿。\n页面面向男女混合用户，覆盖更多风格与场景。\n页面采用真人穿搭、主题合集与商品搭配混排的内容流。\n二级结构采用三个平行 Tab：按场景、适合我、博主推荐。\n用户可以喜欢、收藏、关注，也可以标记不感兴趣并撤销。\n用户可以进入真人穿搭详情、主题合集详情和商品搭配详情，返回后恢复频道、筛选和滚动位置。\n页面覆盖加载、空内容、加载失败、图片失败和重试状态。\n\n## 假设\n\n原型使用演示内容验证混排浏览与详情往返。\n\n## 待确认\n\n真实商品、真人素材和主题合集的数据来源与接口待确认。\n"
+}

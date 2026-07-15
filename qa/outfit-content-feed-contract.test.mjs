@@ -4,6 +4,66 @@ import { readFile, readdir } from 'node:fs/promises';
 
 const root = 'work/douyin-outfit-content-feed';
 
+test('ships a versioned, safe editable runtime and complete delivery artifacts', async () => {
+  const [html, prd, contextSource, profileSource, manifestSource, patchesSource, commentsSource, summary, assumptions] = await Promise.all([
+    readFile(`${root}/index.html`, 'utf8'),
+    readFile(`${root}/prd.md`, 'utf8'),
+    readFile(`${root}/demo-context.json`, 'utf8'),
+    readFile(`${root}/design-profile.json`, 'utf8'),
+    readFile(`${root}/prototype.manifest.json`, 'utf8'),
+    readFile(`${root}/prototype.patches.json`, 'utf8'),
+    readFile(`${root}/agent-comments.json`, 'utf8'),
+    readFile(`${root}/demo-summary.md`, 'utf8'),
+    readFile(`${root}/assumptions.md`, 'utf8'),
+  ]);
+  const context = JSON.parse(contextSource);
+  const profile = JSON.parse(profileSource);
+  const manifest = JSON.parse(manifestSource);
+  const patches = JSON.parse(patchesSource);
+  const comments = JSON.parse(commentsSource);
+
+  assert.equal(context.sourcePrd, prd);
+  for (const field of ['completeness', 'pageUnits', 'visualInventory', 'interactionInventory', 'stateMatrix', 'assumptions', 'openQuestions', 'doNotInfer', 'evidenceSources']) {
+    assert.ok(context[field], `demo-context missing ${field}`);
+  }
+  assert.deepEqual(Object.keys(context.completeness).sort(), ['interaction', 'semantic', 'state', 'visual']);
+  assert.equal(profile.domain, 'ecommerce');
+  assert.ok(profile.tokens && profile.componentRouting);
+  assert.equal(manifest.schemaVersion, 1);
+  assert.equal(manifest.startPage, 'feed');
+  assert.ok(manifest.pages.flatMap((page) => page.elements).length > 0);
+  assert.deepEqual(patches, { schemaVersion: 1, manifestId: manifest.id, patches: {} });
+  assert.deepEqual(comments, { schemaVersion: 1, manifestId: manifest.id, comments: [] });
+  assert.match(summary, /按场景[\s\S]*适合我[\s\S]*博主推荐/);
+  assert.match(summary, /编辑模式|编辑态/);
+  assert.match(assumptions, /演示作者|演示素材/);
+  assert.match(assumptions, /真实商品数据不可用/);
+
+  assert.match(html, /data-mode="preview"/);
+  assert.match(html, /id="authoring-controls"/);
+  for (const id of ['mode-preview', 'mode-edit', 'edit-text', 'edit-color', 'edit-image', 'edit-hidden', 'edit-disabled', 'edit-target', 'undo-edit', 'redo-edit', 'export-patches', 'agent-request', 'agent-submit', 'export-comments']) {
+    assert.match(html, new RegExp(`id=["']${id}["']`), `missing authoring control ${id}`);
+  }
+  assert.match(html, /outfit-content-feed:v1/);
+  assert.match(html, /localStorage\.setItem/);
+  assert.match(html, /URL\.createObjectURL/);
+  assert.match(html, /SAFE_IMAGE_PATH/);
+  assert.match(html, /document\.createTextNode|textContent/);
+  assert.match(html, /body\[data-mode="preview"\] #authoring-controls\{display:none\}/);
+});
+
+test('every literal and generated editable region has a deterministic unique key', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  const literalKeys = [...html.matchAll(/data-proto-key="([^"$]+)"/g)].map((match) => match[1]);
+  assert.equal(new Set(literalKeys).size, literalKeys.length, 'literal data-proto-key values must not repeat');
+  assert.doesNotMatch(html, /data-proto-key="(?:open-card|toggle-like|toggle-collect|toggle-follow|hide-card)"/);
+  for (const suffix of ['open', 'like', 'collect', 'follow', 'hide']) {
+    assert.match(html, new RegExp(`data-proto-key="\\$\\{escapeAttr\\(card\\.id\\)\\}-${suffix}"`));
+  }
+  assert.match(html, /function\s+applyEditablePatches\s*\(/);
+  assert.match(html, /function\s+bindEditableRegions\s*\(/);
+});
+
 test('mobile feed exposes stable prototype hooks and remains locally self-contained', async () => {
   const html = await readFile(`${root}/index.html`, 'utf8');
 
@@ -91,11 +151,13 @@ test('detail navigation escapes catalog content and invalidates pending feed wor
 test('exposes observable detail, feedback, recovery, and live-region hooks', async () => {
   const html = await readFile(`${root}/index.html`, 'utf8');
   for (const key of [
-    'open-card', 'back-to-feed', 'toggle-like', 'toggle-collect', 'toggle-follow',
-    'hide-card', 'undo-hide', 'clear-filter', 'retry-feed',
+    'back-to-feed', 'undo-hide', 'clear-filter', 'retry-feed',
     'creator-detail', 'collection-detail', 'outfit-detail',
   ]) {
     assert.match(html, new RegExp(`data-proto-key=["']${key}["']`), `missing observable hook: ${key}`);
+  }
+  for (const suffix of ['open', 'like', 'collect', 'follow', 'hide']) {
+    assert.match(html, new RegExp(`data-proto-key="\\$\\{escapeAttr\\(card\\.id\\)\\}-${suffix}"`), `missing deterministic ${suffix} hook`);
   }
   assert.match(html, /aria-live=["']polite["']/);
   assert.match(html, /data-feed-state=["'](?:loading|empty|error|image-failure|ready)["']/);

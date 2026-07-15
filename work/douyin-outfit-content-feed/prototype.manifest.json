@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "douyin-outfit-content-feed",
+  "product": "抖音商城独立端",
+  "startPage": "feed",
+  "pages": [
+    { "id": "feed", "title": "穿搭内容流", "elements": [
+      { "key": "nav-title", "type": "text" }, { "key": "channel-scene", "type": "tab" }, { "key": "channel-fit", "type": "tab" }, { "key": "channel-creator", "type": "tab" }, { "key": "featured-theme", "type": "hero" }, { "key": "inspiration-strip", "type": "collection-strip" }, { "key": "mixed-feed", "type": "feed" }, { "key": "bottom-nav-outfit", "type": "navigation" }
+    ] },
+    { "id": "creator-detail", "title": "真人穿搭详情", "elements": [{ "key": "creator-detail", "type": "page" }] },
+    { "id": "collection-detail", "title": "主题合集详情", "elements": [{ "key": "collection-detail", "type": "page" }] },
+    { "id": "outfit-detail", "title": "商品搭配详情", "elements": [{ "key": "outfit-detail", "type": "page" }, { "key": "outfit-commerce-feedback", "type": "action" }] }
+  ],
+  "flows": [{ "from": "feed", "to": "creator-detail" }, { "from": "feed", "to": "collection-detail" }, { "from": "feed", "to": "outfit-detail" }, { "from": "*-detail", "to": "feed", "preserves": ["channel", "filter", "scroll"] }],
+  "states": { "feed": ["loading", "empty", "error", "image-failure", "ready"], "authoring": ["preview", "edit"] },
+  "dynamicKeyPattern": "{cardId}-{region}",
+  "assumptions": ["本地演示数据和抽象素材", "推荐反馈为模拟效果"],
+  "gaps": ["无真实商品、库存、价格、账号与推荐服务"]
+}

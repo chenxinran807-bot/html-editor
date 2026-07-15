@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "domain": "ecommerce",
+  "designSystem": "douyin-mall-independent-app",
+  "tokens": {
+    "color": { "text": "#161823", "muted": "#5C5D65", "surface": "#FFFFFF", "canvas": "#F5F6F9", "accent": "#FF003C" },
+    "spacing": [0, 2, 4, 8, 12, 16, 20, 24, 32],
+    "radius": [4, 8, 12, 16, 20],
+    "touchTarget": 44
+  },
+  "componentRouting": {
+    "navigation": ["sticky-titlebar", "parallel-tabs", "bottom-navigation"],
+    "discovery": ["filter-chips", "featured-theme", "horizontal-collection-strip", "mixed-card-grid"],
+    "feedback": ["reaction-actions", "toast-with-undo", "state-recovery"],
+    "details": ["creator-detail", "collection-detail", "outfit-detail"],
+    "authoring": ["preview-edit-switch", "element-inspector", "patch-export", "agent-comment-export"]
+  },
+  "assetPolicy": "local-abstract-svg-only"
+}
