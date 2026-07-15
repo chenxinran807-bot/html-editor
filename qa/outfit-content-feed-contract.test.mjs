@@ -4,6 +4,33 @@ import { readFile } from 'node:fs/promises';
 
 const root = 'work/douyin-outfit-content-feed';
 
+test('mobile feed exposes stable prototype hooks and remains locally self-contained', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+
+  for (const key of [
+    'nav-title',
+    'channel-scene',
+    'channel-fit',
+    'channel-creator',
+    'featured-theme',
+    'inspiration-strip',
+    'mixed-feed',
+    'bottom-nav-outfit',
+  ]) {
+    assert.match(html, new RegExp(`data-proto-key=["']${key}["']`), `missing prototype hook: ${key}`);
+  }
+
+  for (const cardType of ['creator', 'collection', 'outfit']) {
+    assert.match(html, new RegExp(`data-card-type=["']${cardType}["']`), `missing card type: ${cardType}`);
+  }
+
+  assert.doesNotMatch(html, /[\u{1F300}-\u{1FAFF}]/u, 'emoji are not approved interface icons');
+  assert.doesNotMatch(html, /(?:https?:)?\/\//i, 'the prototype must not load remote dependencies');
+  assert.match(html, /type=["']module["']/);
+  assert.match(html, /from\s+["']\.\/catalog\.js["']/);
+  assert.match(html, /from\s+["']\.\/state\.js["']/);
+});
+
 const acceptedStatements = [
   '# 抖音商城独立端穿搭 Tab',
   '首要目标是提升穿搭内容浏览时长和连续浏览意愿。',
