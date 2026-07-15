@@ -10,6 +10,7 @@ import {
   selectChannel,
   selectFilter,
   setFeedStatus,
+  toggleFollow,
   toggleReaction,
   undoHide,
 } from '../work/douyin-outfit-content-feed/state.js';
@@ -72,6 +73,18 @@ test('likes, hides, and restores only the most recently hidden card', () => {
   assert.equal(state.undo, null);
 });
 
+test('keeps reactions and author follows consistent while a card is hidden and restored', () => {
+  let state = toggleReaction(createState(), 'creator-1', 'liked');
+  state = toggleReaction(state, 'creator-1', 'saved');
+  state = toggleFollow(state, 'author-1');
+  state = hideCard(state, 'creator-1');
+  state = undoHide(state);
+
+  assert.deepEqual(state.reactions['creator-1'], { liked: true, saved: true });
+  assert.deepEqual(state.followingAuthorIds, ['author-1']);
+  assert.equal(state.cardOrder.indexOf('creator-1'), 0);
+});
+
 test('preserves catalog order without accepting injected card order', () => {
   assert.equal(createState.length, 0);
   const state = createState([{ id: 'invented-card' }]);
@@ -87,8 +100,8 @@ test('no-op transitions still return immutable state snapshots', () => {
   assert.notStrictEqual(hideCard(hidden, 'creator-1'), hidden);
 });
 
-test('supports every feed status', () => {
-  for (const status of ['loading', 'empty', 'error', 'ready']) {
+test('supports every feed status including image failure', () => {
+  for (const status of ['loading', 'empty', 'error', 'image-failure', 'ready']) {
     assert.equal(setFeedStatus(createState(), status).feedStatus, status);
   }
 });

@@ -88,6 +88,22 @@ test('detail navigation escapes catalog content and invalidates pending feed wor
   assert.match(html, /cancelAnimationFrame\(restoreFrame\)/);
 });
 
+test('exposes observable detail, feedback, recovery, and live-region hooks', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  for (const key of [
+    'open-card', 'back-to-feed', 'toggle-like', 'toggle-collect', 'toggle-follow',
+    'hide-card', 'undo-hide', 'clear-filter', 'retry-feed',
+    'creator-detail', 'collection-detail', 'outfit-detail',
+  ]) {
+    assert.match(html, new RegExp(`data-proto-key=["']${key}["']`), `missing observable hook: ${key}`);
+  }
+  assert.match(html, /aria-live=["']polite["']/);
+  assert.match(html, /data-feed-state=["'](?:loading|empty|error|image-failure|ready)["']/);
+  assert.match(html, /function\s+renderCreatorDetail\s*\(/);
+  assert.match(html, /function\s+renderCollectionDetail\s*\(/);
+  assert.match(html, /function\s+renderOutfitDetail\s*\(/);
+});
+
 test('all required local SVG assets physically exist and are self-contained', async () => {
   const assetsDirectory = `${root}/assets`;
   const names = await readdir(assetsDirectory);

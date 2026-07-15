@@ -1,6 +1,6 @@
 import { createCatalog } from './catalog.js';
 
-const validStatuses = new Set(['loading', 'empty', 'error', 'ready']);
+const validStatuses = new Set(['loading', 'empty', 'error', 'image-failure', 'ready']);
 const validCardTypes = new Set(['creator', 'collection', 'outfit']);
 const catalogCardTypesById = new Map(createCatalog().cards.map(({ id, type }) => [id, type]));
 const catalogCardOrder = [...catalogCardTypesById.keys()];
@@ -55,6 +55,16 @@ export function toggleReaction(state, cardId, reaction) {
   return {
     ...state,
     reactions: { ...state.reactions, [cardId]: { ...previous, [reaction]: !previous[reaction] } },
+  };
+}
+
+export function toggleFollow(state, authorId) {
+  const following = state.followingAuthorIds.includes(authorId);
+  return {
+    ...state,
+    followingAuthorIds: following
+      ? state.followingAuthorIds.filter((id) => id !== authorId)
+      : [...state.followingAuthorIds, authorId],
   };
 }
 
