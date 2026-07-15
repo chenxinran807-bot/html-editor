@@ -171,8 +171,8 @@ test('position and size editing is bounded, persisted in patches, and baseline-r
   assert.match(html, /width:element\.style\.width/);
   assert.match(html, /height:element\.style\.height/);
   assert.match(html, /element\.style\.transform=baseline\.transform/);
-  assert.match(html, /position:\{x:geometry\.x\.value,y:geometry\.y\.value\}/);
-  assert.match(html, /size:\{width:geometry\.width\.value,height:geometry\.height\.value\}/);
+  assert.match(html, /position:\{requested:/);
+  assert.match(html, /size:\{requested:/);
   assert.match(html, /位置或尺寸超出安全范围/);
   const context = JSON.parse(contextSource);
   const manifest = JSON.parse(manifestSource);
@@ -180,6 +180,27 @@ test('position and size editing is bounded, persisted in patches, and baseline-r
   assert.ok(manifest.editCapabilities.includes('position'));
   assert.ok(manifest.editCapabilities.includes('size'));
   assert.match(summary, /位置.*尺寸|尺寸.*位置/);
+});
+
+test('geometry editing excludes structural navigation and clamps to a 320px app shell', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  const clampGeometry = new Function(`return (${extractNamedFunction(html, 'clampGeometry')})`)();
+  const clamped = clampGeometry(
+    { x: 48, y: 48, width: 430, height: 900 },
+    { containerWidth: 296, viewportWidth: 320, viewportHeight: 700, shellLeft: 0, shellRight: 320, rectLeft: 12, rectTop: 100, rectWidth: 140, rectHeight: 200, margin: 12 },
+  );
+  assert.deepEqual(clamped, { x: 0, y: 48, width: 296, height: 525 });
+  assert.ok(clamped.width + 24 <= 320, 'max edit must not create horizontal overflow at 320px');
+  const selectorCalls = [];
+  const isGeometryEditable = new Function(`return (${extractNamedFunction(html, 'isGeometryEditable')})`)();
+  isGeometryEditable({ matches: (selector) => { selectorCalls.push(selector); return false; } });
+  assert.doesNotMatch(selectorCalls[0], /button|nav|section|header|\.bottom|\.top|\.channels|\.filters/);
+  assert.match(selectorCalls[0], /\.card/);
+  assert.match(selectorCalls[0], /\.hero/);
+  assert.match(html, /getBoundingClientRect\(\)/);
+  assert.match(html, /parentElement\?\.clientWidth/);
+  assert.match(html, /patch\.position=\{requested:[^;]*applied:\{x:applied\.x,y:applied\.y\}/);
+  assert.match(html, /patch\.size=\{requested:[^;]*applied:\{width:applied\.width,height:applied\.height\}/);
 });
 
 test('parent text editing never crosses into a separately keyed child', async () => {
