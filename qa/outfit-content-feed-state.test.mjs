@@ -26,6 +26,13 @@ test('keeps filter and scroll independently per channel', () => {
   assert.equal(state.scrollTop, 640);
 });
 
+test('keeps active channel scroll fields in sync', () => {
+  const state = selectChannel(createState(), '按场景', 480);
+
+  assert.equal(state.scrollByChannel['按场景'], 480);
+  assert.equal(state.scrollTop, 480);
+});
+
 test('opens and returns from every supported catalog card type', () => {
   const cards = createCatalog().cards;
   assert.ok(cards.length >= 12);
@@ -58,9 +65,26 @@ test('likes, hides, and restores only the most recently hidden card', () => {
   assert.equal(state.reactions['creator-1'].liked, true);
 
   state = hideCard(state, 'creator-1');
-  assert.deepEqual(state.hiddenCardIds, ['creator-1']);
+  state = hideCard(state, 'collection-1');
+  assert.deepEqual(state.hiddenCardIds, ['creator-1', 'collection-1']);
   state = undoHide(state);
-  assert.deepEqual(state.hiddenCardIds, []);
+  assert.deepEqual(state.hiddenCardIds, ['creator-1']);
+  assert.equal(state.undo, null);
+});
+
+test('preserves catalog order without accepting injected card order', () => {
+  assert.equal(createState.length, 0);
+  const state = createState([{ id: 'invented-card' }]);
+  assert.deepEqual(state.cardOrder, createCatalog().cards.map(({ id }) => id));
+});
+
+test('no-op transitions still return immutable state snapshots', () => {
+  const initial = createState();
+  assert.notStrictEqual(selectChannel(initial, 'unknown-channel'), initial);
+  assert.notStrictEqual(undoHide(initial), initial);
+
+  const hidden = hideCard(initial, 'creator-1');
+  assert.notStrictEqual(hideCard(hidden, 'creator-1'), hidden);
 });
 
 test('supports every feed status', () => {

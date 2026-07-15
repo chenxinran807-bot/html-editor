@@ -3,8 +3,9 @@ import { createCatalog } from './catalog.js';
 const validStatuses = new Set(['loading', 'empty', 'error', 'ready']);
 const validCardTypes = new Set(['creator', 'collection', 'outfit']);
 const catalogCardTypesById = new Map(createCatalog().cards.map(({ id, type }) => [id, type]));
+const catalogCardOrder = [...catalogCardTypesById.keys()];
 
-export function createState(cards = createCatalog().cards) {
+export function createState() {
   return {
     channel: '按场景',
     filterByChannel: { '按场景': '推荐', '适合我': '不限性别', '博主推荐': '精选' },
@@ -16,18 +17,19 @@ export function createState(cards = createCatalog().cards) {
     followingAuthorIds: [],
     hiddenCardIds: [],
     undo: null,
-    cardOrder: cards.map(({ id }) => id),
+    cardOrder: [...catalogCardOrder],
     feedStatus: 'ready',
   };
 }
 
 export function selectChannel(state, channel, currentScrollTop = state.scrollTop) {
-  if (!(channel in state.filterByChannel)) return state;
+  if (!(channel in state.filterByChannel)) return { ...state };
+  const scrollByChannel = { ...state.scrollByChannel, [state.channel]: currentScrollTop };
   return {
     ...state,
     channel,
-    scrollByChannel: { ...state.scrollByChannel, [state.channel]: currentScrollTop },
-    scrollTop: state.scrollByChannel[channel],
+    scrollByChannel,
+    scrollTop: scrollByChannel[channel],
   };
 }
 
@@ -57,7 +59,7 @@ export function toggleReaction(state, cardId, reaction) {
 }
 
 export function hideCard(state, cardId) {
-  if (state.hiddenCardIds.includes(cardId)) return state;
+  if (state.hiddenCardIds.includes(cardId)) return { ...state };
   return {
     ...state,
     hiddenCardIds: [...state.hiddenCardIds, cardId],
@@ -66,7 +68,7 @@ export function hideCard(state, cardId) {
 }
 
 export function undoHide(state) {
-  if (!state.undo) return state;
+  if (!state.undo) return { ...state };
   return {
     ...state,
     hiddenCardIds: state.hiddenCardIds.filter((id) => id !== state.undo.cardId),
