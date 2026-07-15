@@ -1,40 +1,42 @@
-# Editorial Outfit Tab debug prototype
+# Editorial Outfit Tab 原型
 
-This directory is reserved for a debug prototype of the new Douyin Mall standalone “穿搭” Tab. It does not modify or extend the formal design-language assets.
+这是抖音商城独立端“穿搭”Tab 的本地可交互编辑内容原型。它覆盖穿搭瀑布流、频道筛选、故事详情、收藏、故事/整套商品双视图、商品勾选与原型购买反馈；不会连接生产接口，也不包含真实购物车、库存、支付、登录或推荐能力。
 
-## Goal and scope
+## 启动
 
-The product goal is editorial browsing, saving, and product discovery through editor-curated image-and-text outfit stories. The approved scope covers the outfit feed, editorial feature cards, story detail, the story/product dual view, saving, product selection, and prototype-only purchase feedback.
+在仓库根目录任选一种方式启动静态服务：
 
-This task only completes the context contract in `demo-context.json`. It does not implement UI, production integrations, checkout, authentication, recommendation, inventory, cart, or payment behavior.
+```sh
+python3 -m http.server 8000 --bind 127.0.0.1
+```
+
+然后访问 `http://127.0.0.1:8000/work/editorial-outfit-tab/`。也可以直接运行下文的浏览器 QA；脚本会在 `127.0.0.1` 随机端口启动并在结束时关闭自己的静态服务。
+
+## 主要交互路径
+
+1. 在“精选 / 通勤 / 约会 / 周末 / 显高”之间切换频道。
+2. 打开任一穿搭卡片，在详情页收藏或取消收藏。
+3. 在“穿搭故事 / 整套商品”之间切换。
+4. 勾选可售商品；若显示“请选择规格”，先选择演示规格。
+5. 点击“购买整套”或“购买已选”，查看 aria-live 原型反馈。
+6. 返回信息流，频道选择会保留。
+
+## 原型状态
+
+页面顶部“原型状态”折叠区提供七种本地夹具：正常、加载、空态、错误、图片失败、部分售罄、全部不可售。图片失败夹具会故意请求不存在的本地文件，以验证可访问的替代内容；其 404 是浏览器 QA 中唯一明确过滤的已知无害控制台项。
+
+内容图片均为本目录 `assets/` 下的无品牌 SVG 插画：10 张竖向编辑造型、3 张竖向细节特写、6 张方形商品图。所有 catalog 图片路径均为本地路径。
 
 ## Soft open questions
 
-- Which production API supplies product data, inventory, and prices?
-- What are the final position and icon for the outfit Tab in the production bottom navigation?
+- 哪个生产 API 最终提供商品资料、库存和价格？
+- 穿搭 Tab 在生产底部导航中的最终位置和正式图标是什么？
 
-Both questions are soft: they affect production integration or final navigation visuals, but do not block the static prototype.
+两项问题都只影响生产接入或最终导航视觉，不阻塞这个静态原型。
 
-## Explicit prohibitions
+## 设计语言来源
 
-- Do not invent real sales, reviews, discounts, or lowest-price claims.
-- Do not present editor-curated content as ordinary user-generated content.
-- Do not implement real payment, login, or cart integrations.
-- Do not claim pixel-level fidelity without a source design.
-- Do not read from or reuse older same-topic designs or implementation plans.
-- Do not modify formal design-language assets from this debug prototype.
-
-## Run the current context contract
-
-From the repository root, run:
-
-```sh
-node --test qa/editorial-outfit-static.test.mjs
-```
-
-## Design-language sources
-
-The following absolute paths are the design-language source locations on the current machine. In another environment, resolve the same logical files again from that environment's installed `ecommerce-design-language` skill root; do not assume these machine-specific absolute paths are portable.
+本原型保留以下 11 个 Markdown 来源；在其他机器上应从已安装的 `ecommerce-design-language` 技能根目录解析同名文件：
 
 - `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/全局通用规则.md`
 - `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/设计资产目录和映射.md`
@@ -47,3 +49,22 @@ The following absolute paths are the design-language source locations on the cur
 - `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/组件元素/颜色.md`
 - `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/组件元素/文字.md`
 - `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/组件元素/圆角.md`
+
+## 验证
+
+2026-07-15 本地真实结果：
+
+```sh
+node --test qa/editorial-outfit-state.test.mjs qa/editorial-outfit-static.test.mjs
+# PASS：29/29
+
+/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node qa/editorial-outfit-browser.mjs
+# PASS：390x844 与 320x720；输出 4 张截图
+
+node /Users/bytedance/.codex/skills/ecommerce-design-language/scripts/validate-assets.js work/editorial-outfit-tab
+# PASS：Asset validation passed（上游正式资产仍报告 34 条既有 paired-html warning）
+
+git diff --check
+```
+
+浏览器证据位于 `qa/evidence/editorial-outfit/`：`feed-390.png`、`story-390.png`、`products-390.png`、`feed-320.png`。

@@ -6,7 +6,7 @@ const product = (storyId, number, category, title, spec, priceFen, status = 'ava
   title,
   spec,
   priceFen,
-  image: `./assets/${storyId}-product-${number}.jpg`,
+  image: `./assets/product-${((number - 1) % 6) + 1}.svg`,
   status,
 });
 
@@ -16,8 +16,8 @@ const story = (id, storyChannels, title, intro, tips, topics, products) => ({
   title,
   editorialLabel: '编辑精选',
   savedCountLabel: '灵感收藏',
-  image: `./assets/${id}-cover.jpg`,
-  gallery: [`./assets/${id}-01.jpg`, `./assets/${id}-02.jpg`],
+  image: `./assets/${id}.svg`,
+  gallery: ['./assets/detail-fabric.svg', './assets/detail-silhouette.svg', './assets/detail-accessory.svg'],
   intro,
   tips,
   topics,
@@ -73,7 +73,7 @@ const feature = {
   type: 'feature',
   id: 'weekly-city-edit',
   title: '本周城市通勤灵感',
-  image: './assets/weekly-city-edit.jpg',
+  image: './assets/city-trench.svg',
 };
 
 export const feedEntriesByChannel = Object.fromEntries(channels.map((channel) => {

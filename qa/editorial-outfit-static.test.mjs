@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { access } from 'node:fs/promises';
 import test from 'node:test';
 
 const contextUrl = new URL(
@@ -11,8 +12,26 @@ const stylesUrl = new URL('../work/editorial-outfit-tab/styles.css', import.meta
 const indexUrl = new URL('../work/editorial-outfit-tab/index.html', import.meta.url);
 const appUrl = new URL('../work/editorial-outfit-tab/app.mjs', import.meta.url);
 const renderUrl = new URL('../work/editorial-outfit-tab/render.mjs', import.meta.url);
+const catalogUrl = new URL('../work/editorial-outfit-tab/catalog.mjs', import.meta.url);
 
 const withoutComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '');
+
+test('catalog uses local SVG artwork and every referenced asset exists', async () => {
+  const { stories, feedEntriesByChannel } = await import(catalogUrl);
+  const references = stories.flatMap((story) => [
+    story.image,
+    ...story.gallery,
+    ...story.products.map((product) => product.image),
+  ]);
+  for (const entry of feedEntriesByChannel['精选']) {
+    if (entry.type === 'feature') references.push(entry.image);
+  }
+  assert.ok(references.length > 0);
+  for (const reference of references) {
+    assert.match(reference, /^\.\/assets\/[\w-]+\.svg$/);
+    await access(new URL(`../work/editorial-outfit-tab/${reference.slice(2)}`, import.meta.url));
+  }
+});
 
 function declarations(css) {
   return [...withoutComments(css).matchAll(/([\w-]+)\s*:\s*([^;{}]+)\s*;/g)]
