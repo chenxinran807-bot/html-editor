@@ -128,6 +128,17 @@ async function exerciseViewport(browser, url, viewport) {
   await page.getByRole('tab', { name: '推荐', exact: true }).click();
   await waitReady(page);
 
+  const feedEnd = page.locator('[data-proto-key="feed-end"]');
+  check('ready feed ends after last card with adjacent recommendation', await feedEnd.isVisible() && await feedEnd.getByText('已浏览完当前主题').isVisible() && await feedEnd.evaluate(node => node.parentElement?.lastElementChild === node && node.previousElementSibling?.classList.contains('card')) && await feedEnd.locator('[data-feed-end-id]').isEnabled());
+  await feedEnd.scrollIntoViewIfNeeded();
+  const feedEndScroll = await page.evaluate(() => scrollY);
+  await feedEnd.locator('[data-feed-end-id]').click();
+  check('feed-end recommendation opens collection detail', await page.locator('.collection-detail').isVisible());
+  await page.getByRole('button', { name: '返回内容流' }).click();
+  await page.waitForTimeout(40);
+  check('feed-end recommendation back restores context', await page.locator('.channel[aria-selected="true"]').textContent() === '按场景' && await page.locator('.filter[aria-selected="true"]').textContent() === '推荐' && Math.abs((await page.evaluate(() => scrollY)) - feedEndScroll) < 3);
+  await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+
   const searchOpen = page.getByRole('button', { name: '搜索穿搭灵感' });
   await searchOpen.click();
   const searchInput = page.locator('#search-input');
@@ -136,6 +147,7 @@ async function exerciseViewport(browser, url, viewport) {
   check('search filters visible cards and result count', await page.locator('#feed .card:visible').count() === 1 && await page.locator('#feed-label').textContent() === '1 条结果' && await page.locator('#feed').textContent().then(text => text.includes('简线穿搭')));
   await searchInput.fill('没有这种穿搭');
   check('search exposes no-result recovery', await page.getByText('没有找到相关穿搭').isVisible() && await page.getByRole('button', { name: '清除搜索' }).isVisible());
+  check('search no-result omits content end', await page.locator('[data-proto-key="feed-end"]').count() === 0);
   await page.getByRole('button', { name: '清除搜索' }).click();
   check('clear no-result restores cards and search focus', await page.locator('#feed .card:visible').count() > 1 && await searchInput.inputValue() === '' && await searchInput.evaluate(node => document.activeElement === node));
   await searchInput.fill('通勤');
@@ -158,6 +170,7 @@ async function exerciseViewport(browser, url, viewport) {
   }));
   check('loading shows multiple typed card skeletons', skeletonRatios.length >= 4 && new Set(skeletonRatios.map(item => item.type)).size === 3);
   check('loading skeletons preserve content type ratios', skeletonRatios.every(({ actual, expected }) => Math.abs(actual - expected) < 0.03), JSON.stringify(skeletonRatios));
+  check('loading omits content end', await page.locator('[data-proto-key="feed-end"]').count() === 0);
   await waitReady(page);
   await page.getByRole('tab', { name: '按场景', exact: true }).click();
   await waitReady(page);
@@ -197,15 +210,18 @@ async function exerciseViewport(browser, url, viewport) {
     check('state menu toggles visibly', await page.locator('#state-menu').isVisible() && await page.getByRole('button', { name: '原型状态菜单' }).getAttribute('aria-expanded') === 'true');
     await page.getByRole('button', { name: '加载', exact: true }).click();
     check('loading state reachable', await page.locator('#feed[data-feed-state="loading"] .skeleton').count() >= 4 && await page.locator('#status').isHidden());
+    check('prototype loading omits content end', await page.locator('[data-proto-key="feed-end"]').count() === 0);
     for (const [button, state] of [['空内容', 'empty'], ['失败', 'error']]) {
       await page.getByRole('button', { name: '原型状态菜单' }).click();
       await page.getByRole('button', { name: button, exact: true }).click();
       check(`${state} state reachable`, await page.locator(`#feed[data-feed-state="${state}"]`).count() === 1);
       if (state === 'empty') {
+        check('empty state omits content end', await page.locator('[data-proto-key="feed-end"]').count() === 0);
         await page.getByRole('button', { name: '清除筛选' }).click();
         check('clear-filter restores ready content', await page.locator('#feed[data-feed-state="ready"] .card').count() > 0);
       } else {
         check('post-load error retains cards and follows feed inline', await page.locator('#feed .card:visible').count() > 0 && await page.locator('#status').evaluate(node => node.classList.contains('inline') && node.previousElementSibling?.id === 'feed'));
+        check('error state omits content end', await page.locator('[data-proto-key="feed-end"]').count() === 0);
         await page.getByRole('button', { name: '重新加载' }).click();
         await waitReady(page);
         check('retry restores explicit ready content', await page.locator('#feed').getAttribute('data-feed-state') === 'ready' && await page.locator('#status').evaluate(node => node.hidden && getComputedStyle(node).display === 'none') && await page.locator('#feed .card:visible').count() > 0);
@@ -220,6 +236,7 @@ async function exerciseViewport(browser, url, viewport) {
       return { type, actual: failure.getBoundingClientRect().width / failure.getBoundingClientRect().height, expected };
     }));
     check('image-failure state preserves type ratios', ratios.every(({ actual, expected }) => Math.abs(actual - expected) < 0.03), JSON.stringify(ratios));
+    check('image-failure omits content end', await page.locator('[data-proto-key="feed-end"]').count() === 0);
     await page.getByRole('button', { name: '原型状态菜单' }).click();
     await page.getByRole('button', { name: '正常' }).click();
     check('ready state reachable', await page.locator('#feed[data-feed-state="ready"] .card').count() > 0);
@@ -281,6 +298,7 @@ async function exerciseViewport(browser, url, viewport) {
       await card.locator('.open-card').click();
       check(`${type} card opens correct detail`, await page.locator(`.${expectedClass}`).isVisible());
       if (type === 'creator') check('creator nickname and scene/style tags visible in detail', await page.locator('.creator-detail').textContent().then(text => text.includes('简线穿搭') && text.includes('场景：通勤') && text.includes('风格：简洁')));
+      if (type === 'collection') check('collection detail end precedes adjacent recommendation', await page.locator('[data-proto-key="collection-detail-end"]').evaluate(node => node.textContent.includes('已浏览完当前合集') && node.nextElementSibling?.matches('[data-adjacent-id]')));
       await page.getByRole('button', { name: '返回内容流' }).click();
       await page.waitForTimeout(40);
       check(`${type} back restores channel/filter/scroll`, await page.locator('.channel[aria-selected="true"]').textContent() === '按场景' && await page.locator('.filter[aria-selected="true"]').textContent() === '推荐' && Math.abs((await page.evaluate(() => scrollY)) - savedScroll) < 3, cardId);
