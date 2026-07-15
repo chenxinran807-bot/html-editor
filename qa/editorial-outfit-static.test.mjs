@@ -6,6 +6,47 @@ const contextUrl = new URL(
   '../work/editorial-outfit-tab/demo-context.json',
   import.meta.url,
 );
+const tokensUrl = new URL('../work/editorial-outfit-tab/tokens.css', import.meta.url);
+const stylesUrl = new URL('../work/editorial-outfit-tab/styles.css', import.meta.url);
+
+const withoutComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '');
+
+function declarations(css) {
+  return [...withoutComments(css).matchAll(/([\w-]+)\s*:\s*([^;{}]+)\s*;/g)]
+    .map(([, property, value]) => [property.toLowerCase(), value.trim()]);
+}
+
+test('visual foundation exposes the approved semantic aliases', async () => {
+  const css = withoutComments(await readFile(tokensUrl, 'utf8'));
+  for (const [name, value] of Object.entries({
+    '--text-primary': '#161823',
+    '--brand-primary': '#FF003C',
+    '--radius-card': '8px',
+    '--font-card-title': '16px',
+    '--line-card-title': '22px',
+  })) {
+    assert.match(css, new RegExp(`${name}\\s*:\\s*${value.replace('.', '\\.') }\\s*;`, 'i'));
+  }
+});
+
+test('layout styles consume tokens and contain no raw hex colors', async () => {
+  const css = withoutComments(await readFile(stylesUrl, 'utf8'));
+  assert.match(css, /var\(\s*--text-primary\s*\)/);
+  assert.match(css, /var\(\s*--radius-card\s*\)/);
+  assert.doesNotMatch(css, /#[\da-f]{3,8}\b/i);
+});
+
+test('visual declarations in layout styles use aliases', async () => {
+  const css = await readFile(stylesUrl, 'utf8');
+  const tokenOnly = /^(?:var\(\s*--[\w-]+\s*(?:,[^)]+)?\)|0|none|transparent|inherit|initial|unset|auto)$/i;
+  const visualProperties = /^(?:color|background-color|border-color|font-size|line-height|gap|row-gap|column-gap|padding(?:-(?:top|right|bottom|left|inline|block)(?:-(?:start|end))?)?|margin(?:-(?:top|right|bottom|left|inline|block)(?:-(?:start|end))?)?|border-radius)$/;
+
+  for (const [property, value] of declarations(css)) {
+    if (visualProperties.test(property)) {
+      assert.match(value, tokenOnly, `${property}: ${value} must use a registered alias`);
+    }
+  }
+});
 
 test('locks the approved editorial outfit demo context', async () => {
   const context = JSON.parse(await readFile(contextUrl, 'utf8'));
