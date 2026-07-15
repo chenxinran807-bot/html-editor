@@ -11,7 +11,11 @@ const feedScreen = document.querySelector('#feed-screen');
 const detailScreen = document.querySelector('#detail-screen');
 const detailContent = document.querySelector('#detail-content');
 const toast = document.querySelector('#toast');
+const TOAST_DURATION_MS = 1800;
 let state = createState();
+let toastTimer = null;
+let pendingFeedFocusStoryId = null;
+let shouldFocusDetailTab = false;
 
 const activeStory = () => stories.find((story) => story.id === state.activeStoryId);
 const rememberFeedScroll = () => {
@@ -19,6 +23,11 @@ const rememberFeedScroll = () => {
 };
 const restoreFeedScroll = () => requestAnimationFrame(() => {
   window.scrollTo({ top: state.scrollByChannel[state.channel], behavior: 'auto' });
+  if (pendingFeedFocusStoryId) {
+    feedScreen.querySelector(`[data-action="open-story"][data-story-id="${pendingFeedFocusStoryId}"]`)
+      ?.focus({ preventScroll: true });
+    pendingFeedFocusStoryId = null;
+  }
 });
 
 function render() {
@@ -38,12 +47,22 @@ function render() {
   channelTabs.hidden = !onFeed;
   detailScreen.hidden = onFeed;
   if (onFeed) restoreFeedScroll();
+  if (!onFeed && shouldFocusDetailTab) {
+    requestAnimationFrame(() => {
+      detailContent.querySelector(`#detail-tab-${state.detailView}`)?.focus({ preventScroll: true });
+      shouldFocusDetailTab = false;
+    });
+  }
 }
 
 const showToast = (message) => {
+  if (toastTimer !== null) clearTimeout(toastTimer);
   toast.textContent = message;
   toast.hidden = false;
-  requestAnimationFrame(() => { toast.hidden = true; });
+  toastTimer = setTimeout(() => {
+    toast.hidden = true;
+    toastTimer = null;
+  }, TOAST_DURATION_MS);
 };
 
 shell.addEventListener('click', (event) => {
@@ -57,14 +76,21 @@ shell.addEventListener('click', (event) => {
     rememberFeedScroll();
     state = openStory(state, control.dataset.storyId, stories);
   } else if (action === 'close-story') {
+    pendingFeedFocusStoryId = state.activeStoryId;
     state = closeStory(state);
   } else if (action === 'toggle-save') {
+    if (state.screen === 'feed') rememberFeedScroll();
     state = toggleSave(state, control.dataset.storyId, stories);
     showToast(state.savedStoryIds.includes(control.dataset.storyId) ? '已收藏' : '已取消收藏');
   } else if (action === 'set-detail-view') {
     state = setDetailView(state, control.dataset.detailView, stories);
+    shouldFocusDetailTab = true;
   } else if (action === 'share-story') {
     showToast('分享功能为原型演示');
+  } else if (action === 'prototype-search') {
+    showToast('搜索功能为原型演示');
+  } else if (action === 'prototype-nav') {
+    showToast('该导航为原型演示');
   }
   render();
 });

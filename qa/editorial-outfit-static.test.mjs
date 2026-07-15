@@ -36,6 +36,12 @@ test('HTML exposes stable semantic feed and detail shells', async () => {
   ]) assert.match(html, pattern);
   assert.match(html, /<link[^>]+href="\.\/tokens\.css"/);
   assert.match(html, /<link[^>]+href="\.\/styles\.css"/);
+
+  const buttons = [...html.matchAll(/<button\b[^>]*>/gi)].map(([tag]) => tag);
+  assert.ok(buttons.length > 0);
+  for (const button of buttons) {
+    assert.match(button, /\bdata-action="[^"]+"|\brole="tab"/i, `dead static control: ${button}`);
+  }
 });
 
 test('app uses the required delegated action vocabulary', async () => {
@@ -51,11 +57,22 @@ test('app uses the required delegated action vocabulary', async () => {
   assert.doesNotMatch(source, /feedScreen\.scrollTop|#feed-scroller/);
   assert.match(source, /share-story/);
   assert.match(source, /分享功能为原型演示/);
+  assert.match(source, /prototype-search/);
+  assert.match(source, /搜索功能为原型演示/);
+  assert.match(source, /prototype-nav/);
+  assert.match(source, /该导航为原型演示/);
   assert.match(source, /replaceWith/);
   assert.match(source, /role:\s*['"]img['"]/);
   assert.match(source, /aria-label/);
   assert.match(source, /detailContent\.innerHTML\s*=\s*state\.detailView\s*===\s*['"]story['"]/);
   assert.doesNotMatch(source, /storyView\.innerHTML|productsView\.innerHTML/);
+  assert.match(source, /clearTimeout\(toastTimer\)/);
+  assert.match(source, /setTimeout\([^]*TOAST_DURATION_MS\)/);
+  assert.match(source, /TOAST_DURATION_MS\s*=\s*(?:1[6-9]\d{2}|2000)/);
+  assert.match(source, /toastTimer\s*=\s*null/);
+  assert.match(source, /action === ['"]toggle-save['"][^]*state\.screen === ['"]feed['"][^]*rememberFeedScroll\(\)[^]*toggleSave/s);
+  assert.match(source, /focus\(\{\s*preventScroll:\s*true\s*\}\)/);
+  assert.match(source, /data-story-id/);
 });
 
 test('render module exports the feed, detail and stable state renderers', async () => {
