@@ -1,0 +1,80 @@
+# Editorial Outfit Tab 原型
+
+这是抖音商城独立端“穿搭”Tab 的本地可交互编辑内容原型。它覆盖穿搭瀑布流、频道筛选、故事详情、收藏、故事/整套商品双视图、商品勾选与原型购买反馈；不会连接生产接口，也不包含真实购物车、库存、支付、登录或推荐能力。
+
+## 启动
+
+在仓库根目录任选一种方式启动静态服务：
+
+```sh
+python3 -m http.server 8000 --bind 127.0.0.1
+```
+
+然后访问 `http://127.0.0.1:8000/work/editorial-outfit-tab/`。也可以直接运行下文的浏览器 QA；脚本会在 `127.0.0.1` 随机端口启动并在结束时关闭自己的静态服务。
+
+## 主要交互路径
+
+1. 在“精选 / 通勤 / 约会 / 周末 / 显高”之间切换频道。
+2. 打开任一穿搭卡片，在详情页收藏或取消收藏。
+3. 在“穿搭故事 / 整套商品”之间切换。
+4. 勾选可售商品；若显示“请选择规格”，先选择演示规格。
+5. 点击“购买整套”或“购买已选”，查看 aria-live 原型反馈。
+6. 返回信息流，频道选择会保留。
+
+## 原型状态
+
+页面顶部“原型状态”折叠区提供七种本地夹具：正常、加载、空态、错误、图片失败、部分售罄、全部不可售。图片失败夹具会故意请求不存在的本地文件，以验证可访问的替代内容；其 404 是浏览器 QA 中唯一明确过滤的已知无害控制台项。
+
+内容图片均为本目录 `assets/` 下的无品牌 SVG 插画：10 张竖向编辑造型、1 张独立专题图、3 张竖向细节特写、6 张方形商品图。所有 catalog 图片路径均为本地路径；商品图片按品类与标题语义映射。
+
+## 审计交接
+
+- Demo 路径：`work/editorial-outfit-tab/`；按上文从仓库根启动静态服务后访问对应 URL。
+- 覆盖范围：feed 信息流、story 穿搭故事、products 整套商品，以及正常、加载、空态、错误、图片失败、部分售罄、全部不可售 7 states。
+- 视觉说明：当前视觉基于 PRD 与 11 份设计语言 Markdown 规范推断，不是对未提供设计稿的像素级还原。
+- 资产边界：本原型只新增并使用自身目录内的中性 SVG 插画，未修改技能包中的正式设计资产。
+
+## Soft open questions
+
+- **Q01 / 商品 API**：哪个生产 API 最终提供商品资料、库存和价格？建议接入前补齐商品 API 契约、失败策略与字段映射。
+- **Q02 / bottom nav**：穿搭 Tab 在生产底部导航中的最终位置和正式图标是什么？建议补充 bottom-nav 规范后再做正式导航视觉定稿。
+
+两项问题都只影响生产接入或最终导航视觉，不阻塞这个静态原型。
+
+## 设计语言来源
+
+本原型保留以下 11 个 Markdown 来源。以下路径相对 `<ecommerce-design-language skill root>`；当前环境通过 `${CODEX_HOME:-$HOME/.codex}/skills/ecommerce-design-language` 解析，其他环境应使用其实际安装根目录：
+
+- `assets/design-assets/common/md/全局通用规则.md`
+- `assets/design-assets/common/md/设计资产目录和映射.md`
+- `assets/design-assets/common/md/token/设计 Token.md`
+- `assets/design-assets/common/md/组件/标签栏Tab.md`
+- `assets/design-assets/common/md/组件/商品卡.md`
+- `assets/design-assets/common/md/组件/按钮.md`
+- `assets/design-assets/common/md/组件/货币／价格.md`
+- `assets/design-assets/common/md/组件元素/布局.md`
+- `assets/design-assets/common/md/组件元素/颜色.md`
+- `assets/design-assets/common/md/组件元素/文字.md`
+- `assets/design-assets/common/md/组件元素/圆角.md`
+
+## 验证
+
+2026-07-15 本地真实结果：
+
+```sh
+node --test qa/editorial-outfit-state.test.mjs qa/editorial-outfit-static.test.mjs
+# PASS：31/31
+
+CODEX_WORKSPACE_NODE_MODULES="${CODEX_WORKSPACE_NODE_MODULES:-$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules}" node qa/editorial-outfit-browser.mjs
+# PASS：390x844 与 320x720；标题区域整卡打开、频道/feed 收藏/detail 收藏焦点恢复、详情 story/products 加载与错误重试均通过；输出 4 张截图
+
+node "${CODEX_HOME:-$HOME/.codex}/skills/ecommerce-design-language/scripts/validate-assets.js" work/editorial-outfit-tab
+# PASS：Asset validation passed（上游正式资产仍报告 34 条既有 paired-html warning）
+
+git diff --check
+# PASS：无空白错误
+```
+
+浏览器证据位于 `qa/evidence/editorial-outfit/`：`feed-390.png`、`story-390.png`、`products-390.png`、`feed-320.png`。
+
+已知环境说明：全仓测试仍有 3 项既有失败，均因默认环境无法解析 `playwright-core`；这不等同于本专项浏览器验收失败。本专项已通过上面的 `CODEX_WORKSPACE_NODE_MODULES` 显式使用 Codex bundled Node 依赖运行，且 390×844、320×720 两个视口均通过。该说明只描述环境边界，不宣称全仓测试通过。
