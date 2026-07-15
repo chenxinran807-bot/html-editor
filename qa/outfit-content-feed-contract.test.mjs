@@ -43,7 +43,7 @@ test('feed navigation preserves browsing context without reloading the page', as
     'saved scroll must be restored only after the ready feed has rendered',
   );
   assert.match(html, /\.status\{[^}]*min-height:var\(--feed-reserve\)/, 'loading must reserve feed height');
-  assert.match(html, /returnToFeed\(state\);\s*renderShell\(\);\s*renderFeed\(\);\s*restoreFeedScroll\(\)/, 'detail return must restore the feed before scroll');
+  assert.match(html, /returnToFeed\(state\);\s*closeStateMenu\(true\);\s*renderShell\(\);\s*renderFeed\(\);\s*restoreFeedScroll\(\)/, 'detail return must restore controls and feed before scroll');
 });
 
 test('all structural CSS dimensions are named in the root token registry', async () => {
@@ -119,6 +119,20 @@ test('binds every detail action and state recovery hook to an observable transit
   assert.match(html, /data-clear-filter.*selectFilter\(state,catalog\.channels\[state\.channel\]\[0\]\).*setFeedStatus\(state,'ready'\)/s);
   assert.match(html, /data-retry-feed.*startLoading\(\)/s);
   assert.match(html, /feedStatus==='image-failure'.*class="image-failure".*图片暂时无法显示/s);
+});
+
+test('keeps prototype state controls hidden in detail and preserves failed media ratios', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  const style = html.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? '';
+
+  assert.match(style, /\.state-menu\[hidden\]\{display:none\}/);
+  assert.match(style, /\.image-failure\{[^}]*aspect-ratio:3\/4/);
+  assert.match(style, /\.collection-card \.image-failure\{aspect-ratio:1\/1\}/);
+  assert.match(style, /\.outfit-card \.image-failure\{aspect-ratio:4\/5\}/);
+  assert.match(html, /function closeStateMenu\(enabled=false\).*stateMenu\.hidden=true.*stateToggle\.disabled=!enabled/s);
+  assert.match(html, /function showDetail\(card\)\{cancelPendingLoad\(\);closeStateMenu\(\)/);
+  assert.match(html, /returnToFeed\(state\);closeStateMenu\(true\);renderShell\(\)/);
+  assert.match(html, /media\.dataset\.imageState='failed'/);
 });
 
 test('all required local SVG assets physically exist and are self-contained', async () => {
