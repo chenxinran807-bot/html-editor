@@ -138,6 +138,19 @@ test('storage failures are non-throwing and report through the editor status', a
   assert.match(html, /export-comments[^;]*persistEditable\(\)/s);
 });
 
+test('apply reports memory-only fallback when browser persistence fails', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  const reportEditableSave = new Function(`return (${extractNamedFunction(html, 'reportEditableSave')})`)();
+  const messages = [];
+  assert.equal(reportEditableSave(false, (message) => messages.push(message)), false);
+  assert.deepEqual(messages, ['修改已应用，但无法保存到浏览器']);
+  assert.equal(reportEditableSave(true, (message) => messages.push(message)), true);
+  assert.equal(messages.at(-1), '修改已保存');
+  assert.match(html, /function\s+recordEditable\([^)]*\)\{[^}]*return persistEditable\(\)/s);
+  assert.match(html, /const saved=recordEditable\(\);reportEditableSave\(saved,setEditorStatus\)/);
+  assert.doesNotMatch(html, /recordEditable\(\);document\.querySelector\('#agent-status'\)\.textContent='修改已保存'/);
+});
+
 test('parent text editing never crosses into a separately keyed child', async () => {
   const html = await readFile(`${root}/index.html`, 'utf8');
   const ownsEditableNode = new Function(`return (${extractNamedFunction(html, 'ownsEditableNode')})`)();
