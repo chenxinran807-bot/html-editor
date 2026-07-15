@@ -7,6 +7,7 @@ export const createState = () => ({
   detailView: 'story',
   savedStoryIds: [],
   selectedProductIds: [],
+  selectionInitializedForStoryId: null,
   scrollByChannel: Object.fromEntries(catalogChannels.map((channel) => [channel, 0])),
 });
 
@@ -28,7 +29,14 @@ export const setChannel = (state, channel) => {
 
 export const openStory = (state, storyId, stories) => {
   findStory(storyId, stories);
-  return { ...state, screen: 'detail', activeStoryId: storyId, detailView: 'story', selectedProductIds: [] };
+  return {
+    ...state,
+    screen: 'detail',
+    activeStoryId: storyId,
+    detailView: 'story',
+    selectedProductIds: [],
+    selectionInitializedForStoryId: null,
+  };
 };
 
 export const closeStory = (state) => ({
@@ -37,6 +45,7 @@ export const closeStory = (state) => ({
   activeStoryId: null,
   detailView: 'story',
   selectedProductIds: [],
+  selectionInitializedForStoryId: null,
 });
 
 export const toggleSave = (state, storyId, stories) => {
@@ -54,9 +63,11 @@ export const setDetailView = (state, detailView, stories) => {
   if (!['story', 'products'].includes(detailView)) throw new TypeError(`未知详情视图: ${detailView}`);
   if (detailView === 'story') return { ...state, detailView };
   const story = findStory(state.activeStoryId, stories);
+  if (state.selectionInitializedForStoryId === story.id) return { ...state, detailView };
   return {
     ...state,
     detailView,
+    selectionInitializedForStoryId: story.id,
     selectedProductIds: story.products
       .filter((product) => product.status === 'available')
       .map((product) => product.id),

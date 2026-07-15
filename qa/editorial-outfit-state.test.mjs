@@ -100,6 +100,31 @@ test('products view selects only available products and partial selection is sum
   assert.equal(summary.disabled, false);
 });
 
+test('products view preserves a partial selection when returning from story view', () => {
+  const available = story.products.filter((product) => product.status === 'available');
+  let state = openStory(createState(), story.id, stories);
+  state = setDetailView(state, 'products', stories);
+  state = toggleProduct(state, available[0].id, stories);
+  state = setDetailView(state, 'story', stories);
+  state = setDetailView(state, 'products', stories);
+
+  assert.deepEqual(state.selectedProductIds, available.slice(1).map((product) => product.id));
+  assert.equal(summarizeSelection(state, stories).actionLabel, '购买已选');
+});
+
+test('products view preserves an intentional zero selection when returning from story view', () => {
+  let state = openStory(createState(), story.id, stories);
+  state = setDetailView(state, 'products', stories);
+  for (const productId of [...state.selectedProductIds]) {
+    state = toggleProduct(state, productId, stories);
+  }
+  state = setDetailView(state, 'story', stories);
+  state = setDetailView(state, 'products', stories);
+
+  assert.deepEqual(state.selectedProductIds, []);
+  assert.equal(summarizeSelection(state, stories).actionLabel, '请选择商品');
+});
+
 test('sold-out products cannot be selected', () => {
   const productsView = setDetailView(openStory(createState(), story.id, stories), 'products', stories);
   const soldOut = story.products.find((product) => product.status === 'sold-out');
