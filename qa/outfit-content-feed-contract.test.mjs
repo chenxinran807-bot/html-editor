@@ -24,6 +24,9 @@ test('freezes the accepted outfit content feed requirements', async () => {
 
   assert.equal(requirements.schemaVersion, 1);
   assert.equal(requirements.confidence, 'high');
+  assert.equal(requirements.title, '抖音商城独立端穿搭 Tab');
+  assert.equal(requirements.actor, '男女混合的穿搭内容浏览用户');
+  assert.equal(requirements.goal, '提升穿搭内容浏览时长和连续浏览意愿');
 
   assert.equal(requirements.extractionMode, 'model-semantic');
   assert.deepEqual(requirements.screens, [
@@ -38,8 +41,18 @@ test('freezes the accepted outfit content feed requirements', async () => {
   }
 
   const evidenceById = new Map(requirements.evidence.map((item) => [item.id, item]));
+  assert.equal(evidenceById.size, requirements.evidence.length, 'evidence IDs must be unique');
+  assert.deepEqual(
+    [...evidenceById.keys()].sort(),
+    ['goal', 'audience', 'content-mix', 'secondary-tabs', 'engagement-actions', 'detail-navigation', 'page-states'].sort(),
+    'evidence IDs must exactly cover the accepted requirement categories',
+  );
   for (const item of requirements.evidence) {
     assert.ok(prd.includes(item.quote), `evidence quote not found verbatim: ${item.quote}`);
+  }
+  assert.ok(evidenceById.get('goal').quote.includes(requirements.goal), 'goal must link to verbatim evidence');
+  for (const actorTerm of ['男女混合', '用户']) {
+    assert.ok(evidenceById.get('audience').quote.includes(actorTerm), `actor evidence lacks term: ${actorTerm}`);
   }
 
   assert.deepEqual(requirements.businessObjects.map(({ name }) => name), [
@@ -91,10 +104,11 @@ test('freezes the accepted outfit content feed requirements', async () => {
     assert.ok(evidenceById.get('secondary-tabs').quote.includes(tab), `IA tab lacks verbatim evidence: ${tab}`);
   }
 
-  assert.equal(requirements.transitions.length * 2, 6, 'three open and three return transitions are required');
+  assert.equal(requirements.transitions.length, 3, 'exactly three open transitions are required');
   const expectedDetailScreens = ['真人穿搭详情', '主题合集详情', '商品搭配详情'];
   const openDestinations = requirements.transitions.map(({ to }) => to);
   const returnOrigins = requirements.transitions.filter(({ return: returnBehavior }) => returnBehavior).map(({ to }) => to);
+  assert.equal(returnOrigins.length, 3, 'exactly three return transitions are required');
   assert.deepEqual(
     [...new Set(openDestinations)].sort(),
     [...expectedDetailScreens].sort(),
