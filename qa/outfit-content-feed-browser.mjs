@@ -1,8 +1,29 @@
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { readFile, mkdir } from 'node:fs/promises';
-import { extname, join, normalize } from 'node:path';
-import { chromium } from '/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs';
+import { readFile, mkdir, access } from 'node:fs/promises';
+import { delimiter, extname, join, normalize } from 'node:path';
+import { homedir } from 'node:os';
+import { pathToFileURL } from 'node:url';
+
+async function loadPlaywright() {
+  const moduleRoots = [
+    process.env.CODEX_NODE_MODULES,
+    ...(process.env.NODE_PATH || '').split(delimiter),
+    join(homedir(), '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules'),
+  ].filter(Boolean);
+  for (const moduleRoot of moduleRoots) {
+    const entry = join(moduleRoot, 'playwright/index.mjs');
+    try {
+      await access(entry);
+      return import(pathToFileURL(entry).href);
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+  }
+  throw new Error(`Bundled Playwright was not found. Set CODEX_NODE_MODULES or NODE_PATH to the directory containing playwright (checked: ${moduleRoots.join(', ') || 'no candidates'}).`);
+}
+
+const { chromium } = await loadPlaywright();
 
 const root = new URL('../work/douyin-outfit-content-feed/', import.meta.url).pathname;
 const evidence = new URL('./evidence/outfit-content-feed/', import.meta.url).pathname;
@@ -37,6 +58,14 @@ async function startServer() {
 
 async function waitReady(page) {
   await page.locator('#feed[data-feed-state="ready"] .card').first().waitFor();
+}
+
+async function waitForCanonicalLayout(page, stableLocator) {
+  await page.locator('#toast').waitFor({ state: 'detached' });
+  await stableLocator.waitFor({ state: 'visible' });
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 }
 
 async function assertSelected(page, selector, value) {
@@ -130,7 +159,7 @@ async function exerciseViewport(browser, url, viewport) {
       } else {
         await page.getByRole('button', { name: '重新加载' }).click();
         await waitReady(page);
-        check('retry restores ready content', true);
+        check('retry restores explicit ready content', await page.locator('#feed').getAttribute('data-feed-state') === 'ready' && await page.locator('#status').evaluate(node => node.hidden && getComputedStyle(node).display === 'none') && await page.locator('#feed .card:visible').count() > 0);
       }
     }
     await page.getByRole('button', { name: '原型状态菜单' }).click();
@@ -184,9 +213,12 @@ async function exerciseViewport(browser, url, viewport) {
       check(`${type} back restores channel/filter/scroll`, await page.locator('.channel[aria-selected="true"]').textContent() === '按场景' && await page.locator('.filter[aria-selected="true"]').textContent() === '推荐' && Math.abs((await page.evaluate(() => scrollY)) - savedScroll) < 3, cardId);
     }
 
-  await page.evaluate(() => scrollTo(0, 0));
+  await page.reload({ waitUntil: 'networkidle' });
+  await waitReady(page);
+  await waitForCanonicalLayout(page, page.locator('#feed[data-feed-state="ready"] .card').first());
   await page.screenshot({ path: join(evidence, `feed-${viewport.width}x${viewport.height}.png`), fullPage: true });
   await page.locator('#strip [data-strip-id]').first().click();
+  await waitForCanonicalLayout(page, page.locator('.collection-detail'));
   await page.screenshot({ path: join(evidence, `detail-${viewport.width}x${viewport.height}.png`), fullPage: true });
   await page.getByRole('button', { name: '返回内容流' }).click();
   await assertNoRuntimeProblems(page, errors, `${viewport.width}x${viewport.height}`);

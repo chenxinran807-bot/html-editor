@@ -14,6 +14,8 @@
 
 浏览器验收：使用仓库外的 bundled Playwright，从 `index.html` 入口 UI 在 390×844 与 320×700 两个视口分别独立执行完整交互套件。最终结果为 `114 browser checks passed`、退出码 0；两个视口均验证 `#status` 隐藏、计算样式为 `display:none` 且布局高度为 0。每个视口都覆盖三个频道及其全部筛选、三类卡片详情与返回上下文、喜欢/收藏/关注/不感兴趣/撤销、状态菜单的加载/空/失败/图片失败/正常及清除筛选和重试、按卡片类型保持图片失败占比、编辑标题/应用/撤销/预览隐藏且 inert、快速切换 latest-wins、加载中打开详情不被覆盖，以及横向溢出、固定栏空间、图片 natural dimensions、页面错误和控制台错误。
 
+证据稳定性：截图前重新载入标准首页状态，等待 ready 内容、toast 脱离 DOM、目标视图可见、连续两帧布局稳定，并滚动到标准顶部位置。完整脚本连续执行两次均为 114/114 通过，第二次生成的四张 PNG 与第一次逐字节相同：`detail-320x700 d204e6c8…`、`detail-390x844 2049e84e…`、`feed-320x700 7bc9e9d0…`、`feed-390x844 2c9f25ee…`；截图中无残留“筛选已清除”提示。Playwright 由 `CODEX_NODE_MODULES`、`NODE_PATH` 或当前用户的 bundled runtime 路径发现，不依赖固定账号目录。
+
 Task 1–5 自动测试：`node --test qa/outfit-content-feed-state.test.mjs qa/outfit-content-feed-contract.test.mjs`，31/31 通过，0 失败，退出码 0。
 
 已安装 Skill 门禁（`/Users/bytedance/.codex/skills/prd-to-editable-demo`）：
