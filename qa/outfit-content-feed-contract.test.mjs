@@ -426,6 +426,21 @@ test('searches catalog content with explicit creator names and keeps retained er
   assert.match(html, /feedStatus==='error'.*status\.classList\.toggle\('inline',hasRenderedFeed\)/s);
 });
 
+test('renders actionable content-end recommendations only for populated ready content', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  assert.match(html, /function renderFeedEnd\(cards\)/);
+  assert.match(html, /data-proto-key="feed-end"/);
+  assert.match(html, /已浏览完当前主题/);
+  assert.match(html, /data-proto-key="feed-end-recommendation" data-feed-end-id=/);
+  assert.match(html, /src="\$\{escapeAttr\(recommendation\.assetPath\)\}"/);
+  assert.match(html, /cards\.length\?cards\.map\(.*state\.feedStatus==='ready'\?renderFeedEnd\(cards\):''/s);
+  assert.match(html, /data-feed-end-id.*showDetail\(recommendation\)/s);
+  assert.match(html, /feedStatus==='loading'.*return.*feedStatus==='error'.*return.*feedStatus==='empty'.*return/s);
+  assert.match(html, /searchQuery\?'<div class="state-panel">没有找到相关穿搭.*清除搜索/s);
+  assert.match(html, /data-proto-key="collection-detail-end"[^>]*role="status"[^>]*>已浏览完当前合集/);
+  assert.match(html, /returnToFeed\(state\).*restoreFeedScroll\(\)/s);
+});
+
 test('all required local SVG assets physically exist and are self-contained', async () => {
   const assetsDirectory = `${root}/assets`;
   const names = await readdir(assetsDirectory);

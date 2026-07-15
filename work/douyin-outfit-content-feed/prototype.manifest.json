@@ -34,6 +34,8 @@
         { "key": "section-recommendation-title", "type": "heading" },
         { "key": "feed-label", "type": "text" },
         { "key": "mixed-feed", "type": "feed" },
+        { "key": "feed-end", "type": "status" },
+        { "key": "feed-end-recommendation", "type": "navigation" },
         { "key": "clear-filter", "type": "recovery-button" },
         { "key": "clear-search", "type": "recovery-button" },
         { "key": "retry-feed", "type": "recovery-button" },
@@ -53,7 +55,7 @@
     {
       "id": "collection-detail",
       "title": "主题合集详情",
-      "elements": [{ "key": "collection-detail", "type": "page" }, { "key": "back-to-feed", "type": "navigation" }, { "key": "adjacent-collection", "type": "navigation" }]
+      "elements": [{ "key": "collection-detail", "type": "page" }, { "key": "back-to-feed", "type": "navigation" }, { "key": "collection-detail-end", "type": "status" }, { "key": "adjacent-collection", "type": "navigation" }]
     },
     {
       "id": "outfit-detail",
@@ -90,6 +92,7 @@
     { "id": "search-feed", "from": "feed", "to": "filtered-feed", "effect": "trimmed query matches title, description, authorName, and tags; closing clears query" },
     { "id": "clear-search", "from": "search-empty", "to": "ready", "effect": "clear query and restore current channel/filter results" },
     { "id": "open-featured", "from": "feed", "to": "collection-detail" },
+    { "id": "continue-from-feed-end", "from": "feed-end", "to": "collection-detail", "preserves": ["channel", "filter", "query", "scroll"] },
     { "id": "retry-action", "from": "action-failed", "to": "ready", "effect": "retry rolled-back reaction" },
     { "id": "author-preview-edit", "from": "preview", "to": "edit" }
   ],
