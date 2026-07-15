@@ -89,6 +89,7 @@ async function normalJourney(page, width) {
   const commute = page.getByRole('tab', { name: '通勤' });
   await commute.click();
   assert.equal(await commute.getAttribute('aria-selected'), 'true');
+  await page.waitForFunction(() => document.activeElement?.dataset.channel === '通勤');
   assert.equal(await page.evaluate(() => document.activeElement?.dataset.channel), '通勤', `${width}: selected channel keeps focus`);
   await capture(page, `feed-${width}.png`);
 
@@ -112,10 +113,16 @@ async function normalJourney(page, width) {
   await page.locator('[data-action="close-story"]').click();
   await visible(page.locator('#feed-screen'), `${width}: keyboard journey returns to feed`);
 
-  await page.evaluate(() => window.scrollTo({ top: 280, behavior: 'auto' }));
+  const cardTitle = page.locator('.story-card__title').last();
+  await cardTitle.scrollIntoViewIfNeeded();
+  await page.evaluate(() => window.scrollBy({ top: 120, behavior: 'auto' }));
+  const titleIsVisible = await cardTitle.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.top >= 0 && rect.bottom <= innerHeight;
+  });
+  assert.equal(titleIsVisible, true, `${width}: target card remains visible before click`);
   const beforeStory = await page.evaluate(() => window.scrollY);
   assert.ok(beforeStory > 0, `${width}: feed must be scrolled before opening a story`);
-  const cardTitle = page.locator('.story-card__title').first();
   assert.equal(await cardTitle.locator('xpath=ancestor::a').getAttribute('data-action'), 'open-story');
   await cardTitle.click();
   await visible(page.locator('#detail-screen'), `${width}: detail is visible`);
@@ -197,7 +204,7 @@ async function edgeStates(page, browserSignals) {
   assert.match(await page.locator('[data-action="buy-selection"]').textContent(), /请选择商品/);
 
   await select.selectOption('normal');
-  await page.locator('.story-card__title').first().click();
+  await page.getByRole('tab', { name: '穿搭故事' }).click();
   const activeStoryId = await page.locator('#detail-screen [data-action="toggle-save"]').getAttribute('data-story-id');
   await select.selectOption('loading');
   await visible(page.locator('[data-detail-state="loading"] [aria-label="穿搭故事加载中"]'), 'detail story skeleton');
