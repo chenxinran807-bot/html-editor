@@ -31,6 +31,21 @@ test('mobile feed exposes stable prototype hooks and remains locally self-contai
   assert.match(html, /from\s+["']\.\/state\.js["']/);
 });
 
+test('feed navigation preserves browsing context without reloading the page', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+
+  assert.doesNotMatch(html, /location\.reload\s*\(/, 'detail return must re-render in place');
+  assert.doesNotMatch(html, /rgba\s*\(/i, 'all interface colors must come from approved tokens');
+  assert.match(html, /function\s+restoreFeedScroll\s*\(/, 'scroll restoration must be an explicit post-render step');
+  assert.match(
+    html,
+    /setFeedStatus\(state,'ready'\);\s*renderFeed\(\);\s*restoreFeedScroll\(\)/,
+    'saved scroll must be restored only after the ready feed has rendered',
+  );
+  assert.match(html, /\.status\{[^}]*min-height:var\(--feed-reserve\)/, 'loading must reserve feed height');
+  assert.match(html, /returnToFeed\(state\);\s*renderShell\(\);\s*renderFeed\(\);\s*restoreFeedScroll\(\)/, 'detail return must restore the feed before scroll');
+});
+
 const acceptedStatements = [
   '# 抖音商城独立端穿搭 Tab',
   '首要目标是提升穿搭内容浏览时长和连续浏览意愿。',
