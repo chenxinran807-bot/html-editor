@@ -74,6 +74,20 @@ test('feed controls are semantic, accessible, and race-safe', async () => {
   assert.match(html, /function escapeAttr\(/);
 });
 
+test('detail navigation escapes catalog content and invalidates pending feed work', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+
+  assert.match(html, /function\s+cancelPendingLoad\s*\(/);
+  assert.match(html, /function\s+showDetail\(card\)\{cancelPendingLoad\(\)/);
+  assert.match(html, /src="\$\{escapeAttr\(card\.assetPath\)\}"/);
+  assert.match(html, /alt="\$\{escapeAttr\(card\.title\)\}抽象穿搭插图"/);
+  assert.match(html, /<h2>\$\{escapeText\(card\.title\)\}<\/h2>/);
+  assert.match(html, /<p>\$\{escapeText\(card\.reason\|\|card\.description\)\}<\/p>/);
+  assert.match(html, /loadGeneration\+\+/);
+  assert.match(html, /clearTimeout\(loadTimer\)/);
+  assert.match(html, /cancelAnimationFrame\(restoreFrame\)/);
+});
+
 test('all required local SVG assets physically exist and are self-contained', async () => {
   const assetsDirectory = `${root}/assets`;
   const names = await readdir(assetsDirectory);
