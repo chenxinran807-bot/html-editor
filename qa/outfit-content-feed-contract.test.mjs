@@ -151,6 +151,37 @@ test('apply reports memory-only fallback when browser persistence fails', async 
   assert.doesNotMatch(html, /recordEditable\(\);document\.querySelector\('#agent-status'\)\.textContent='修改已保存'/);
 });
 
+test('position and size editing is bounded, persisted in patches, and baseline-restorable', async () => {
+  const [html, contextSource, manifestSource, summary] = await Promise.all([
+    readFile(`${root}/index.html`, 'utf8'),
+    readFile(`${root}/demo-context.json`, 'utf8'),
+    readFile(`${root}/prototype.manifest.json`, 'utf8'),
+    readFile(`${root}/demo-summary.md`, 'utf8'),
+  ]);
+  for (const id of ['edit-offset-x', 'edit-offset-y', 'edit-width', 'edit-height']) {
+    assert.match(html, new RegExp(`id=["']${id}["']`), `missing geometry input ${id}`);
+  }
+  const parseBoundedOptional = new Function(`return (${extractNamedFunction(html, 'parseBoundedOptional')})`)();
+  assert.deepEqual(parseBoundedOptional('', -48, 48), { valid: true, value: null });
+  assert.deepEqual(parseBoundedOptional('48', -48, 48), { valid: true, value: 48 });
+  assert.deepEqual(parseBoundedOptional('49', -48, 48), { valid: false, value: null });
+  assert.deepEqual(parseBoundedOptional('oops', 40, 430), { valid: false, value: null });
+  assert.match(html, /function\s+isGeometryEditable\s*\(/);
+  assert.match(html, /transform:element\.style\.transform/);
+  assert.match(html, /width:element\.style\.width/);
+  assert.match(html, /height:element\.style\.height/);
+  assert.match(html, /element\.style\.transform=baseline\.transform/);
+  assert.match(html, /position:\{x:geometry\.x\.value,y:geometry\.y\.value\}/);
+  assert.match(html, /size:\{width:geometry\.width\.value,height:geometry\.height\.value\}/);
+  assert.match(html, /位置或尺寸超出安全范围/);
+  const context = JSON.parse(contextSource);
+  const manifest = JSON.parse(manifestSource);
+  assert.ok(context.interactionInventory.some((item) => /位置|尺寸/.test(item)));
+  assert.ok(manifest.editCapabilities.includes('position'));
+  assert.ok(manifest.editCapabilities.includes('size'));
+  assert.match(summary, /位置.*尺寸|尺寸.*位置/);
+});
+
 test('parent text editing never crosses into a separately keyed child', async () => {
   const html = await readFile(`${root}/index.html`, 'utf8');
   const ownsEditableNode = new Function(`return (${extractNamedFunction(html, 'ownsEditableNode')})`)();

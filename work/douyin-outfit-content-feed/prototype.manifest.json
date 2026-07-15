@@ -92,6 +92,7 @@
     { "id": "author-preview-edit", "from": "preview", "to": "edit" }
   ],
   "states": { "feed": ["loading", "empty", "error", "image-failure", "ready"], "detail": ["creator-detail", "collection-detail", "outfit-detail"], "authoring": ["preview", "edit", "selected", "patched", "undo", "redo"] },
+  "editCapabilities": ["text", "color", "image", "position", "size", "visibility", "disabled", "navigation", "undo", "redo", "persistence", "export"],
   "assumptions": ["本地演示数据和抽象素材", "推荐反馈为模拟效果"],
   "gaps": ["无真实商品、库存、价格、账号与推荐服务"]
 }
