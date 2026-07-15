@@ -14,6 +14,20 @@
       <h1 class="app-header__title">穿搭</h1>
     </header>
     <nav id="channel-tabs" aria-label="穿搭场景"></nav>
+    <details>
+      <summary>原型状态</summary>
+      <label>演示状态
+        <select data-action="set-prototype-state">
+          <option value="normal">正常</option>
+          <option value="loading">加载</option>
+          <option value="empty">空态</option>
+          <option value="error">错误</option>
+          <option value="broken-image">图片失败</option>
+          <option value="partial-sold-out">部分售罄</option>
+          <option value="all-unavailable">全部不可售</option>
+        </select>
+      </label>
+    </details>
     <main id="feed-screen" data-screen="feed" tabindex="-1"></main>
     <main id="detail-screen" data-screen="detail" tabindex="-1" hidden>
       <div id="detail-content"></div>

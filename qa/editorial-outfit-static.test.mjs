@@ -73,6 +73,21 @@ test('app uses the required delegated action vocabulary', async () => {
   assert.match(source, /action === ['"]toggle-save['"][^]*state\.screen === ['"]feed['"][^]*rememberFeedScroll\(\)[^]*toggleSave/s);
   assert.match(source, /focus\(\{\s*preventScroll:\s*true\s*\}\)/);
   assert.match(source, /data-story-id/);
+  for (const action of ['toggle-product', 'choose-spec', 'buy-selection', 'retry-feed', 'return-featured']) {
+    assert.match(source, new RegExp(action), `missing ${action} action`);
+  }
+  assert.match(source, /addEventListener\(\s*['"]change['"]/);
+  assert.match(source, /已确认购买整套（原型）/);
+  assert.match(source, /已确认购买已选商品（原型）/);
+  assert.match(source, /status:\s*productIndex\s*===\s*0[\s\S]{0,160}spec:\s*productIndex\s*===\s*0\s*\?\s*['"]{2}/, 'partial fixture must expose the unresolved-spec path');
+});
+
+test('HTML exposes a non-blocking prototype edge-state chooser with exact fixture values', async () => {
+  const html = await readFile(indexUrl, 'utf8').catch(() => '');
+  assert.match(html, /<details[^>]*>[\s\S]*原型状态[\s\S]*<select[^>]+data-action="set-prototype-state"/);
+  for (const value of ['normal', 'loading', 'empty', 'error', 'broken-image', 'partial-sold-out', 'all-unavailable']) {
+    assert.match(html, new RegExp(`<option\\s+value=["']${value}["']`));
+  }
 });
 
 test('render module exports the feed, detail and stable state renderers', async () => {
@@ -122,6 +137,41 @@ test('renderers escape fixture content and expose accessible selected states', a
 
   const feature = render.renderFeed([{ type: 'feature', id: 'f', title: '专题', image: './f.jpg' }], [], []);
   assert.match(feature, /feature-card/);
+});
+
+test('product renderer exposes safe selection, specs, prices, availability and checkout semantics', async () => {
+  const { renderProducts } = await import(renderUrl);
+  const fixture = {
+    id: 'fixture', title: '<造型>', image: './look.jpg', priceNote: '参考价格', products: [
+      { id: 'available', category: '上装', title: '<衬衫>', spec: '', image: './a.jpg', status: 'available', priceFen: 26905 },
+      { id: 'sold', category: '鞋', title: '便鞋', spec: '黑色 38', image: './b.jpg', status: 'sold-out', priceFen: 45900 },
+      { id: 'invalid', category: '包', title: '旧款包', spec: '棕色', image: './c.jpg', status: 'invalid', priceFen: Number.NaN },
+    ],
+  };
+  const html = renderProducts(fixture, 'products', {
+    selectedProductIds: ['available'],
+    resolvedSpecProductIds: [],
+  });
+  assert.match(html, /当前造型/);
+  assert.match(html, /data-action="toggle-product"[^>]+type="checkbox"[^>]+checked/);
+  assert.match(html, /data-product-id="sold"[^>]+disabled/);
+  assert.match(html, /已售罄/);
+  assert.match(html, /已失效/);
+  assert.match(html, /请选择规格/);
+  assert.match(html, /data-action="choose-spec"/);
+  assert.match(html, /product-row__price-major[^>]*>269</);
+  assert.match(html, /product-row__price-minor[^>]*>\.05</);
+  assert.doesNotMatch(html, /NaN|Infinity|<衬衫>|<造型>/);
+  assert.match(html, /class="checkout-bar"/);
+  assert.match(html, /已选 1 件/);
+  assert.match(html, /data-action="buy-selection"/);
+});
+
+test('edge-state renderers expose retry and return-featured actions', async () => {
+  const render = await import(renderUrl);
+  assert.match(render.renderEmpty(), /data-action="return-featured"/);
+  assert.match(render.renderError(), /data-action="retry-feed"/);
+  assert.match(render.renderSkeleton(), /aria-busy="true"/);
 });
 
 test('visual foundation exposes the approved semantic aliases', async () => {
