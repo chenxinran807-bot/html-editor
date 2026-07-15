@@ -106,6 +106,15 @@ test('freezes the accepted outfit content feed requirements', async () => {
     'open transitions must have three exact unique actions',
   );
   assert.deepEqual(
+    requirements.transitions.map(({ action, to }) => `${action}→${to}`).sort(),
+    [
+      '打开真人穿搭→真人穿搭详情',
+      '打开主题合集→主题合集详情',
+      '打开商品搭配→商品搭配详情',
+    ].sort(),
+    'each open action must lead to its matching detail screen',
+  );
+  assert.deepEqual(
     [...new Set(returnOrigins)].sort(),
     [...expectedDetailScreens].sort(),
     'return transitions must originate from each exact detail screen',
