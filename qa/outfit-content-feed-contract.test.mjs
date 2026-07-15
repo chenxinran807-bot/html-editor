@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
+import { createCatalog } from '../work/douyin-outfit-content-feed/catalog.js';
 
 const root = 'work/douyin-outfit-content-feed';
 
@@ -62,6 +63,66 @@ test('every literal and generated editable region has a deterministic unique key
   }
   assert.match(html, /function\s+applyEditablePatches\s*\(/);
   assert.match(html, /function\s+bindEditableRegions\s*\(/);
+});
+
+test('covers all visible feed controls and headings with stable editable keys', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  for (const key of [
+    'state-toggle', 'section-inspiration-title', 'section-inspiration-more',
+    'section-recommendation-title', 'feed-label', 'bottom-nav-home',
+    'bottom-nav-outfit', 'bottom-nav-cart', 'bottom-nav-profile',
+    'featured-eyebrow', 'featured-title', 'featured-summary',
+  ]) {
+    assert.match(html, new RegExp(`data-proto-key=["']${key}["']`), `missing visible editable key ${key}`);
+  }
+  assert.match(html, /data-proto-key="filter-\$\{escapeAttr\(state\.channel\)\}-\$\{escapeAttr\(filter\)\}"/);
+  assert.match(html, /data-proto-key="strip-\$\{escapeAttr\(card\.id\)\}"/);
+  for (const state of ['loading', 'empty', 'error', 'image-failure', 'ready']) {
+    assert.match(html, new RegExp(`data-proto-key=["']state-${state}["']`));
+  }
+});
+
+test('editable capture honors disabled ancestors and limits control patches to interactive keys', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  assert.match(html, /function\s+keyedPath\s*\(/);
+  assert.match(html, /keyedPath\(event\.target\)\.some\([^)]*editablePatches\[[^\]]+\]\?\.disabled/s);
+  assert.match(html, /function\s+isInteractiveEditable\s*\(/);
+  assert.match(html, /edit-disabled['"]\)\.disabled=!interactive/);
+  assert.match(html, /edit-target['"]\)\.disabled=!interactive/);
+  assert.match(html, /if\(!isInteractiveEditable\(selectedEditable\)\)/);
+  assert.match(html, /const element=event\.target\.closest\('\[data-proto-key\]'\)/, 'nested selection must choose the nearest keyed region');
+});
+
+test('undo and redo persist the restored patch snapshot', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  assert.match(html, /function\s+restoreEditable\([^)]*\)\{[^}]*editablePatches=structuredClone\([^)]*\);persistEditable\(\);bindEditableRegions\(\)/s);
+});
+
+test('manifest inventories static and catalog-generated editable regions and state flows', async () => {
+  const [html, manifestSource] = await Promise.all([
+    readFile(`${root}/index.html`, 'utf8'),
+    readFile(`${root}/prototype.manifest.json`, 'utf8'),
+  ]);
+  const manifest = JSON.parse(manifestSource);
+  const manifestKeys = new Set(manifest.pages.flatMap((page) => page.elements.map((element) => element.key)));
+  const staticKeys = [...html.matchAll(/data-proto-key="([^"$]+)"/g)].map((match) => match[1]);
+  for (const key of staticKeys) assert.ok(manifestKeys.has(key), `manifest misses static key ${key}`);
+  const patternNames = new Set(manifest.dynamicElements.map((item) => item.name));
+  for (const name of ['filter', 'strip-card', 'card', 'card-open', 'card-like', 'card-collect', 'card-follow', 'card-hide', 'detail-action', 'detail-heading', 'collection-content', 'collection-content-heading', 'state-control']) {
+    assert.ok(patternNames.has(name), `manifest misses dynamic pattern ${name}`);
+  }
+  const catalog = createCatalog();
+  assert.ok(catalog.cards.length > 0);
+  for (const card of catalog.cards) {
+    for (const suffix of ['', '-open', '-like', '-collect', '-hide']) {
+      assert.ok(manifest.dynamicElements.some((item) => item.pattern.includes('{cardId}') && item.pattern.replace('{cardId}', card.id).endsWith(suffix)), `catalog key not represented: ${card.id}${suffix}`);
+    }
+    if (card.type === 'creator') assert.ok(manifest.dynamicElements.some((item) => item.pattern === '{cardId}-follow'));
+  }
+  assert.deepEqual(manifest.states.feed, ['loading', 'empty', 'error', 'image-failure', 'ready']);
+  assert.ok(manifest.flows.some((flow) => flow.id === 'retry-error'));
+  assert.ok(manifest.flows.some((flow) => flow.id === 'clear-empty'));
+  assert.ok(manifest.flows.some((flow) => flow.id === 'detail-return'));
 });
 
 test('mobile feed exposes stable prototype hooks and remains locally self-contained', async () => {
@@ -141,7 +202,7 @@ test('detail navigation escapes catalog content and invalidates pending feed wor
   assert.match(html, /function\s+showDetail\(card\)\{cancelPendingLoad\(\)/);
   assert.match(html, /src="\$\{escapeAttr\(card\.assetPath\)\}"/);
   assert.match(html, /alt="\$\{escapeAttr\(card\.title\)\}抽象穿搭插图"/);
-  assert.match(html, /<h2>\$\{escapeText\(card\.title\)\}<\/h2>/);
+  assert.match(html, /<h2[^>]*>\$\{escapeText\(card\.title\)\}<\/h2>/);
   assert.match(html, /<p>\$\{escapeText\(card\.reason\|\|card\.description\)\}<\/p>/);
   assert.match(html, /loadGeneration\+\+/);
   assert.match(html, /clearTimeout\(loadTimer\)/);
