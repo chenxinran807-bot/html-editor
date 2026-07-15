@@ -104,6 +104,23 @@ test('exposes observable detail, feedback, recovery, and live-region hooks', asy
   assert.match(html, /function\s+renderOutfitDetail\s*\(/);
 });
 
+test('binds every detail action and state recovery hook to an observable transition', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+
+  assert.match(html, /data-proto-key="outfit-commerce-feedback"/);
+  assert.match(html, /querySelector\('\.secondary-action'\).*showToast\('已记录查看搭配单品意向'\)/);
+  assert.match(html, /data-proto-key="collection-content-\$\{escapeAttr\(item\.id\)\}" data-id="\$\{escapeAttr\(item\.id\)\}"/);
+  assert.match(html, /data-proto-key="adjacent-collection" data-adjacent-id=/);
+  assert.match(html, /querySelector\('\[data-adjacent-id\]'\).*showDetail\(nextCard\)/);
+
+  assert.match(html, /data-detail-reaction.*toggleReaction\(state,card\.id,button\.dataset\.detailReaction\)/s);
+  assert.match(html, /data-detail-hide.*hideCard\(state,card\.id\).*returnToFeed\(state\)/s);
+  assert.match(html, /data-feed-state.*setFeedStatus\(state,button\.dataset\.feedState\).*renderFeed\(\)/s);
+  assert.match(html, /data-clear-filter.*selectFilter\(state,catalog\.channels\[state\.channel\]\[0\]\).*setFeedStatus\(state,'ready'\)/s);
+  assert.match(html, /data-retry-feed.*startLoading\(\)/s);
+  assert.match(html, /feedStatus==='image-failure'.*class="image-failure".*图片暂时无法显示/s);
+});
+
 test('all required local SVG assets physically exist and are self-contained', async () => {
   const assetsDirectory = `${root}/assets`;
   const names = await readdir(assetsDirectory);
