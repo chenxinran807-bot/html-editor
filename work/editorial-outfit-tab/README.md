@@ -34,6 +34,8 @@ node --test qa/editorial-outfit-static.test.mjs
 
 ## Design-language sources
 
+The following absolute paths are the design-language source locations on the current machine. In another environment, resolve the same logical files again from that environment's installed `ecommerce-design-language` skill root; do not assume these machine-specific absolute paths are portable.
+
 - `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/全局通用规则.md`
 - `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/设计资产目录和映射.md`
 - `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/token/设计 Token.md`
