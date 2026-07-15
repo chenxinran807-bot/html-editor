@@ -27,7 +27,7 @@ export function createCatalog() {
       type,
       title,
       tags: [...tags],
-      assetPath: `./assets/${id}.jpg`,
+      assetPath: `./assets/${id}.svg`,
       filters: { '按场景': [...scenes], '适合我': [...people], '博主推荐': [...creators] },
       originalIndex,
       ...details,

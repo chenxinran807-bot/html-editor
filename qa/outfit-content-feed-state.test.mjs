@@ -39,6 +39,20 @@ test('opens and returns from every supported catalog card type', () => {
   }
 });
 
+test('rejects cards that are not in the catalog', () => {
+  assert.throws(
+    () => openCard(createState(), { id: 'invented-card', type: 'creator' }),
+    /Unsupported card/,
+  );
+});
+
+test('rejects unsupported card types', () => {
+  assert.throws(
+    () => openCard(createState(), { id: 'creator-1', type: 'advertisement' }),
+    /Unsupported card/,
+  );
+});
+
 test('likes, hides, and restores only the most recently hidden card', () => {
   let state = toggleReaction(createState(), 'creator-1', 'liked');
   assert.equal(state.reactions['creator-1'].liked, true);
@@ -63,7 +77,8 @@ test('catalog exposes the accepted channel filters and neutral card metadata', (
     '博主推荐': ['精选', '关注', '新锐', '男生穿搭', '女生穿搭'],
   });
   for (const card of catalog.cards) {
-    assert.ok(card.id && card.title && card.assetPath.startsWith('./assets/'));
+    assert.ok(card.id && card.title);
+    assert.match(card.assetPath, /^\.\/assets\/[a-z0-9-]+\.svg$/);
     assert.ok(Array.isArray(card.tags) && card.tags.length > 0);
     assert.deepEqual(Object.keys(card.filters), Object.keys(catalog.channels));
   }

@@ -2,6 +2,7 @@ import { createCatalog } from './catalog.js';
 
 const validStatuses = new Set(['loading', 'empty', 'error', 'ready']);
 const validCardTypes = new Set(['creator', 'collection', 'outfit']);
+const catalogCardTypesById = new Map(createCatalog().cards.map(({ id, type }) => [id, type]));
 
 export function createState(cards = createCatalog().cards) {
   return {
@@ -35,7 +36,11 @@ export function selectFilter(state, filter) {
 }
 
 export function openCard(state, card) {
-  if (!card || !validCardTypes.has(card.type) || !card.id) throw new TypeError('Unsupported card');
+  if (
+    !card
+    || !validCardTypes.has(card.type)
+    || catalogCardTypesById.get(card.id) !== card.type
+  ) throw new TypeError('Unsupported card');
   return { ...state, view: `${card.type}-detail`, activeCardId: card.id };
 }
 
