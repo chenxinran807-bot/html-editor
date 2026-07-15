@@ -46,6 +46,18 @@ test('feed navigation preserves browsing context without reloading the page', as
   assert.match(html, /returnToFeed\(state\);\s*renderShell\(\);\s*renderFeed\(\);\s*restoreFeedScroll\(\)/, 'detail return must restore the feed before scroll');
 });
 
+test('all structural CSS dimensions are named in the root token registry', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  const style = html.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? '';
+  const declarationsOutsideRoot = style.replace(/:root\{[^}]*\}/, '');
+
+  assert.doesNotMatch(
+    declarationsOutsideRoot,
+    /(?:\d*\.)?\d+(?:px|vh)\b/,
+    'raw structural px/vh dimensions must be declared once as named root constants',
+  );
+});
+
 const acceptedStatements = [
   '# 抖音商城独立端穿搭 Tab',
   '首要目标是提升穿搭内容浏览时长和连续浏览意愿。',
