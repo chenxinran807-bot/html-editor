@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Upgrade `prd-to-editable-demo` so it preserves PRD information without putting background material into the UI, blocks on consequential ambiguity, executes a frozen page-and-flow baseline, binds each reference image to explicit visual properties, and verifies the published core journey before completion.
+**Goal:** Upgrade `prd-to-editable-demo` so it preserves PRD information without putting background material into the UI, blocks on consequential ambiguity, executes a frozen page-and-flow baseline, binds each reference image to explicit visual properties, and verifies the core journey in the user's actual final deliverable.
 
 **Architecture:** Keep one public Skill and CLI, but add five focused internal modules: lossless requirements validation, progressive clarification, baseline compilation, visual-reference binding, and fidelity verification. Existing renderers and Inspire routing consume the frozen baseline instead of independently interpreting the PRD; deterministic checks produce machine-readable evidence and block delivery when requirements are unresolved or core paths are not reachable.
 
@@ -24,7 +24,7 @@
 - Modify `src/semantic-to-model.mjs`: render page regions and actions from the baseline instead of flattening arrays.
 - Modify `src/write-output.mjs`: persist source map, IR, baseline, traceability, and fidelity reports.
 - Modify `src/verify-demo.mjs`: delegate product-fidelity checks to the new verifier.
-- Modify `scripts/browser-e2e.mjs`: execute declared core journeys in the served artifact.
+- Modify `scripts/browser-e2e.mjs`: execute declared core journeys in the final local artifact or, when online delivery is requested, the final URL.
 - Modify `SKILL.md`, `references/requirements-ir.md`, and `references/quality-gates.md`: make the four contracts and progressive interaction mandatory.
 - Add focused tests under `test/` for every module and CLI gate.
 
@@ -549,11 +549,11 @@ git add work/prd-to-editable-demo-repo/prd-to-editable-demo/bin/prd-to-editable-
 git commit -m "feat: gate generation on confirmed requirements"
 ```
 
-### Task 7: Published core-journey verification
+### Task 7: Final-deliverable core-journey verification
 
 **Files:**
 - Modify: `work/prd-to-editable-demo-repo/prd-to-editable-demo/scripts/browser-e2e.mjs`
-- Create: `work/prd-to-editable-demo-repo/prd-to-editable-demo/test/published-journey.test.mjs`
+- Create: `work/prd-to-editable-demo-repo/prd-to-editable-demo/test/final-deliverable-journey.test.mjs`
 - Modify: `work/prd-to-editable-demo-repo/prd-to-editable-demo/package.json`
 
 - [ ] **Step 1: Write a failing browser test that walks declared journeys**
@@ -563,18 +563,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { verifyPublishedJourneys } from '../scripts/browser-e2e.mjs';
 
-test('fails when a published core action is only a notice', async () => {
+test('fails when a final-artifact core action is only a notice', async () => {
   const fixtureUrl = `data:text/html,${encodeURIComponent('<main data-page-id="P1"><button data-action-id="A1" onclick="alert(1)">Open</button></main>')}`;
   await assert.rejects(() => verifyPublishedJourneys({
     url: fixtureUrl,
     journeys: [{ id: 'J1', start: 'P1', steps: [{ actionId: 'A1', expectedPage: 'P2' }] }]
-  }), /published journey failed: J1.*A1/);
+  }), /final deliverable journey failed: J1.*A1/);
 });
 ```
 
 - [ ] **Step 2: Run the browser test and verify the missing export failure**
 
-Run: `cd work/prd-to-editable-demo-repo/prd-to-editable-demo && node --test test/published-journey.test.mjs`
+Run: `cd work/prd-to-editable-demo-repo/prd-to-editable-demo && node --test test/final-deliverable-journey.test.mjs`
 
 Expected: FAIL because `verifyPublishedJourneys` is not exported.
 
@@ -591,7 +591,7 @@ export async function verifyPublishedJourneys({ url, journeys }) {
       for (const step of journey.steps) {
         await page.locator(`[data-action-id="${step.actionId}"]`).click();
         const visible = await page.locator(`[data-page-id="${step.expectedPage}"]:not([hidden])`).count();
-        if (visible !== 1) throw new Error(`published journey failed: ${journey.id} ${step.actionId}`);
+        if (visible !== 1) throw new Error(`final deliverable journey failed: ${journey.id} ${step.actionId}`);
       }
     }
     return { status: 'passed', journeys: journeys.map(item => item.id) };
@@ -601,7 +601,7 @@ export async function verifyPublishedJourneys({ url, journeys }) {
 }
 ```
 
-Ensure `render-demo.mjs` emits `data-action-id` from each element's `actionId`. Add `"verify:published": "node scripts/browser-e2e.mjs"` to `package.json` and accept `PUBLISHED_URL` plus `requirements-baseline.json` as runtime inputs.
+Ensure `render-demo.mjs` emits `data-action-id` from each element's `actionId`. Add `"verify:delivery": "node scripts/browser-e2e.mjs"` to `package.json`. The verifier must serve the generated local output directory by default; only when `DELIVERY_URL` is explicitly supplied should it verify an online final URL.
 
 - [ ] **Step 4: Run browser, smoke, and full tests**
 
@@ -612,8 +612,8 @@ Expected: browser journeys PASS, smoke PASS, full suite PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add work/prd-to-editable-demo-repo/prd-to-editable-demo/scripts/browser-e2e.mjs work/prd-to-editable-demo-repo/prd-to-editable-demo/src/render-demo.mjs work/prd-to-editable-demo-repo/prd-to-editable-demo/test/published-journey.test.mjs work/prd-to-editable-demo-repo/prd-to-editable-demo/package.json
-git commit -m "test: verify published core journeys"
+git add work/prd-to-editable-demo-repo/prd-to-editable-demo/scripts/browser-e2e.mjs work/prd-to-editable-demo-repo/prd-to-editable-demo/src/render-demo.mjs work/prd-to-editable-demo-repo/prd-to-editable-demo/test/final-deliverable-journey.test.mjs work/prd-to-editable-demo-repo/prd-to-editable-demo/package.json
+git commit -m "test: verify final-deliverable core journeys"
 ```
 
 ### Task 8: Skill protocols, behavioral fixtures, and release gate
@@ -666,7 +666,7 @@ In `SKILL.md`, keep the trigger and single public entry. Replace the current top
 3. Read `references/visual-reference.md` for every supplied image and obtain confirmation for consequential bindings or conflicts.
 4. Read `references/execution-contract.md`; freeze the baseline before selecting HTML or Inspire.
 5. Generate from page slices; do not reinterpret the PRD.
-6. Read `references/fidelity-verification.md` and `references/quality-gates.md`; verify local and published core journeys.
+6. Read `references/fidelity-verification.md` and `references/quality-gates.md`; verify the final local artifact, and verify an online URL only when online delivery is requested.
 7. Select and complete the delivery container only after fidelity gates pass.
 ```
 
@@ -700,5 +700,5 @@ git commit -m "feat: enforce PRD fidelity workflow"
 - [ ] Exact copy, required regions, core actions, state changes, and return paths are traceable and verified.
 - [ ] Each image reference affects only its confirmed scope and properties.
 - [ ] Static notices, unreachable pages, and code-only declarations do not pass as completed interactions.
-- [ ] Every core journey passes against the final published URL.
+- [ ] Every core journey passes against the actual final deliverable: local HTML by default, final URL only when online delivery is requested.
 - [ ] Visual polish cannot override a failed structure, hierarchy, reachability, or journey gate.
