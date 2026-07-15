@@ -10,14 +10,14 @@
 <body>
   <div class="app-shell" id="app-shell">
     <header class="app-header">
-      <button type="button" aria-label="搜索穿搭" data-action="prototype-search">搜索穿搭灵感</button>
+      <button class="search-action" type="button" aria-label="搜索穿搭" data-action="prototype-search"><span aria-hidden="true">⌕</span><span>搜索穿搭灵感</span></button>
       <h1 class="app-header__title">穿搭</h1>
     </header>
-    <nav id="channel-tabs" aria-label="穿搭场景"></nav>
-    <details>
-      <summary>原型状态</summary>
-      <label>演示状态
-        <select data-action="set-prototype-state">
+    <nav class="channel-nav" id="channel-tabs" aria-label="穿搭场景"></nav>
+    <details class="prototype-state">
+      <summary class="prototype-state__summary">原型状态</summary>
+      <label class="prototype-state__label">演示状态
+        <select class="prototype-state__select" data-action="set-prototype-state">
           <option value="normal">正常</option>
           <option value="loading">加载</option>
           <option value="empty">空态</option>
@@ -28,17 +28,17 @@
         </select>
       </label>
     </details>
-    <main id="feed-screen" data-screen="feed" tabindex="-1"></main>
+    <main class="feed-screen" id="feed-screen" data-screen="feed" tabindex="-1"></main>
     <main id="detail-screen" data-screen="detail" tabindex="-1" hidden>
       <div id="detail-content"></div>
       <template data-detail-view="story"></template>
       <template data-detail-view="products"></template>
     </main>
-    <nav aria-label="商城底部导航">
-      <button type="button" data-action="prototype-nav">首页</button>
-      <button type="button" data-action="prototype-nav" aria-current="page">穿搭</button>
-      <button type="button" data-action="prototype-nav">购物车</button>
-      <button type="button" data-action="prototype-nav">我的</button>
+    <nav class="bottom-nav" aria-label="商城底部导航">
+      <button class="bottom-nav__item" type="button" data-action="prototype-nav"><span aria-hidden="true">⌂</span><span>首页</span></button>
+      <button class="bottom-nav__item" type="button" data-action="prototype-nav" aria-current="page"><span aria-hidden="true">◇</span><span>穿搭</span></button>
+      <button class="bottom-nav__item" type="button" data-action="prototype-nav"><span aria-hidden="true">▣</span><span>购物车</span></button>
+      <button class="bottom-nav__item" type="button" data-action="prototype-nav"><span aria-hidden="true">○</span><span>我的</span></button>
     </nav>
     <div class="toast" id="toast" aria-live="polite" hidden></div>
   </div>

@@ -25,7 +25,7 @@ python3 -m http.server 8000 --bind 127.0.0.1
 
 页面顶部“原型状态”折叠区提供七种本地夹具：正常、加载、空态、错误、图片失败、部分售罄、全部不可售。图片失败夹具会故意请求不存在的本地文件，以验证可访问的替代内容；其 404 是浏览器 QA 中唯一明确过滤的已知无害控制台项。
 
-内容图片均为本目录 `assets/` 下的无品牌 SVG 插画：10 张竖向编辑造型、3 张竖向细节特写、6 张方形商品图。所有 catalog 图片路径均为本地路径。
+内容图片均为本目录 `assets/` 下的无品牌 SVG 插画：10 张竖向编辑造型、1 张独立专题图、3 张竖向细节特写、6 张方形商品图。所有 catalog 图片路径均为本地路径；商品图片按品类与标题语义映射。
 
 ## Soft open questions
 
@@ -36,19 +36,19 @@ python3 -m http.server 8000 --bind 127.0.0.1
 
 ## 设计语言来源
 
-本原型保留以下 11 个 Markdown 来源；在其他机器上应从已安装的 `ecommerce-design-language` 技能根目录解析同名文件：
+本原型保留以下 11 个 Markdown 来源。以下路径相对 `<ecommerce-design-language skill root>`；当前环境通过 `${CODEX_HOME:-$HOME/.codex}/skills/ecommerce-design-language` 解析，其他环境应使用其实际安装根目录：
 
-- `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/全局通用规则.md`
-- `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/设计资产目录和映射.md`
-- `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/token/设计 Token.md`
-- `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/组件/标签栏Tab.md`
-- `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/组件/商品卡.md`
-- `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/组件/按钮.md`
-- `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/组件/货币／价格.md`
-- `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/组件元素/布局.md`
-- `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/组件元素/颜色.md`
-- `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/组件元素/文字.md`
-- `/Users/bytedance/.codex/skills/ecommerce-design-language/assets/design-assets/common/md/组件元素/圆角.md`
+- `assets/design-assets/common/md/全局通用规则.md`
+- `assets/design-assets/common/md/设计资产目录和映射.md`
+- `assets/design-assets/common/md/token/设计 Token.md`
+- `assets/design-assets/common/md/组件/标签栏Tab.md`
+- `assets/design-assets/common/md/组件/商品卡.md`
+- `assets/design-assets/common/md/组件/按钮.md`
+- `assets/design-assets/common/md/组件/货币／价格.md`
+- `assets/design-assets/common/md/组件元素/布局.md`
+- `assets/design-assets/common/md/组件元素/颜色.md`
+- `assets/design-assets/common/md/组件元素/文字.md`
+- `assets/design-assets/common/md/组件元素/圆角.md`
 
 ## 验证
 
@@ -56,12 +56,12 @@ python3 -m http.server 8000 --bind 127.0.0.1
 
 ```sh
 node --test qa/editorial-outfit-state.test.mjs qa/editorial-outfit-static.test.mjs
-# PASS：29/29
+# PASS：31/31
 
-/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node qa/editorial-outfit-browser.mjs
+CODEX_WORKSPACE_NODE_MODULES="${CODEX_WORKSPACE_NODE_MODULES:-$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules}" node qa/editorial-outfit-browser.mjs
 # PASS：390x844 与 320x720；输出 4 张截图
 
-node /Users/bytedance/.codex/skills/ecommerce-design-language/scripts/validate-assets.js work/editorial-outfit-tab
+node "${CODEX_HOME:-$HOME/.codex}/skills/ecommerce-design-language/scripts/validate-assets.js" work/editorial-outfit-tab
 # PASS：Asset validation passed（上游正式资产仍报告 34 条既有 paired-html warning）
 
 git diff --check

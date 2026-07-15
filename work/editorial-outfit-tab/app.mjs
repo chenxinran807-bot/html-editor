@@ -20,6 +20,7 @@ let toastTimer = null;
 let pendingFeedFocusStoryId = null;
 let shouldFocusDetailTab = false;
 let pendingProductFocus = null;
+let pendingDetailScroll = false;
 let prototypeState = 'normal';
 let resolvedSpecProductIds = [];
 
@@ -91,6 +92,12 @@ function render() {
   channelTabs.hidden = !onFeed;
   detailScreen.hidden = onFeed;
   if (onFeed) restoreFeedScroll();
+  if (!onFeed && pendingDetailScroll) {
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      pendingDetailScroll = false;
+    });
+  }
   if (!onFeed && shouldFocusDetailTab) {
     requestAnimationFrame(() => {
       detailContent.querySelector(`#detail-tab-${state.detailView}`)?.focus({ preventScroll: true });
@@ -129,6 +136,7 @@ shell.addEventListener('click', (event) => {
   } else if (action === 'open-story') {
     rememberFeedScroll();
     state = openStory(state, control.dataset.storyId, stories);
+    pendingDetailScroll = true;
   } else if (action === 'close-story') {
     pendingFeedFocusStoryId = state.activeStoryId;
     state = closeStory(state);

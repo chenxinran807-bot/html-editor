@@ -1,29 +1,45 @@
 export const channels = ['精选', '通勤', '约会', '周末', '显高'];
 
+export const productAssetFor = (category, title) => {
+  if (category === '外套') return './assets/product-1.svg';
+  if (category === '上装') return './assets/product-4.svg';
+  if (category === '鞋') return './assets/product-3.svg';
+  if (category === '包') return './assets/product-6.svg';
+  if (category === '下装' && title.includes('裙')) return './assets/product-5.svg';
+  if (category === '下装') return './assets/product-2.svg';
+  throw new TypeError(`未知商品品类：${category}`);
+};
+
 const product = (storyId, number, category, title, spec, priceFen, status = 'available') => ({
   id: `${storyId}-p${number}`,
   category,
   title,
   spec,
   priceFen,
-  image: `./assets/product-${((number - 1) % 6) + 1}.svg`,
+  image: productAssetFor(category, title),
   status,
 });
 
-const story = (id, storyChannels, title, intro, tips, topics, products) => ({
+const detailArt = ['./assets/detail-fabric.svg', './assets/detail-silhouette.svg', './assets/detail-accessory.svg'];
+let storyNumber = 0;
+const story = (id, storyChannels, title, intro, tips, topics, products) => {
+  const image = `./assets/${id}.svg`;
+  const offset = storyNumber++ % detailArt.length;
+  return ({
   id,
   channels: storyChannels,
   title,
   editorialLabel: '编辑精选',
   savedCountLabel: '灵感收藏',
-  image: `./assets/${id}.svg`,
-  gallery: ['./assets/detail-fabric.svg', './assets/detail-silhouette.svg', './assets/detail-accessory.svg'],
+  image,
+  gallery: [image, detailArt[offset], detailArt[(offset + 1) % detailArt.length]],
   intro,
   tips,
   topics,
   priceNote: '价格仅为原型演示参考',
   products,
-});
+  });
+};
 
 export const stories = [
   story('city-trench', ['精选', '通勤'], '一件风衣的三种城市穿法', '从清晨通勤到傍晚散步，用轻薄层次连接一天的不同场景。', ['内搭保持同色系', '裤脚留出利落线条', '用小包收束比例'], ['城市通勤', '轻层次'], [
@@ -73,7 +89,7 @@ const feature = {
   type: 'feature',
   id: 'weekly-city-edit',
   title: '本周城市通勤灵感',
-  image: './assets/city-trench.svg',
+  image: './assets/weekly-city-edit.svg',
 };
 
 export const feedEntriesByChannel = Object.fromEntries(channels.map((channel) => {

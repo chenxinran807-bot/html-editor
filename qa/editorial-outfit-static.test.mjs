@@ -33,6 +33,42 @@ test('catalog uses local SVG artwork and every referenced asset exists', async (
   }
 });
 
+test('catalog maps product semantics to artwork and varies story galleries', async () => {
+  const { productAssetFor, stories, feedEntriesByChannel } = await import(catalogUrl);
+  assert.equal(productAssetFor('外套', '轻量长风衣'), './assets/product-1.svg');
+  assert.equal(productAssetFor('上装', '宽松棉质衬衫'), './assets/product-4.svg');
+  assert.equal(productAssetFor('下装', '垂感长裙'), './assets/product-5.svg');
+  assert.equal(productAssetFor('下装', '直筒长裤'), './assets/product-2.svg');
+  assert.equal(productAssetFor('鞋', '方头便鞋'), './assets/product-3.svg');
+  assert.equal(productAssetFor('包', '小号托特包'), './assets/product-6.svg');
+  for (const story of stories) {
+    assert.equal(story.gallery[0], story.image, `${story.id} gallery must lead with its look`);
+    for (const product of story.products) {
+      assert.equal(product.image, productAssetFor(product.category, product.title));
+    }
+  }
+  assert.ok(new Set(stories.map((story) => story.gallery.join('|'))).size >= 3);
+  const feature = feedEntriesByChannel['精选'].find((entry) => entry.type === 'feature');
+  assert.equal(feature.image, './assets/weekly-city-edit.svg');
+  assert.notEqual(feature.image, stories[0].image);
+});
+
+test('rendered UI gives all visible components semantic classes', async () => {
+  const source = await readFile(renderUrl, 'utf8');
+  for (const className of [
+    'story-card__open', 'story-card__label', 'story-card__meta', 'save-button',
+    'detail-header', 'detail-action', 'story-detail__intro', 'story-detail__tips',
+    'story-detail__topics', 'outfit-summary__content', 'product-row__select',
+    'product-row__content', 'product-row__spec', 'product-row__status',
+    'checkout-bar__count', 'checkout-bar__total', 'checkout-bar__cta',
+  ]) assert.match(source, new RegExp(`class=["'][^"']*${className}`), `missing ${className}`);
+
+  const html = await readFile(indexUrl, 'utf8');
+  for (const className of ['search-action', 'prototype-state', 'prototype-state__select', 'bottom-nav', 'bottom-nav__item']) {
+    assert.match(html, new RegExp(`class=["'][^"']*${className}`), `missing ${className}`);
+  }
+});
+
 function declarations(css) {
   return [...withoutComments(css).matchAll(/([\w-]+)\s*:\s*([^;{}]+)\s*;/g)]
     .map(([, property, value]) => [property.toLowerCase(), value.trim()]);
