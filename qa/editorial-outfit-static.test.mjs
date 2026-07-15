@@ -149,13 +149,13 @@ test('HTML exposes a non-blocking prototype edge-state chooser with exact fixtur
 
 test('render module exports the feed, detail and stable state renderers', async () => {
   const source = await readFile(renderUrl, 'utf8').catch(() => '');
-  for (const name of ['renderChannelTabs', 'renderFeed', 'renderStory', 'renderProducts', 'renderSkeleton', 'renderEmpty', 'renderError']) {
+  for (const name of ['renderChannelTabs', 'renderFeed', 'renderStory', 'renderProducts', 'renderSkeleton', 'renderDetailSkeleton', 'renderDetailError', 'renderEmpty', 'renderError']) {
     assert.match(source, new RegExp(`export\\s+(?:const|function)\\s+${name}\\b`));
   }
   const render = await import(renderUrl);
   assert.deepEqual(Object.keys(render).sort(), [
-    'renderChannelTabs', 'renderEmpty', 'renderError', 'renderFeed',
-    'renderProducts', 'renderSkeleton', 'renderStory',
+    'renderChannelTabs', 'renderDetailError', 'renderDetailSkeleton', 'renderEmpty',
+    'renderError', 'renderFeed', 'renderProducts', 'renderSkeleton', 'renderStory',
   ]);
 });
 
@@ -170,7 +170,9 @@ test('renderers escape fixture content and expose accessible selected states', a
   assert.doesNotMatch(feed, /<script>|<img src=x/);
   assert.match(feed, /&lt;img src=x onerror=alert\(1\)&gt;/);
   assert.match(feed, /aria-pressed="true"/);
-  assert.match(feed, /data-action="open-story"/);
+  assert.match(feed, /<a[^>]+href="#fixture-story"[^>]+data-action="open-story"[^>]+data-story-id="fixture-story"/);
+  assert.match(feed, /<a[^>]*>[\s\S]*story-card__title[\s\S]*story-card__meta[\s\S]*<\/a>[\s\S]*<button[^>]+data-action="toggle-save"/);
+  assert.doesNotMatch(feed, /<a[^>]*>[\s\S]*<button[^>]+data-action="toggle-save"[\s\S]*<\/a>/);
 
   const tabs = render.renderChannelTabs(['精选', '通勤'], '通勤');
   assert.match(tabs, /role="tablist"/);
@@ -238,6 +240,11 @@ test('edge-state renderers expose retry and return-featured actions', async () =
   assert.match(render.renderEmpty(), /data-action="return-featured"/);
   assert.match(render.renderError(), /data-action="retry-feed"/);
   assert.match(render.renderSkeleton(), /aria-busy="true"/);
+  assert.match(render.renderDetailSkeleton('story'), /aria-label="穿搭故事加载中"/);
+  assert.match(render.renderDetailSkeleton('products'), /aria-label="整套商品加载中"/);
+  assert.match(render.renderDetailError('story'), /穿搭故事暂时无法加载/);
+  assert.match(render.renderDetailError('products'), /商品数据暂时无法加载/);
+  assert.match(render.renderDetailError('products'), /data-action="retry-detail"/);
 });
 
 test('visual foundation exposes the approved semantic aliases', async () => {

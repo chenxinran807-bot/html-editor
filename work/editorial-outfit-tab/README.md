@@ -66,7 +66,7 @@ node --test qa/editorial-outfit-state.test.mjs qa/editorial-outfit-static.test.m
 # PASS：31/31
 
 CODEX_WORKSPACE_NODE_MODULES="${CODEX_WORKSPACE_NODE_MODULES:-$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules}" node qa/editorial-outfit-browser.mjs
-# PASS：390x844 与 320x720；输出 4 张截图
+# PASS：390x844 与 320x720；标题区域整卡打开、频道/feed 收藏/detail 收藏焦点恢复、详情 story/products 加载与错误重试均通过；输出 4 张截图
 
 node "${CODEX_HOME:-$HOME/.codex}/skills/ecommerce-design-language/scripts/validate-assets.js" work/editorial-outfit-tab
 # PASS：Asset validation passed（上游正式资产仍报告 34 条既有 paired-html warning）

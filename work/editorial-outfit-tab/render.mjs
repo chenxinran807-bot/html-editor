@@ -25,9 +25,10 @@ export function renderFeed(entries, stories, savedStoryIds = []) {
     if (!story) return '';
     const saved = savedStoryIds.includes(story.id);
     return `<article class="story-card" id="story-${escapeAttribute(story.id)}">
-      <button class="story-card__open" type="button" data-action="open-story" data-story-id="${escapeAttribute(story.id)}" aria-label="打开${escapeAttribute(story.title)}">${image(story.image, story.title, 'story-card__image')}</button>
+      <a class="story-card__open" href="#${escapeAttribute(story.id)}" data-action="open-story" data-story-id="${escapeAttribute(story.id)}" aria-label="打开${escapeAttribute(story.title)}">${image(story.image, story.title, 'story-card__image')}
       <div class="story-card__body"><small class="story-card__label">${escapeHtml(story.editorialLabel)}</small><h2 class="story-card__title">${escapeHtml(story.title)}</h2>
-      <div class="story-card__meta"><span>${escapeHtml(story.savedCountLabel)}</span><button class="save-button" type="button" data-action="toggle-save" data-story-id="${escapeAttribute(story.id)}" aria-pressed="${saved}">${saved ? '已收藏' : '收藏'}</button></div></div>
+      <div class="story-card__meta"><span>${escapeHtml(story.savedCountLabel)}</span></div></div></a>
+      <button class="save-button story-card__save" type="button" data-action="toggle-save" data-story-id="${escapeAttribute(story.id)}" aria-pressed="${saved}">${saved ? '已收藏' : '收藏'}</button>
     </article>`;
   }).join('')}</div><p class="state-panel">已经到底了</p>`;
 }
@@ -95,5 +96,13 @@ export function renderProducts(story, activeView = 'products') {
 }
 
 export const renderSkeleton = () => '<div class="skeleton" aria-busy="true"><div class="skeleton__image"></div><div class="skeleton__line"></div><div class="skeleton__line skeleton__line--short"></div></div>';
+export const renderDetailSkeleton = (activeView = 'story') => {
+  const label = activeView === 'products' ? '整套商品' : '穿搭故事';
+  return `<article class="detail-state" data-detail-state="loading"><header class="detail-header"><button class="detail-action detail-action--back" type="button" data-action="close-story">‹ 返回</button><strong class="detail-header__title">${label}</strong></header>${detailTabs(activeView)}<section class="skeleton detail-state__skeleton" aria-busy="true" aria-label="${label}加载中"><div class="skeleton__image"></div><div class="skeleton__line"></div><div class="skeleton__line skeleton__line--short"></div></section></article>`;
+};
+export const renderDetailError = (activeView = 'story') => {
+  const message = activeView === 'products' ? '商品数据暂时无法加载' : '穿搭故事暂时无法加载';
+  return `<article class="detail-state" data-detail-state="error"><header class="detail-header"><button class="detail-action detail-action--back" type="button" data-action="close-story">‹ 返回</button></header>${detailTabs(activeView)}<section class="state-panel state-panel--error"><span class="state-panel__icon" aria-hidden="true">!</span><p>${message}</p><button class="state-panel__action" type="button" data-action="retry-detail">重试</button></section></article>`;
+};
 export const renderEmpty = () => '<section class="state-panel state-panel--empty"><span class="state-panel__icon" aria-hidden="true">◇</span><p>当前频道暂无内容</p><button class="state-panel__action" type="button" data-action="return-featured">返回精选</button></section>';
 export const renderError = () => '<section class="state-panel state-panel--error"><span class="state-panel__icon" aria-hidden="true">!</span><p>内容暂时无法加载</p><button class="state-panel__action" type="button" data-action="retry-feed">重试</button></section>';

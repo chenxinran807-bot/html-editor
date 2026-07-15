@@ -4,8 +4,8 @@ import {
   setDetailView, summarizeSelection, toggleProduct, toggleSave,
 } from './state.mjs';
 import {
-  renderChannelTabs, renderEmpty, renderError, renderFeed, renderProducts,
-  renderSkeleton, renderStory,
+  renderChannelTabs, renderDetailError, renderDetailSkeleton, renderEmpty,
+  renderError, renderFeed, renderProducts, renderSkeleton, renderStory,
 } from './render.mjs';
 
 const shell = document.querySelector('#app-shell');
@@ -18,6 +18,8 @@ const TOAST_DURATION_MS = 1800;
 let state = createState();
 let toastTimer = null;
 let pendingFeedFocusStoryId = null;
+let pendingChannelFocus = null;
+let pendingSaveFocus = null;
 let shouldFocusDetailTab = false;
 let pendingProductFocus = null;
 let pendingDetailScroll = false;
@@ -58,6 +60,8 @@ const restoreFeedScroll = () => requestAnimationFrame(() => {
     pendingFeedFocusStoryId = null;
   }
 });
+const matchingControl = (root, action, key, value) => [...root.querySelectorAll(`[data-action="${action}"]`)]
+  .find((control) => control.dataset[key] === value);
 
 function render() {
   const fixtureCatalog = currentStories();
@@ -67,7 +71,11 @@ function render() {
   else if (prototypeState === 'error') feedScreen.innerHTML = renderError();
   else feedScreen.innerHTML = renderFeed(feedEntriesByChannel[state.channel], fixtureCatalog, state.savedStoryIds);
   const story = activeStory();
-  if (story) {
+  if (story && prototypeState === 'loading') {
+    detailContent.innerHTML = renderDetailSkeleton(state.detailView);
+  } else if (story && prototypeState === 'error') {
+    detailContent.innerHTML = renderDetailError(state.detailView);
+  } else if (story) {
     const saved = state.savedStoryIds.includes(story.id);
     let summary;
     if (state.detailView === 'products') {
@@ -92,6 +100,19 @@ function render() {
   channelTabs.hidden = !onFeed;
   detailScreen.hidden = onFeed;
   if (onFeed) restoreFeedScroll();
+  if (onFeed && pendingChannelFocus) {
+    requestAnimationFrame(() => {
+      matchingControl(channelTabs, 'set-channel', 'channel', pendingChannelFocus)?.focus({ preventScroll: true });
+      pendingChannelFocus = null;
+    });
+  }
+  if (pendingSaveFocus) {
+    requestAnimationFrame(() => {
+      const root = pendingSaveFocus.screen === 'feed' ? feedScreen : detailContent;
+      matchingControl(root, 'toggle-save', 'storyId', pendingSaveFocus.storyId)?.focus({ preventScroll: true });
+      pendingSaveFocus = null;
+    });
+  }
   if (!onFeed && pendingDetailScroll) {
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0, behavior: 'auto' });
@@ -133,7 +154,9 @@ shell.addEventListener('click', (event) => {
   if (action === 'set-channel') {
     rememberFeedScroll();
     state = setChannel(state, control.dataset.channel);
+    pendingChannelFocus = control.dataset.channel;
   } else if (action === 'open-story') {
+    event.preventDefault();
     rememberFeedScroll();
     state = openStory(state, control.dataset.storyId, stories);
     pendingDetailScroll = true;
@@ -142,6 +165,7 @@ shell.addEventListener('click', (event) => {
     state = closeStory(state);
   } else if (action === 'toggle-save') {
     if (state.screen === 'feed') rememberFeedScroll();
+    pendingSaveFocus = { screen: state.screen, storyId: control.dataset.storyId };
     state = toggleSave(state, control.dataset.storyId, stories);
     showToast(state.savedStoryIds.includes(control.dataset.storyId) ? '已收藏' : '已取消收藏');
   } else if (action === 'set-detail-view') {
@@ -170,6 +194,9 @@ shell.addEventListener('click', (event) => {
   } else if (action === 'retry-feed') {
     prototypeState = 'normal';
     shell.querySelector('[data-action="set-prototype-state"]').value = prototypeState;
+  } else if (action === 'retry-detail') {
+    prototypeState = 'normal';
+    shell.querySelector('[data-action="set-prototype-state"]').value = prototypeState;
   } else if (action === 'return-featured') {
     prototypeState = 'normal';
     state = setChannel(state, '精选');
@@ -187,12 +214,14 @@ shell.addEventListener('click', (event) => {
 shell.addEventListener('change', (event) => {
   const control = event.target.closest('[data-action="set-prototype-state"]');
   if (!control) return;
-  prototypeState = control.value;
+  const nextPrototypeState = control.value;
+  const preserveDetail = state.screen === 'detail' && ['normal', 'loading', 'error'].includes(nextPrototypeState);
+  prototypeState = nextPrototypeState;
   resolvedSpecProductIds = [];
   if (['partial-sold-out', 'all-unavailable'].includes(prototypeState)) {
     state = openStory(createState(), stories[0].id, currentStories());
     state = setDetailView(state, 'products', currentStories());
-  } else {
+  } else if (!preserveDetail) {
     state = createState();
   }
   render();

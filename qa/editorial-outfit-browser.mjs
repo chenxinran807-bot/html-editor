@@ -89,16 +89,48 @@ async function normalJourney(page, width) {
   const commute = page.getByRole('tab', { name: '通勤' });
   await commute.click();
   assert.equal(await commute.getAttribute('aria-selected'), 'true');
+  assert.equal(await page.evaluate(() => document.activeElement?.dataset.channel), '通勤', `${width}: selected channel keeps focus`);
   await capture(page, `feed-${width}.png`);
+
+  const feedSave = page.locator('#feed-screen [data-action="toggle-save"]').first();
+  const feedSaveStoryId = await feedSave.getAttribute('data-story-id');
+  await feedSave.click();
+  await page.waitForFunction((storyId) => document.activeElement?.dataset.action === 'toggle-save'
+    && document.activeElement?.dataset.storyId === storyId, feedSaveStoryId);
+  assert.deepEqual(await page.evaluate(() => ({
+    action: document.activeElement?.dataset.action,
+    storyId: document.activeElement?.dataset.storyId,
+  })), { action: 'toggle-save', storyId: feedSaveStoryId }, `${width}: feed save keeps focus`);
+  await page.keyboard.press('Shift+Tab');
+  assert.deepEqual(await page.evaluate(() => ({
+    tag: document.activeElement?.tagName,
+    action: document.activeElement?.dataset.action,
+    storyId: document.activeElement?.dataset.storyId,
+  })), { tag: 'A', action: 'open-story', storyId: feedSaveStoryId }, `${width}: card main link is keyboard focusable`);
+  await page.keyboard.press('Enter');
+  await visible(page.locator('#detail-screen'), `${width}: Enter opens focused card`);
+  await page.locator('[data-action="close-story"]').click();
+  await visible(page.locator('#feed-screen'), `${width}: keyboard journey returns to feed`);
 
   await page.evaluate(() => window.scrollTo({ top: 280, behavior: 'auto' }));
   const beforeStory = await page.evaluate(() => window.scrollY);
   assert.ok(beforeStory > 0, `${width}: feed must be scrolled before opening a story`);
-  await page.locator('[data-action="open-story"]').first().evaluate((element) => element.click());
+  const cardTitle = page.locator('.story-card__title').first();
+  assert.equal(await cardTitle.locator('xpath=ancestor::a').getAttribute('data-action'), 'open-story');
+  await cardTitle.click();
   await visible(page.locator('#detail-screen'), `${width}: detail is visible`);
   await visible(page.getByRole('tab', { name: '穿搭故事' }), `${width}: story tab`);
   await visible(page.getByRole('tab', { name: '整套商品' }), `${width}: products tab`);
   await visible(page.locator('#detail-screen [data-action="toggle-save"]'), `${width}: save control`);
+  const detailSave = page.locator('#detail-screen [data-action="toggle-save"]');
+  const detailSaveStoryId = await detailSave.getAttribute('data-story-id');
+  await detailSave.click();
+  await page.waitForFunction((storyId) => document.activeElement?.dataset.action === 'toggle-save'
+    && document.activeElement?.dataset.storyId === storyId, detailSaveStoryId);
+  assert.deepEqual(await page.evaluate(() => ({
+    action: document.activeElement?.dataset.action,
+    storyId: document.activeElement?.dataset.storyId,
+  })), { action: 'toggle-save', storyId: detailSaveStoryId }, `${width}: detail save keeps focus`);
   await page.waitForFunction(() => window.scrollY === 0);
   await noOverflow(page, `${width} story`);
   const storyPanelStyle = await page.locator('.story-detail__body').evaluate((element) => {
@@ -163,6 +195,25 @@ async function edgeStates(page, browserSignals) {
   assert.ok(await page.getByText('已失效').count() >= 1, 'all-unavailable labels');
   assert.equal(await page.locator('[data-action="buy-selection"]').isDisabled(), true, 'all-unavailable checkout disabled');
   assert.match(await page.locator('[data-action="buy-selection"]').textContent(), /请选择商品/);
+
+  await select.selectOption('normal');
+  await page.locator('.story-card__title').first().click();
+  const activeStoryId = await page.locator('#detail-screen [data-action="toggle-save"]').getAttribute('data-story-id');
+  await select.selectOption('loading');
+  await visible(page.locator('[data-detail-state="loading"] [aria-label="穿搭故事加载中"]'), 'detail story skeleton');
+  assert.equal(await page.locator('#detail-screen').isVisible(), true, 'story loading stays in detail');
+  await select.selectOption('error');
+  await visible(page.getByText('穿搭故事暂时无法加载'), 'detail story error');
+  await select.selectOption('normal');
+  assert.equal(await page.locator('#detail-screen [data-action="toggle-save"]').getAttribute('data-story-id'), activeStoryId, 'normal restores active story');
+  await page.getByRole('tab', { name: '整套商品' }).click();
+  await select.selectOption('loading');
+  await visible(page.locator('[data-detail-state="loading"] [aria-label="整套商品加载中"]'), 'detail products skeleton');
+  await select.selectOption('error');
+  await visible(page.getByText('商品数据暂时无法加载'), 'detail products error');
+  await page.locator('[data-action="retry-detail"]').click();
+  assert.equal(await page.getByRole('tab', { name: '整套商品' }).getAttribute('aria-selected'), 'true', 'detail retry preserves products view');
+  assert.equal(await page.locator('#products-detail-' + activeStoryId).isVisible(), true, 'detail retry preserves active story');
 }
 
 let browser;
