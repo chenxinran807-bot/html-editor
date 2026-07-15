@@ -69,7 +69,7 @@ async function assertNoRuntimeProblems(page, errors, label) {
   check(`${label}: no page or console errors`, errors.length === 0, errors.join(' | '));
 }
 
-async function exerciseViewport(browser, url, viewport, full = false) {
+async function exerciseViewport(browser, url, viewport) {
   const context = await browser.newContext({ viewport });
   const page = await context.newPage();
   const errors = [];
@@ -99,8 +99,7 @@ async function exerciseViewport(browser, url, viewport, full = false) {
   await page.getByRole('tab', { name: '推荐', exact: true }).click();
   await waitReady(page);
 
-  if (full) {
-    const first = page.locator('#feed .card').first();
+  const first = page.locator('#feed .card').first();
     const id = await first.getAttribute('data-id');
     const like = first.getByRole('button', { name: '喜欢' });
     const collect = first.getByRole('button', { name: '收藏' });
@@ -184,7 +183,6 @@ async function exerciseViewport(browser, url, viewport, full = false) {
       await page.waitForTimeout(40);
       check(`${type} back restores channel/filter/scroll`, await page.locator('.channel[aria-selected="true"]').textContent() === '按场景' && await page.locator('.filter[aria-selected="true"]').textContent() === '推荐' && Math.abs((await page.evaluate(() => scrollY)) - savedScroll) < 3, cardId);
     }
-  }
 
   await page.evaluate(() => scrollTo(0, 0));
   await page.screenshot({ path: join(evidence, `feed-${viewport.width}x${viewport.height}.png`), fullPage: true });
@@ -200,8 +198,8 @@ const { server, url } = await startServer();
 let browser;
 try {
   browser = await chromium.launch({ headless: true });
-  await exerciseViewport(browser, url, { width: 390, height: 844 }, true);
-  await exerciseViewport(browser, url, { width: 320, height: 700 }, false);
+  await exerciseViewport(browser, url, { width: 390, height: 844 });
+  await exerciseViewport(browser, url, { width: 320, height: 700 });
   console.log(`RESULT ${checks.length} browser checks passed`);
 } catch (error) {
   console.error(`FAIL ${error.stack || error}`);
