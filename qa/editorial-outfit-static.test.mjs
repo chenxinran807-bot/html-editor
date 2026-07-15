@@ -80,6 +80,8 @@ test('app uses the required delegated action vocabulary', async () => {
   assert.match(source, /已确认购买整套（原型）/);
   assert.match(source, /已确认购买已选商品（原型）/);
   assert.match(source, /status:\s*productIndex\s*===\s*0[\s\S]{0,160}spec:\s*productIndex\s*===\s*0\s*\?\s*['"]{2}/, 'partial fixture must expose the unresolved-spec path');
+  assert.match(source, /pendingProductFocus/);
+  assert.match(source, /data-action[^]*data-product-id[^]*focus\(\{\s*preventScroll:\s*true\s*\}\)/);
 });
 
 test('HTML exposes a non-blocking prototype edge-state chooser with exact fixture values', async () => {
@@ -165,6 +167,15 @@ test('product renderer exposes safe selection, specs, prices, availability and c
   assert.match(html, /class="checkout-bar"/);
   assert.match(html, /已选 1 件/);
   assert.match(html, /data-action="buy-selection"/);
+  assert.match(html, /data-action="buy-selection"[^>]+disabled[^>]+aria-describedby="unresolved-spec-message"/);
+  assert.match(html, /id="unresolved-spec-message"/);
+
+  const resolved = renderProducts(fixture, 'products', {
+    selectedProductIds: ['available'],
+    resolvedSpecProductIds: ['available'],
+  });
+  assert.match(resolved, /data-action="buy-selection"(?![^>]+disabled)[^>]*>/);
+  assert.doesNotMatch(resolved, /id="unresolved-spec-message"/);
 });
 
 test('edge-state renderers expose retry and return-featured actions', async () => {
@@ -287,6 +298,7 @@ test('fixed checkout stays inside the mobile shell and dividers are rendered', a
   assert.match(checkout, /right:\s*0\s*;/);
 
   const productRow = css.match(/\.product-row\s*\{([^}]*)\}/)?.[1] ?? '';
+  assert.match(productRow, /grid-template-columns:\s*auto\s+minmax\(0,\s*72px\)\s+minmax\(0,\s*1fr\)\s+auto\s*;/);
   assert.match(productRow, /border-bottom-style:\s*solid\s*;/);
   assert.match(productRow, /border-bottom-width:\s*var\(--stroke-divider\)\s*;/);
   assert.match(productRow, /border-bottom-color:\s*var\(--divider\)\s*;/);

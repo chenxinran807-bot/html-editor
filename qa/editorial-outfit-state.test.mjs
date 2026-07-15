@@ -158,6 +158,18 @@ test('all available products are summarized as a complete outfit', () => {
   });
 });
 
+test('selection summaries reject invalid and overflowing fen amounts', () => {
+  const base = setDetailView(openStory(createState(), story.id, stories), 'products', stories);
+  const withPrice = (prices) => stories.map((item) => item.id === story.id ? {
+    ...item,
+    products: item.products.map((product, index) => ({ ...product, priceFen: prices[index] ?? product.priceFen })),
+  } : item);
+
+  assert.throws(() => summarizeSelection(base, withPrice([-1])), /商品价格无效/);
+  assert.throws(() => summarizeSelection(base, withPrice([Number.NaN])), /商品价格无效/);
+  assert.throws(() => summarizeSelection(base, withPrice([Number.MAX_SAFE_INTEGER, 1])), /商品价格合计溢出/);
+});
+
 test('unknown channel, story, and product throw explicit TypeErrors', () => {
   assert.throws(() => setChannel(createState(), '不存在'), { name: 'TypeError', message: /未知频道/ });
   assert.throws(() => openStory(createState(), 'missing-story', stories), { name: 'TypeError', message: /未知故事/ });

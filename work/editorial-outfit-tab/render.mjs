@@ -52,16 +52,17 @@ export function renderProducts(story, activeView = 'products') {
     .filter(({ spec }) => Boolean(spec)).map(({ id }) => id);
   const available = story.products.filter(({ status }) => status === 'available');
   const selected = available.filter(({ id }) => selectedProductIds.includes(id));
-  const totalFen = selected.reduce((total, product) => total + (Number.isSafeInteger(product.priceFen) ? product.priceFen : 0), 0);
+  const pricesValid = selected.every(({ priceFen }) => Number.isSafeInteger(priceFen) && priceFen >= 0);
+  const totalFen = pricesValid ? selected.reduce((total, product) => total + product.priceFen, 0) : null;
   const summary = options.summary ?? {
     count: selected.length,
     totalFen,
     actionLabel: selected.length === 0 ? '请选择商品' : selected.length === available.length ? '购买整套' : '购买已选',
-    disabled: selected.length === 0,
+    disabled: selected.length === 0 || !pricesValid,
   };
   const formatFen = (fen) => {
-    const safeFen = Number.isSafeInteger(fen) && fen >= 0 ? fen : 0;
-    return { major: String(Math.floor(safeFen / 100)), minor: `.${String(safeFen % 100).padStart(2, '0')}` };
+    if (!Number.isSafeInteger(fen) || fen < 0) return null;
+    return { major: String(Math.floor(fen / 100)), minor: `.${String(fen % 100).padStart(2, '0')}` };
   };
   const rows = story.products.map((product) => {
     const selectable = product.status === 'available';
@@ -74,11 +75,14 @@ export function renderProducts(story, activeView = 'products') {
       ${image(product.image, product.title, 'story-card__image')}
       <div><strong>${escapeHtml(product.category)}</strong><p>${escapeHtml(product.title)}</p>
         ${specResolved ? `<small>${escapeHtml(product.spec || '演示规格')}</small>` : `<small id="spec-${escapeAttribute(product.id)}">请选择规格</small><button type="button" data-action="choose-spec" data-product-id="${escapeAttribute(product.id)}">选择演示规格</button>`}
-        <p class="product-row__price" aria-label="参考价格 ${price.major}${price.minor} 元"><span class="product-row__price-major">${price.major}</span><span class="product-row__price-minor">${price.minor}</span></p>
+        ${price ? `<p class="product-row__price" aria-label="参考价格 ${price.major}${price.minor} 元"><span class="product-row__price-major">${price.major}</span><span class="product-row__price-minor">${price.minor}</span></p>` : '<p class="product-row__price">价格待补充</p>'}
       </div><span>${statusLabel}</span>
     </div>`;
   }).join('');
   const total = formatFen(summary.totalFen);
+  const hasUnresolvedSelected = selected.some((product) => !product.spec && !resolvedSpecProductIds.includes(product.id));
+  const checkoutDisabled = summary.disabled || hasUnresolvedSelected || !total;
+  const checkoutHint = hasUnresolvedSelected ? '<p id="unresolved-spec-message">请先为已选商品选择规格</p>' : '';
   return `<article id="products-detail-${escapeAttribute(story.id)}">
     <header><button type="button" data-action="close-story">返回</button></header>
     ${detailTabs(activeView)}
@@ -86,7 +90,7 @@ export function renderProducts(story, activeView = 'products') {
       <div class="outfit-summary">${image(story.image, story.title, 'story-card__image')}<div><small>当前造型</small><h2>${escapeHtml(story.title)}</h2><p>${escapeHtml(story.priceNote)}</p></div></div>
       <div class="product-list">${rows}</div>
     </section>
-    <div class="checkout-bar"><span>已选 ${summary.count} 件</span><span>合计参考 ¥${total.major}${total.minor}</span><button type="button" data-action="buy-selection"${summary.disabled ? ' disabled' : ''}>${escapeHtml(summary.actionLabel)}</button></div>
+    <div class="checkout-bar"><span>已选 ${summary.count} 件</span><span>${total ? `合计参考 ¥${total.major}${total.minor}` : '合计价格待补充'}</span>${checkoutHint}<button type="button" data-action="buy-selection"${checkoutDisabled ? ' disabled' : ''}${hasUnresolvedSelected ? ' aria-describedby="unresolved-spec-message"' : ''}>${escapeHtml(summary.actionLabel)}</button></div>
   </article>`;
 }
 

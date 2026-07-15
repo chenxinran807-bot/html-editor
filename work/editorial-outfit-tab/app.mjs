@@ -19,6 +19,7 @@ let state = createState();
 let toastTimer = null;
 let pendingFeedFocusStoryId = null;
 let shouldFocusDetailTab = false;
+let pendingProductFocus = null;
 let prototypeState = 'normal';
 let resolvedSpecProductIds = [];
 
@@ -67,12 +68,20 @@ function render() {
   const story = activeStory();
   if (story) {
     const saved = state.savedStoryIds.includes(story.id);
+    let summary;
+    if (state.detailView === 'products') {
+      try {
+        summary = summarizeSelection(state, fixtureCatalog);
+      } catch {
+        summary = { count: state.selectedProductIds.length, totalFen: null, actionLabel: '价格待补充', disabled: true };
+      }
+    }
     detailContent.innerHTML = state.detailView === 'story'
       ? renderStory(story, saved, state.detailView)
       : renderProducts(story, state.detailView, {
         selectedProductIds: state.selectedProductIds,
         resolvedSpecProductIds,
-        summary: summarizeSelection(state, fixtureCatalog),
+        summary,
       });
   } else {
     detailContent.innerHTML = '';
@@ -86,6 +95,16 @@ function render() {
     requestAnimationFrame(() => {
       detailContent.querySelector(`#detail-tab-${state.detailView}`)?.focus({ preventScroll: true });
       shouldFocusDetailTab = false;
+    });
+  }
+  if (!onFeed && pendingProductFocus) {
+    requestAnimationFrame(() => {
+      const { action, productId } = pendingProductFocus;
+      const exact = detailContent.querySelector(`[data-action="${action}"][data-product-id="${productId}"]`);
+      const fallback = detailContent.querySelector(`[data-action="toggle-product"][data-product-id="${productId}"]`)
+        ?? detailContent.querySelector('[data-action="buy-selection"]');
+      (exact ?? fallback)?.focus({ preventScroll: true });
+      pendingProductFocus = null;
     });
   }
 }
@@ -121,9 +140,11 @@ shell.addEventListener('click', (event) => {
     state = setDetailView(state, control.dataset.detailView, currentStories());
     shouldFocusDetailTab = true;
   } else if (action === 'toggle-product') {
+    pendingProductFocus = { action, productId: control.dataset.productId };
     state = toggleProduct(state, control.dataset.productId, currentStories());
     shouldFocusDetailTab = false;
   } else if (action === 'choose-spec') {
+    pendingProductFocus = { action, productId: control.dataset.productId };
     resolvedSpecProductIds = [...new Set([...resolvedSpecProductIds, control.dataset.productId])];
   } else if (action === 'buy-selection') {
     const story = activeStory();
@@ -131,10 +152,12 @@ shell.addEventListener('click', (event) => {
       && !product.spec && !resolvedSpecProductIds.includes(product.id));
     if (unresolved) {
       showToast('请先选择商品规格');
-      requestAnimationFrame(() => detailContent.querySelector(`[data-action="choose-spec"][data-product-id="${unresolved.id}"]`)?.focus());
+      detailContent.querySelector(`[data-action="choose-spec"][data-product-id="${unresolved.id}"]`)?.focus({ preventScroll: true });
+      return;
     } else {
       const summary = summarizeSelection(state, currentStories());
       showToast(summary.actionLabel === '购买整套' ? '已确认购买整套（原型）' : '已确认购买已选商品（原型）');
+      return;
     }
   } else if (action === 'retry-feed') {
     prototypeState = 'normal';

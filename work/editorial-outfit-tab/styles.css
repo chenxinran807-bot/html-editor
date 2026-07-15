@@ -143,7 +143,7 @@
 
 .product-row {
   display: grid;
-  grid-template-columns: auto 1fr auto; /* Structural content columns. */
+  grid-template-columns: auto minmax(0, 72px) minmax(0, 1fr) auto; /* Four bounded direct-child columns. */
   gap: var(--gap-12);
   align-items: center;
   padding-bottom: var(--gap-12);
@@ -175,6 +175,7 @@
   max-width: 430px; /* Matches the supported app-shell boundary. */
   margin-inline: auto;
   display: flex;
+  flex-wrap: wrap;
   gap: var(--gap-12);
   align-items: center;
   padding: var(--gap-16);

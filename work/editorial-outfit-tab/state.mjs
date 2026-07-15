@@ -93,9 +93,18 @@ export const summarizeSelection = (state, stories) => {
   const available = story.products.filter((product) => product.status === 'available');
   const selected = available.filter((product) => state.selectedProductIds.includes(product.id));
   const count = selected.length;
+  let totalFen = 0;
+  for (const product of selected) {
+    if (!Number.isSafeInteger(product.priceFen) || product.priceFen < 0) {
+      throw new TypeError(`商品价格无效: ${product.id}`);
+    }
+    const nextTotal = totalFen + product.priceFen;
+    if (!Number.isSafeInteger(nextTotal)) throw new TypeError('商品价格合计溢出');
+    totalFen = nextTotal;
+  }
   return {
     count,
-    totalFen: selected.reduce((total, product) => total + product.priceFen, 0),
+    totalFen,
     actionLabel: count === 0 ? '请选择商品' : count === available.length ? '购买整套' : '购买已选',
     disabled: count === 0,
   };
