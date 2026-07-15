@@ -92,6 +92,24 @@ test('freezes the accepted outfit content feed requirements', async () => {
   }
 
   assert.equal(requirements.transitions.length * 2, 6, 'three open and three return transitions are required');
+  const expectedDetailScreens = ['真人穿搭详情', '主题合集详情', '商品搭配详情'];
+  const openDestinations = requirements.transitions.map(({ to }) => to);
+  const returnOrigins = requirements.transitions.filter(({ return: returnBehavior }) => returnBehavior).map(({ to }) => to);
+  assert.deepEqual(
+    [...new Set(openDestinations)].sort(),
+    [...expectedDetailScreens].sort(),
+    'open transitions must have three exact unique destinations',
+  );
+  assert.deepEqual(
+    [...new Set(requirements.transitions.map(({ action }) => action))].sort(),
+    ['打开真人穿搭', '打开主题合集', '打开商品搭配'].sort(),
+    'open transitions must have three exact unique actions',
+  );
+  assert.deepEqual(
+    [...new Set(returnOrigins)].sort(),
+    [...expectedDetailScreens].sort(),
+    'return transitions must originate from each exact detail screen',
+  );
   for (const transition of requirements.transitions) {
     assert.equal(transition.from, '穿搭内容流');
     assert.ok(requirements.screens.includes(transition.to), `unknown detail destination: ${transition.to}`);
