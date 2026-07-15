@@ -119,4 +119,8 @@ test('catalog exposes the accepted channel filters and neutral card metadata', (
     assert.ok(Array.isArray(card.tags) && card.tags.length > 0);
     assert.deepEqual(Object.keys(card.filters), Object.keys(catalog.channels));
   }
+  for (const card of catalog.cards.filter(({ type }) => type === 'creator')) {
+    assert.ok(card.authorName, `creator needs an explicit authorName: ${card.id}`);
+    assert.doesNotMatch(card.authorName, /author-|作者\s*\d/i, 'authorName must not be synthesized from authorId');
+  }
 });

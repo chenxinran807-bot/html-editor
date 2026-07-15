@@ -382,11 +382,27 @@ test('completes browsing entrances, loading continuity, and prototype failure re
   assert.match(html, /failNextAction=true/);
   assert.match(html, /const previous=state;state=toggleReaction.*if\(failNextAction\).*state=previous/s);
   assert.match(html, /data-proto-key="retry-action"/);
-  assert.match(html, /穿搭作者 \$\{escapeText\(card\.authorId\.replace\('author-',''\)\)\}/);
+  assert.match(html, /\$\{escapeText\(card\.authorName\)\}/);
   assert.match(html, /场景：\$\{escapeText\(card\.tags\[0\]\)\} · 风格：\$\{escapeText\(card\.tags\[1\]\)\}/);
   for (const key of ['bottom-nav-home', 'bottom-nav-cart', 'bottom-nav-profile']) {
     assert.match(html, new RegExp(`<button[^>]*data-proto-key="${key}"[^>]*disabled[^>]*aria-label="[^"]*暂未开放`));
   }
+});
+
+test('searches catalog content with explicit creator names and keeps retained errors after cards', async () => {
+  const html = await readFile(`${root}/index.html`, 'utf8');
+  assert.match(html, /let searchQuery=''/);
+  assert.match(html, /function matchesSearch\(card\).*card\.authorName.*card\.tags/s);
+  assert.match(html, /visibleCards\(\).*matchesSearch\(card\)/s);
+  assert.match(html, /searchInput\.addEventListener\('input'.*searchQuery=searchInput\.value\.trim\(\).*renderFeed\(\)/s);
+  assert.match(html, /searchClose\.onclick=.*searchQuery=''.*searchInput\.value=''.*renderFeed\(\)/s);
+  assert.match(html, /data-proto-key="clear-search" data-clear-search/);
+  assert.match(html, /data-clear-search.*searchQuery=''.*searchInput\.value=''.*renderFeed\(\)/s);
+  assert.match(html, /feedLabel\.textContent=searchQuery\?`\$\{cards\.length\} 条结果`:'混合内容'/);
+  assert.doesNotMatch(html, /card\.authorId\.replace\(/, 'creator labels must come from explicit authorName');
+  assert.match(html, /\$\{escapeText\(card\.authorName\)\}/);
+  assert.ok(html.indexOf('id="feed"') < html.indexOf('id="status"'), 'status banner must follow retained feed cards in DOM order');
+  assert.match(html, /feedStatus==='error'.*status\.classList\.toggle\('inline',hasRenderedFeed\)/s);
 });
 
 test('all required local SVG assets physically exist and are self-contained', async () => {

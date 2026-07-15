@@ -35,6 +35,7 @@
         { "key": "feed-label", "type": "text" },
         { "key": "mixed-feed", "type": "feed" },
         { "key": "clear-filter", "type": "recovery-button" },
+        { "key": "clear-search", "type": "recovery-button" },
         { "key": "retry-feed", "type": "recovery-button" },
         { "key": "retry-action", "type": "recovery-button" },
         { "key": "undo-hide", "type": "recovery-button" },
@@ -86,7 +87,8 @@
     { "id": "retry-error", "from": "error", "to": "loading", "then": "ready" },
     { "id": "clear-empty", "from": "empty", "to": "ready", "effect": "reset active filter" },
     { "id": "undo-hide", "from": "card-hidden", "to": "ready", "effect": "restore most recent card" },
-    { "id": "search-feed", "from": "feed", "to": "search-panel" },
+    { "id": "search-feed", "from": "feed", "to": "filtered-feed", "effect": "trimmed query matches title, description, authorName, and tags; closing clears query" },
+    { "id": "clear-search", "from": "search-empty", "to": "ready", "effect": "clear query and restore current channel/filter results" },
     { "id": "open-featured", "from": "feed", "to": "collection-detail" },
     { "id": "retry-action", "from": "action-failed", "to": "ready", "effect": "retry rolled-back reaction" },
     { "id": "author-preview-edit", "from": "preview", "to": "edit" }

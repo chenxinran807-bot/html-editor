@@ -3,8 +3,8 @@
   "title": "抖音商城独立端穿搭 Tab",
   "completeness": { "semantic": "complete", "interaction": "complete", "state": "complete", "visual": "complete" },
   "pageUnits": ["穿搭内容流", "真人穿搭详情", "主题合集详情", "商品搭配详情"],
-  "visualInventory": ["顶部标题栏", "三个平行频道", "筛选胶囊", "主题首屏", "横滑灵感合集", "双列混合内容流", "四项底部导航", "三类详情页", "原型编辑面板"],
-  "interactionInventory": ["切换频道与筛选", "横滑合集", "打开三类详情并返回", "喜欢、收藏、关注", "不感兴趣与撤销", "状态菜单与重试", "选中元素并编辑文字、颜色、图片、位置、尺寸、显隐、禁用和跳转", "撤销、重做、持久化及导出"],
+  "visualInventory": ["顶部标题栏与搜索面板", "三个平行频道", "筛选胶囊", "主题首屏与合集入口", "横滑灵感合集", "双列混合内容流", "四项底部导航", "三类详情页", "原型编辑面板"],
+  "interactionInventory": ["搜索标题、描述、作者昵称与标签并清空", "切换频道与筛选", "横滑合集", "打开主题入口及三类详情并返回", "喜欢、收藏、关注", "不感兴趣与撤销", "状态菜单、失败回滚与重试", "选中元素并编辑文字、颜色、图片、位置、尺寸、显隐、禁用和跳转", "撤销、重做、持久化及导出"],
   "stateMatrix": {
     "feed": ["loading", "empty", "error", "image-failure", "ready"],
     "navigation": ["feed", "creator-detail", "collection-detail", "outfit-detail"],
