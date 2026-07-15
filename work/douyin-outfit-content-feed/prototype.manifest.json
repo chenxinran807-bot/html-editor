@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "id": "douyin-outfit-content-feed",
+  "product": "抖音商城独立端",
+  "startPage": "feed",
+  "pages": [
+    {
+      "id": "feed",
+      "title": "穿搭内容流",
+      "elements": [
+        { "key": "nav-title", "type": "text" },
+        { "key": "search-open", "type": "button" },
+        { "key": "search-panel", "type": "search" },
+        { "key": "search-input", "type": "input" },
+        { "key": "search-close", "type": "button" },
+        { "key": "state-toggle", "type": "button" },
+        { "key": "state-loading", "type": "state-button" },
+        { "key": "state-empty", "type": "state-button" },
+        { "key": "state-error", "type": "state-button" },
+        { "key": "state-image-failure", "type": "state-button" },
+        { "key": "state-ready", "type": "state-button" },
+        { "key": "state-action-failure", "type": "state-button" },
+        { "key": "channel-scene", "type": "tab" },
+        { "key": "channel-fit", "type": "tab" },
+        { "key": "channel-creator", "type": "tab" },
+        { "key": "featured-theme", "type": "hero" },
+        { "key": "featured-eyebrow", "type": "text" },
+        { "key": "featured-title", "type": "heading" },
+        { "key": "featured-summary", "type": "text" },
+        { "key": "featured-open", "type": "button" },
+        { "key": "section-inspiration-title", "type": "heading" },
+        { "key": "section-inspiration-more", "type": "text" },
+        { "key": "inspiration-strip", "type": "collection-strip" },
+        { "key": "section-recommendation-title", "type": "heading" },
+        { "key": "feed-label", "type": "text" },
+        { "key": "mixed-feed", "type": "feed" },
+        { "key": "feed-end", "type": "status" },
+        { "key": "feed-end-recommendation", "type": "navigation" },
+        { "key": "clear-filter", "type": "recovery-button" },
+        { "key": "clear-search", "type": "recovery-button" },
+        { "key": "retry-feed", "type": "recovery-button" },
+        { "key": "retry-action", "type": "recovery-button" },
+        { "key": "undo-hide", "type": "recovery-button" },
+        { "key": "bottom-nav-home", "type": "navigation" },
+        { "key": "bottom-nav-outfit", "type": "navigation" },
+        { "key": "bottom-nav-cart", "type": "navigation" },
+        { "key": "bottom-nav-profile", "type": "navigation" }
+      ]
+    },
+    {
+      "id": "creator-detail",
+      "title": "真人穿搭详情",
+      "elements": [{ "key": "creator-detail", "type": "page" }, { "key": "back-to-feed", "type": "navigation" }]
+    },
+    {
+      "id": "collection-detail",
+      "title": "主题合集详情",
+      "elements": [{ "key": "collection-detail", "type": "page" }, { "key": "back-to-feed", "type": "navigation" }, { "key": "collection-detail-end", "type": "status" }, { "key": "adjacent-collection", "type": "navigation" }]
+    },
+    {
+      "id": "outfit-detail",
+      "title": "商品搭配详情",
+      "elements": [{ "key": "outfit-detail", "type": "page" }, { "key": "back-to-feed", "type": "navigation" }, { "key": "outfit-commerce-feedback", "type": "action" }]
+    }
+  ],
+  "dynamicElements": [
+    { "name": "filter", "pattern": "filter-{channel}-{filter}", "source": "catalog.channels" },
+    { "name": "strip-card", "pattern": "strip-{cardId}", "source": "catalog.cards[type=collection]" },
+    { "name": "card", "pattern": "{cardId}", "source": "catalog.cards" },
+    { "name": "card-open", "pattern": "{cardId}-open", "source": "catalog.cards" },
+    { "name": "card-like", "pattern": "{cardId}-like", "source": "catalog.cards" },
+    { "name": "card-collect", "pattern": "{cardId}-collect", "source": "catalog.cards" },
+    { "name": "card-follow", "pattern": "{cardId}-follow", "source": "catalog.cards[type=creator]" },
+    { "name": "card-hide", "pattern": "{cardId}-hide", "source": "catalog.cards" },
+    { "name": "detail-follow", "pattern": "{cardId}-detail-follow", "source": "creator detail active card", "pages": ["creator-detail"] },
+    { "name": "detail-reaction", "pattern": "{cardId}-detail-{like|collect|hide}", "source": "active detail card", "pages": ["creator-detail", "collection-detail", "outfit-detail"] },
+    { "name": "creator-detail-heading", "pattern": "{cardId}-detail-{header|title|author|related-heading}", "source": "creator detail active card", "pages": ["creator-detail"] },
+    { "name": "collection-detail-heading", "pattern": "{cardId}-detail-{header|title}", "source": "collection detail active card", "pages": ["collection-detail"] },
+    { "name": "outfit-detail-heading", "pattern": "{cardId}-detail-{header|title|idea-heading|fit-heading|items-heading}", "source": "outfit detail active card", "pages": ["outfit-detail"] },
+    { "name": "collection-content", "pattern": "collection-content-{cardId}", "source": "collection related cards" },
+    { "name": "collection-content-heading", "pattern": "collection-content-{cardId}-heading", "source": "collection related cards" },
+    { "name": "state-control", "pattern": "state-{feedState}", "source": "states.feed" }
+  ],
+  "flows": [
+    { "id": "open-creator", "from": "feed", "to": "creator-detail" },
+    { "id": "open-collection", "from": "feed", "to": "collection-detail" },
+    { "id": "open-outfit", "from": "feed", "to": "outfit-detail" },
+    { "id": "detail-return", "from": "*-detail", "to": "feed", "preserves": ["channel", "filter", "scroll"] },
+    { "id": "retry-error", "from": "error", "to": "loading", "then": "ready" },
+    { "id": "clear-empty", "from": "empty", "to": "ready", "effect": "reset active filter" },
+    { "id": "undo-hide", "from": "card-hidden", "to": "ready", "effect": "restore most recent card" },
+    { "id": "search-feed", "from": "feed", "to": "filtered-feed", "effect": "trimmed query matches title, description, authorName, and tags; closing clears query" },
+    { "id": "clear-search", "from": "search-empty", "to": "ready", "effect": "clear query and restore current channel/filter results" },
+    { "id": "open-featured", "from": "feed", "to": "collection-detail" },
+    { "id": "continue-from-feed-end", "from": "feed-end", "to": "collection-detail", "preserves": ["channel", "filter", "query", "scroll"] },
+    { "id": "retry-action", "from": "action-failed", "to": "ready", "effect": "retry rolled-back reaction" },
+    { "id": "author-preview-edit", "from": "preview", "to": "edit" }
+  ],
+  "states": { "feed": ["loading", "empty", "error", "image-failure", "ready"], "detail": ["creator-detail", "collection-detail", "outfit-detail"], "authoring": ["preview", "edit", "selected", "patched", "undo", "redo"] },
+  "editCapabilities": ["text", "color", "image", "position", "size", "visibility", "disabled", "navigation", "undo", "redo", "persistence", "export"],
+  "assumptions": ["本地演示数据和抽象素材", "推荐反馈为模拟效果"],
+  "gaps": ["无真实商品、库存、价格、账号与推荐服务"]
+}
