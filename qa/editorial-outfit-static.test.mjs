@@ -8,6 +8,9 @@ const contextUrl = new URL(
 );
 const tokensUrl = new URL('../work/editorial-outfit-tab/tokens.css', import.meta.url);
 const stylesUrl = new URL('../work/editorial-outfit-tab/styles.css', import.meta.url);
+const indexUrl = new URL('../work/editorial-outfit-tab/index.html', import.meta.url);
+const appUrl = new URL('../work/editorial-outfit-tab/app.mjs', import.meta.url);
+const renderUrl = new URL('../work/editorial-outfit-tab/render.mjs', import.meta.url);
 
 const withoutComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '');
 
@@ -21,6 +24,63 @@ function customProperties(css) {
     declarations(css).filter(([property]) => property.startsWith('--')),
   );
 }
+
+test('HTML exposes stable semantic feed and detail shells', async () => {
+  const html = await readFile(indexUrl, 'utf8').catch(() => '');
+  for (const pattern of [
+    /<header\b/i, /<nav\b/i, /<main\b/i,
+    /data-screen="feed"/, /data-screen="detail"/,
+    /data-detail-view="story"/, /data-detail-view="products"/,
+    /aria-live="polite"/, /<script\s+type="module"\s+src="\.\/app\.mjs"/,
+    /<button[^>]+aria-current="page"/,
+  ]) assert.match(html, pattern);
+  assert.match(html, /<link[^>]+href="\.\/tokens\.css"/);
+  assert.match(html, /<link[^>]+href="\.\/styles\.css"/);
+});
+
+test('app uses the required delegated action vocabulary', async () => {
+  const source = await readFile(appUrl, 'utf8').catch(() => '');
+  for (const action of ['set-channel', 'open-story', 'close-story', 'toggle-save', 'set-detail-view']) {
+    assert.match(source, new RegExp(`data-action[^\\n]*${action}|${action}`));
+  }
+  assert.match(source, /addEventListener\(\s*['"]click['"]/);
+  assert.match(source, /requestAnimationFrame/);
+  assert.doesNotMatch(source, /window\.scrollY/);
+});
+
+test('render module exports the feed, detail and stable state renderers', async () => {
+  const source = await readFile(renderUrl, 'utf8').catch(() => '');
+  for (const name of ['renderChannelTabs', 'renderFeed', 'renderStory', 'renderProducts', 'renderSkeleton', 'renderEmpty', 'renderError']) {
+    assert.match(source, new RegExp(`export\\s+(?:const|function)\\s+${name}\\b`));
+  }
+});
+
+test('renderers escape fixture content and expose accessible selected states', async () => {
+  const render = await import(renderUrl);
+  const fixture = {
+    id: 'fixture-story', title: '<img src=x onerror=alert(1)>', editorialLabel: '编辑精选',
+    savedCountLabel: '灵感收藏', image: '" onerror="alert(1)', gallery: [], intro: '<b>intro</b>',
+    tips: ['<script>bad</script>'], topics: ['"topic'], products: [],
+  };
+  const feed = render.renderFeed([{ type: 'story', storyId: fixture.id }], [fixture], ['fixture-story']);
+  assert.doesNotMatch(feed, /<script>|<img src=x/);
+  assert.match(feed, /&lt;img src=x onerror=alert\(1\)&gt;/);
+  assert.match(feed, /aria-pressed="true"/);
+  assert.match(feed, /data-action="open-story"/);
+
+  const tabs = render.renderChannelTabs(['精选', '通勤'], '通勤');
+  assert.match(tabs, /role="tablist"/);
+  assert.match(tabs, /data-channel="通勤"[^>]*aria-selected="true"/);
+
+  const story = render.renderStory(fixture, true, 'story');
+  assert.match(story, /role="tablist"/);
+  assert.match(story, /role="tab"[^>]*aria-selected="true"/);
+  assert.match(story, /role="tabpanel"/);
+  assert.match(story, /aria-pressed="true"/);
+
+  const feature = render.renderFeed([{ type: 'feature', id: 'f', title: '专题', image: './f.jpg' }], [], []);
+  assert.match(feature, /feature-card/);
+});
 
 test('visual foundation exposes the approved semantic aliases', async () => {
   const css = withoutComments(await readFile(tokensUrl, 'utf8'));
