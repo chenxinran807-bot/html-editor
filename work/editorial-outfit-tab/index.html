@@ -16,8 +16,9 @@
     <nav id="channel-tabs" aria-label="穿搭场景"></nav>
     <main id="feed-screen" data-screen="feed" tabindex="-1"></main>
     <main id="detail-screen" data-screen="detail" tabindex="-1" hidden>
-      <section id="story-view" data-detail-view="story"></section>
-      <section id="products-view" data-detail-view="products" hidden></section>
+      <div id="detail-content"></div>
+      <template data-detail-view="story"></template>
+      <template data-detail-view="products"></template>
     </main>
     <nav aria-label="商城底部导航">
       <button type="button">首页</button>

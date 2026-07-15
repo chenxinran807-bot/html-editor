@@ -45,7 +45,17 @@ test('app uses the required delegated action vocabulary', async () => {
   }
   assert.match(source, /addEventListener\(\s*['"]click['"]/);
   assert.match(source, /requestAnimationFrame/);
-  assert.doesNotMatch(source, /window\.scrollY/);
+  assert.match(source, /window\.scrollY/);
+  assert.match(source, /window\.scrollTo\(\s*\{/);
+  assert.match(source, /behavior:\s*['"]auto['"]/);
+  assert.doesNotMatch(source, /feedScreen\.scrollTop|#feed-scroller/);
+  assert.match(source, /share-story/);
+  assert.match(source, /分享功能为原型演示/);
+  assert.match(source, /replaceWith/);
+  assert.match(source, /role:\s*['"]img['"]/);
+  assert.match(source, /aria-label/);
+  assert.match(source, /detailContent\.innerHTML\s*=\s*state\.detailView\s*===\s*['"]story['"]/);
+  assert.doesNotMatch(source, /storyView\.innerHTML|productsView\.innerHTML/);
 });
 
 test('render module exports the feed, detail and stable state renderers', async () => {
@@ -53,6 +63,11 @@ test('render module exports the feed, detail and stable state renderers', async 
   for (const name of ['renderChannelTabs', 'renderFeed', 'renderStory', 'renderProducts', 'renderSkeleton', 'renderEmpty', 'renderError']) {
     assert.match(source, new RegExp(`export\\s+(?:const|function)\\s+${name}\\b`));
   }
+  const render = await import(renderUrl);
+  assert.deepEqual(Object.keys(render).sort(), [
+    'renderChannelTabs', 'renderEmpty', 'renderError', 'renderFeed',
+    'renderProducts', 'renderSkeleton', 'renderStory',
+  ]);
 });
 
 test('renderers escape fixture content and expose accessible selected states', async () => {
@@ -77,6 +92,16 @@ test('renderers escape fixture content and expose accessible selected states', a
   assert.match(story, /role="tab"[^>]*aria-selected="true"/);
   assert.match(story, /role="tabpanel"/);
   assert.match(story, /aria-pressed="true"/);
+  assert.equal((story.match(/role="tabpanel"/g) ?? []).length, 1);
+  const storyIds = [...story.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
+  assert.equal(new Set(storyIds).size, storyIds.length);
+
+  const products = render.renderProducts(fixture, 'products');
+  assert.equal((products.match(/role="tabpanel"/g) ?? []).length, 1);
+  const productIds = [...products.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
+  assert.equal(new Set(productIds).size, productIds.length);
+  assert.match(products, /aria-controls="detail-panel-products"/);
+  assert.doesNotMatch(products, /id="detail-panel-story"/);
 
   const feature = render.renderFeed([{ type: 'feature', id: 'f', title: '专题', image: './f.jpg' }], [], []);
   assert.match(feature, /feature-card/);

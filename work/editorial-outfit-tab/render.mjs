@@ -1,16 +1,16 @@
-export const escapeHtml = (value = '') => String(value)
+const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;')
   .replaceAll('<', '&lt;')
   .replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;')
   .replaceAll("'", '&#39;');
 
-export const escapeAttribute = escapeHtml;
+const escapeAttribute = escapeHtml;
 
 const image = (src, alt, className) => `<img class="${className}" src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}">`;
 
 const detailTabs = (active) => `<div class="segmented-view" role="tablist" aria-label="详情视图">
-  ${['story', 'products'].map((view) => `<button type="button" class="segmented-view__option" role="tab" id="detail-tab-${view}" aria-controls="detail-panel-${view}" aria-selected="${active === view}" data-action="set-detail-view" data-detail-view="${view}">${view === 'story' ? '穿搭故事' : '整套商品'}</button>`).join('')}
+  ${['story', 'products'].map((view) => `<button type="button" class="segmented-view__option" role="tab" id="detail-tab-${view}"${active === view ? ` aria-controls="detail-panel-${view}"` : ''} aria-selected="${active === view}" data-action="set-detail-view" data-detail-view="${view}">${view === 'story' ? '穿搭故事' : '整套商品'}</button>`).join('')}
 </div>`;
 
 export function renderChannelTabs(channels, activeChannel) {

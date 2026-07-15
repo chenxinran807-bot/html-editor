@@ -9,20 +9,16 @@ const shell = document.querySelector('#app-shell');
 const channelTabs = document.querySelector('#channel-tabs');
 const feedScreen = document.querySelector('#feed-screen');
 const detailScreen = document.querySelector('#detail-screen');
-const storyView = document.querySelector('#story-view');
-const productsView = document.querySelector('#products-view');
+const detailContent = document.querySelector('#detail-content');
 const toast = document.querySelector('#toast');
 let state = createState();
 
 const activeStory = () => stories.find((story) => story.id === state.activeStoryId);
-const feedScroller = () => feedScreen;
 const rememberFeedScroll = () => {
-  const scroller = feedScroller();
-  if (scroller) state = saveScrollPosition(state, state.channel, scroller.scrollTop);
+  state = saveScrollPosition(state, state.channel, window.scrollY);
 };
 const restoreFeedScroll = () => requestAnimationFrame(() => {
-  const scroller = feedScroller();
-  if (scroller) scroller.scrollTop = state.scrollByChannel[state.channel];
+  window.scrollTo({ top: state.scrollByChannel[state.channel], behavior: 'auto' });
 });
 
 function render() {
@@ -31,15 +27,16 @@ function render() {
   const story = activeStory();
   if (story) {
     const saved = state.savedStoryIds.includes(story.id);
-    storyView.innerHTML = renderStory(story, saved, state.detailView);
-    productsView.innerHTML = renderProducts(story, state.detailView);
+    detailContent.innerHTML = state.detailView === 'story'
+      ? renderStory(story, saved, state.detailView)
+      : renderProducts(story, state.detailView);
+  } else {
+    detailContent.innerHTML = '';
   }
   const onFeed = state.screen === 'feed';
   feedScreen.hidden = !onFeed;
   channelTabs.hidden = !onFeed;
   detailScreen.hidden = onFeed;
-  storyView.hidden = state.detailView !== 'story';
-  productsView.hidden = state.detailView !== 'products';
   if (onFeed) restoreFeedScroll();
 }
 
@@ -66,14 +63,23 @@ shell.addEventListener('click', (event) => {
     showToast(state.savedStoryIds.includes(control.dataset.storyId) ? '已收藏' : '已取消收藏');
   } else if (action === 'set-detail-view') {
     state = setDetailView(state, control.dataset.detailView, stories);
+  } else if (action === 'share-story') {
+    showToast('分享功能为原型演示');
   }
   render();
 });
 
 shell.addEventListener('error', (event) => {
   if (!(event.target instanceof HTMLImageElement)) return;
-  event.target.classList.add('image-fallback');
-  event.target.alt = `${event.target.alt || '图片'}加载失败`;
+  if (event.target.dataset.fallbackHandled === 'true') return;
+  event.target.dataset.fallbackHandled = 'true';
+  const fallback = Object.assign(document.createElement('div'), {
+    className: 'image-fallback',
+    role: 'img',
+    textContent: '图片暂时无法显示',
+  });
+  fallback.setAttribute('aria-label', `${event.target.alt || '图片'}加载失败`);
+  event.target.replaceWith(fallback);
 }, true);
 
 render();
