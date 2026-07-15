@@ -27,10 +27,17 @@ python3 -m http.server 8000 --bind 127.0.0.1
 
 内容图片均为本目录 `assets/` 下的无品牌 SVG 插画：10 张竖向编辑造型、1 张独立专题图、3 张竖向细节特写、6 张方形商品图。所有 catalog 图片路径均为本地路径；商品图片按品类与标题语义映射。
 
+## 审计交接
+
+- Demo 路径：`work/editorial-outfit-tab/`；按上文从仓库根启动静态服务后访问对应 URL。
+- 覆盖范围：feed 信息流、story 穿搭故事、products 整套商品，以及正常、加载、空态、错误、图片失败、部分售罄、全部不可售 7 states。
+- 视觉说明：当前视觉基于 PRD 与 11 份设计语言 Markdown 规范推断，不是对未提供设计稿的像素级还原。
+- 资产边界：本原型只新增并使用自身目录内的中性 SVG 插画，未修改技能包中的正式设计资产。
+
 ## Soft open questions
 
-- 哪个生产 API 最终提供商品资料、库存和价格？
-- 穿搭 Tab 在生产底部导航中的最终位置和正式图标是什么？
+- **Q01 / 商品 API**：哪个生产 API 最终提供商品资料、库存和价格？建议接入前补齐商品 API 契约、失败策略与字段映射。
+- **Q02 / bottom nav**：穿搭 Tab 在生产底部导航中的最终位置和正式图标是什么？建议补充 bottom-nav 规范后再做正式导航视觉定稿。
 
 两项问题都只影响生产接入或最终导航视觉，不阻塞这个静态原型。
 
@@ -65,6 +72,9 @@ node "${CODEX_HOME:-$HOME/.codex}/skills/ecommerce-design-language/scripts/valid
 # PASS：Asset validation passed（上游正式资产仍报告 34 条既有 paired-html warning）
 
 git diff --check
+# PASS：无空白错误
 ```
 
 浏览器证据位于 `qa/evidence/editorial-outfit/`：`feed-390.png`、`story-390.png`、`products-390.png`、`feed-320.png`。
+
+已知环境说明：全仓测试仍有 3 项既有失败，均因默认环境无法解析 `playwright-core`；这不等同于本专项浏览器验收失败。本专项已通过上面的 `CODEX_WORKSPACE_NODE_MODULES` 显式使用 Codex bundled Node 依赖运行，且 390×844、320×720 两个视口均通过。该说明只描述环境边界，不宣称全仓测试通过。
