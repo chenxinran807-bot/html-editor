@@ -128,6 +128,45 @@ async function exerciseViewport(browser, url, viewport) {
   await page.getByRole('tab', { name: '推荐', exact: true }).click();
   await waitReady(page);
 
+  const searchOpen = page.getByRole('button', { name: '搜索穿搭灵感' });
+  await searchOpen.click();
+  const searchInput = page.locator('#search-input');
+  check('search opens and focuses query', await page.locator('#search-panel').isVisible() && await searchInput.evaluate(node => document.activeElement === node));
+  await searchInput.fill('简线');
+  check('search filters visible cards and result count', await page.locator('#feed .card:visible').count() === 1 && await page.locator('#feed-label').textContent() === '1 条结果' && await page.locator('#feed').textContent().then(text => text.includes('简线穿搭')));
+  await searchInput.fill('没有这种穿搭');
+  check('search exposes no-result recovery', await page.getByText('没有找到相关穿搭').isVisible() && await page.getByRole('button', { name: '清除搜索' }).isVisible());
+  await page.getByRole('button', { name: '清除搜索' }).click();
+  check('clear no-result restores cards and search focus', await page.locator('#feed .card:visible').count() > 1 && await searchInput.inputValue() === '' && await searchInput.evaluate(node => document.activeElement === node));
+  await searchInput.fill('通勤');
+  await page.getByRole('button', { name: '关闭搜索' }).click();
+  check('close search clears query and restores trigger focus', await page.locator('#search-panel').isHidden() && await page.locator('#feed-label').textContent() === '混合内容' && await searchInput.inputValue() === '' && await searchOpen.evaluate(node => document.activeElement === node));
+
+  const heroScroll = await page.evaluate(() => scrollY);
+  await page.getByRole('button', { name: '查看合集' }).click();
+  check('hero opens featured collection detail', await page.locator('.collection-detail').isVisible() && await page.getByRole('heading', { name: '周末出游穿搭集' }).isVisible());
+  await page.getByRole('button', { name: '返回内容流' }).click();
+  await page.waitForTimeout(40);
+  check('hero detail back restores feed context', await page.locator('.channel[aria-selected="true"]').textContent() === '按场景' && await page.locator('.filter[aria-selected="true"]').textContent() === '推荐' && Math.abs((await page.evaluate(() => scrollY)) - heroScroll) < 3);
+
+  await page.getByRole('tab', { name: '适合我', exact: true }).click();
+  const skeletons = page.locator('#feed .skeleton');
+  const skeletonRatios = await skeletons.evaluateAll(cards => cards.map(card => {
+    const media = card.querySelector('.skeleton-media').getBoundingClientRect();
+    const type = card.classList.contains('collection-card') ? 'collection' : card.classList.contains('outfit-card') ? 'outfit' : 'creator';
+    return { type, actual: media.width / media.height, expected: type === 'collection' ? 1 : type === 'outfit' ? 4 / 5 : 3 / 4 };
+  }));
+  check('loading shows multiple typed card skeletons', skeletonRatios.length >= 4 && new Set(skeletonRatios.map(item => item.type)).size === 3);
+  check('loading skeletons preserve content type ratios', skeletonRatios.every(({ actual, expected }) => Math.abs(actual - expected) < 0.03), JSON.stringify(skeletonRatios));
+  await waitReady(page);
+  await page.getByRole('tab', { name: '按场景', exact: true }).click();
+  await waitReady(page);
+
+  for (const navKey of ['bottom-nav-home', 'bottom-nav-cart', 'bottom-nav-profile']) {
+    const nav = page.locator(`[data-proto-key="${navKey}"]`);
+    check(`${navKey} is explicitly unavailable`, await nav.isDisabled() && (await nav.getAttribute('aria-label')).includes('暂未开放'));
+  }
+
   const first = page.locator('#feed .card').first();
     const id = await first.getAttribute('data-id');
     const like = first.getByRole('button', { name: '喜欢' });
@@ -143,12 +182,21 @@ async function exerciseViewport(browser, url, viewport) {
     check('hide removes card and exposes undo', await page.locator(`[data-id="${id}"]`).count() === 0 && await page.getByRole('button', { name: '撤销' }).isVisible());
     await page.getByRole('button', { name: '撤销' }).click();
     check('undo restores hidden card and its reactions', await page.locator(`[data-id="${id}"]`).count() === 1 && await page.locator(`[data-id="${id}"] [aria-label="喜欢"]`).getAttribute('aria-pressed') === 'true');
+    check('creator nickname and scene/style tags visible in feed', await page.locator('[data-id="creator-1"]').textContent().then(text => text.includes('简线穿搭') && text.includes('场景：通勤') && text.includes('风格：简洁')));
+
+    await page.getByRole('button', { name: '原型状态菜单' }).click();
+    await page.getByRole('button', { name: '下次反馈失败' }).click();
+    const rollbackLike = page.locator('[data-id="outfit-4"] [aria-label="喜欢"]');
+    await rollbackLike.click();
+    check('simulated action failure rolls reaction back', await page.locator('[data-id="outfit-4"] [aria-label="喜欢"]').getAttribute('aria-pressed') === 'false' && await page.getByRole('button', { name: '重试' }).isVisible());
+    await page.getByRole('button', { name: '重试' }).click();
+    check('failed action retry succeeds', await page.locator('[data-id="outfit-4"] [aria-label="喜欢"]').getAttribute('aria-pressed') === 'true');
 
     check('state menu computed hidden initially', await page.locator('#state-menu').evaluate(node => node.hidden && getComputedStyle(node).display === 'none'));
     await page.getByRole('button', { name: '原型状态菜单' }).click();
     check('state menu toggles visibly', await page.locator('#state-menu').isVisible() && await page.getByRole('button', { name: '原型状态菜单' }).getAttribute('aria-expanded') === 'true');
     await page.getByRole('button', { name: '加载', exact: true }).click();
-    check('loading state reachable', await page.locator('[aria-label="内容加载中"]').isVisible());
+    check('loading state reachable', await page.locator('#feed[data-feed-state="loading"] .skeleton').count() >= 4 && await page.locator('#status').isHidden());
     for (const [button, state] of [['空内容', 'empty'], ['失败', 'error']]) {
       await page.getByRole('button', { name: '原型状态菜单' }).click();
       await page.getByRole('button', { name: button, exact: true }).click();
@@ -157,6 +205,7 @@ async function exerciseViewport(browser, url, viewport) {
         await page.getByRole('button', { name: '清除筛选' }).click();
         check('clear-filter restores ready content', await page.locator('#feed[data-feed-state="ready"] .card').count() > 0);
       } else {
+        check('post-load error retains cards and follows feed inline', await page.locator('#feed .card:visible').count() > 0 && await page.locator('#status').evaluate(node => node.classList.contains('inline') && node.previousElementSibling?.id === 'feed'));
         await page.getByRole('button', { name: '重新加载' }).click();
         await waitReady(page);
         check('retry restores explicit ready content', await page.locator('#feed').getAttribute('data-feed-state') === 'ready' && await page.locator('#status').evaluate(node => node.hidden && getComputedStyle(node).display === 'none') && await page.locator('#feed .card:visible').count() > 0);
@@ -183,6 +232,29 @@ async function exerciseViewport(browser, url, viewport) {
     check('edit changes selected title', await page.locator('[data-proto-key="featured-title"]').textContent() === '穿搭灵感');
     await page.getByRole('button', { name: '撤销' }).click();
     check('edit undo restores title', await page.locator('[data-proto-key="featured-title"]').textContent() === '从城市到自然，找到轻松的穿法');
+
+    const editableCard = page.locator('[data-id="creator-1"]');
+    const originalGeometry = await editableCard.evaluate(node => ({ transform: node.style.transform, width: node.style.width, height: node.style.height }));
+    await editableCard.dispatchEvent('click');
+    check('edit mode selects geometry-allowed card', await page.locator('#selected-key').textContent() === 'creator-1' && await page.locator('#edit-width').isEnabled());
+    await page.locator('#edit-offset-x').fill('48');
+    await page.locator('#edit-offset-y').fill('48');
+    await page.locator('#edit-width').fill('430');
+    await page.locator('#edit-height').fill('900');
+    await page.getByRole('button', { name: '应用修改' }).click();
+    const geometryResult = await editableCard.evaluate(node => {
+      const saved = JSON.parse(localStorage.getItem('outfit-content-feed:v1'));
+      const patch = saved.patches['creator-1'];
+      return { patch, overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth, rect: node.getBoundingClientRect().toJSON() };
+    });
+    check('max geometry request records clamped applied values', geometryResult.patch.position.requested.x === 48 && geometryResult.patch.position.requested.y === 48 && geometryResult.patch.size.requested.width === 430 && geometryResult.patch.size.requested.height === 900 && geometryResult.patch.position.applied.x <= 48 && geometryResult.patch.position.applied.y <= 48 && geometryResult.patch.size.applied.width <= viewport.width - 24 && geometryResult.patch.size.applied.height < 900, JSON.stringify(geometryResult));
+    check('max geometry edit does not overflow viewport', geometryResult.overflow <= 0 && geometryResult.rect.left >= -0.5 && geometryResult.rect.right <= viewport.width + 0.5, JSON.stringify(geometryResult));
+    await page.getByRole('button', { name: '撤销' }).click();
+    check('geometry undo restores original inline geometry', await editableCard.evaluate((node, original) => node.style.transform === original.transform && node.style.width === original.width && node.style.height === original.height, originalGeometry));
+    await page.locator('[data-proto-key="bottom-nav-home"]').dispatchEvent('click');
+    check('excluded navigation geometry controls stay disabled', await page.locator('#edit-offset-x').isDisabled() && await page.locator('#edit-offset-y').isDisabled() && await page.locator('#edit-width').isDisabled() && await page.locator('#edit-height').isDisabled());
+    await page.locator('[data-proto-key="featured-open"]').dispatchEvent('click');
+    check('excluded button geometry controls stay disabled', await page.locator('#edit-offset-x').isDisabled() && await page.locator('#edit-width').isDisabled());
     await page.getByRole('button', { name: '预览' }).click();
     check('preview hides and inerts author controls', await page.locator('#authoring-controls').evaluate(node => node.hidden && node.inert && getComputedStyle(node).display === 'none'));
 
@@ -208,6 +280,7 @@ async function exerciseViewport(browser, url, viewport) {
       const expectedClass = `${type}-detail`;
       await card.locator('.open-card').click();
       check(`${type} card opens correct detail`, await page.locator(`.${expectedClass}`).isVisible());
+      if (type === 'creator') check('creator nickname and scene/style tags visible in detail', await page.locator('.creator-detail').textContent().then(text => text.includes('简线穿搭') && text.includes('场景：通勤') && text.includes('风格：简洁')));
       await page.getByRole('button', { name: '返回内容流' }).click();
       await page.waitForTimeout(40);
       check(`${type} back restores channel/filter/scroll`, await page.locator('.channel[aria-selected="true"]').textContent() === '按场景' && await page.locator('.filter[aria-selected="true"]').textContent() === '推荐' && Math.abs((await page.evaluate(() => scrollY)) - savedScroll) < 3, cardId);
