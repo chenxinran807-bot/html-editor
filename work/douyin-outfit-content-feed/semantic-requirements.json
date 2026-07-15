@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "extractionMode": "model-semantic",
+  "confidence": "high",
+  "title": "抖音商城独立端穿搭 Tab",
+  "actor": "男女混合的穿搭内容浏览用户",
+  "goal": "提升穿搭内容浏览时长和连续浏览意愿",
+  "screens": [
+    "穿搭内容流",
+    "真人穿搭详情",
+    "主题合集详情",
+    "商品搭配详情"
+  ],
+  "businessObjects": [
+    { "name": "真人穿搭", "evidenceId": "content-mix" },
+    { "name": "主题合集", "evidenceId": "content-mix" },
+    { "name": "商品搭配", "evidenceId": "content-mix" }
+  ],
+  "userActions": [
+    { "name": "喜欢", "evidenceId": "engagement-actions" },
+    { "name": "收藏", "evidenceId": "engagement-actions" },
+    { "name": "关注", "evidenceId": "engagement-actions" },
+    { "name": "标记不感兴趣", "evidenceId": "engagement-actions" },
+    { "name": "撤销不感兴趣", "evidenceId": "engagement-actions" },
+    { "name": "进入真人穿搭详情", "evidenceId": "detail-navigation" },
+    { "name": "进入主题合集详情", "evidenceId": "detail-navigation" },
+    { "name": "进入商品搭配详情", "evidenceId": "detail-navigation" },
+    { "name": "返回内容流并恢复状态", "evidenceId": "detail-navigation" },
+    { "name": "失败后重试", "evidenceId": "page-states" }
+  ],
+  "pageContent": {
+    "feed": ["真人穿搭", "主题合集", "商品搭配"],
+    "states": ["加载", "空内容", "加载失败", "图片失败", "重试"]
+  },
+  "informationArchitecture": {
+    "primary": "穿搭 Tab",
+    "secondaryTabs": ["按场景", "适合我", "博主推荐"],
+    "relationship": "parallel"
+  },
+  "transitions": [
+    { "from": "穿搭内容流", "action": "打开真人穿搭", "to": "真人穿搭详情", "return": "恢复频道、筛选和滚动位置" },
+    { "from": "穿搭内容流", "action": "打开主题合集", "to": "主题合集详情", "return": "恢复频道、筛选和滚动位置" },
+    { "from": "穿搭内容流", "action": "打开商品搭配", "to": "商品搭配详情", "return": "恢复频道、筛选和滚动位置" }
+  ],
+  "evidence": [
+    { "id": "goal", "quote": "首要目标是提升穿搭内容浏览时长和连续浏览意愿。" },
+    { "id": "audience", "quote": "页面面向男女混合用户，覆盖更多风格与场景。" },
+    { "id": "content-mix", "quote": "页面采用真人穿搭、主题合集与商品搭配混排的内容流。" },
+    { "id": "secondary-tabs", "quote": "二级结构采用三个平行 Tab：按场景、适合我、博主推荐。" },
+    { "id": "engagement-actions", "quote": "用户可以喜欢、收藏、关注，也可以标记不感兴趣并撤销。" },
+    { "id": "detail-navigation", "quote": "用户可以进入真人穿搭详情、主题合集详情和商品搭配详情，返回后恢复频道、筛选和滚动位置。" },
+    { "id": "page-states", "quote": "页面覆盖加载、空内容、加载失败、图片失败和重试状态。" }
+  ],
+  "assumptions": [
+    "原型使用演示内容验证混排浏览与详情往返。"
+  ],
+  "gaps": [
+    "真实商品、真人素材和主题合集的数据来源与接口待确认。"
+  ]
+}
