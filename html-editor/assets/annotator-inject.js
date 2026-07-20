@@ -228,14 +228,15 @@
       "#ann-input textarea{width:100%;box-sizing:border-box;min-height:64px;border:1px solid #ddd;border-radius:6px;padding:8px;font-size:13px;resize:vertical;outline:none;}",
       "#ann-input .annotator-tip{font-size:11px;color:#999;margin-top:6px;}",
       "#ann-input .annotator-target{font-size:11px;color:#2f7fff;margin-bottom:6px;word-break:break-all;}",
-      "#ann-list{position:fixed;right:16px;bottom:64px;z-index:2147483100;width:300px;max-height:50vh;overflow:auto;background:#fff;border:1px solid #e2e2e2;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.2);display:none;font-family:inherit;}",
-      "#ann-list h4{margin:0;padding:10px 12px;font-size:13px;border-bottom:1px solid #eee;color:#333;display:flex;justify-content:space-between;align-items:center;}",
-      "#ann-list h4 .annotator-clear{color:#e23c3c;cursor:pointer;font-size:12px;font-weight:normal;}",
+      "#ann-list{position:fixed;right:16px;bottom:76px;z-index:2147483100;width:340px;max-height:56vh;overflow:auto;background:var(--ann-surface);border:1px solid var(--ann-border);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.22);display:none;color:var(--ann-text);backdrop-filter:blur(28px);}",
+      "#ann-list header{position:sticky;top:0;z-index:1;display:flex;justify-content:space-between;align-items:center;padding:14px;background:var(--ann-surface);border-bottom:1px solid var(--ann-border);}",
+      "#ann-list header h2{margin:0;font-size:15px;line-height:20px;}",
+      "#ann-list .annotator-clear{appearance:none;border:0;background:transparent;color:var(--ann-danger);font-size:12px;cursor:pointer;}",
       ".annotator-item{padding:8px 12px;border-bottom:1px solid #f2f2f2;font-size:12px;color:#444;}",
       ".annotator-item .annotator-idx{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;background:#e23c3c;color:#fff;border-radius:8px;font-size:10px;margin-right:6px;}",
       ".annotator-item .annotator-idx.annotator-idx-region{background:#c0392b;}",
       ".annotator-item .annotator-note{color:#111;margin:4px 0;}",
-      ".annotator-item .annotator-sel{color:#888;word-break:break-all;font-family:monospace;font-size:11px;}",
+      ".annotator-item .annotator-context-label{color:var(--ann-secondary);font-size:11px;}",
       ".annotator-item .annotator-ops{float:right;}",
       ".annotator-item .annotator-ops span{cursor:pointer;font-size:11px;margin-left:8px;}",
       ".annotator-item .annotator-edit{color:#2f7fff;}",
@@ -886,29 +887,28 @@
 
   function renderList() {
     if (listPanel.style.display !== "block") return;
-    var head = '<h4><span>标注列表（' + annotations.length + '）</span>' +
-      (annotations.length ? '<span class="annotator-clear" data-clear="1">清空全部</span>' : '') +
-      '</h4>';
+    var head = '<header><div><h2>我的修改</h2><div class="annotator-context-label">' + annotations.length + ' 条</div></div>' +
+      (annotations.length ? '<button class="annotator-clear" data-clear="1">清空全部</button>' : '') +
+      '</header>';
     var html = head;
     if (annotations.length === 0) {
-      html += '<div class="annotator-item" style="color:#999;">还没有标注。点选单个元素，或拖拽框选一片区域。</div>';
+      html += '<div class="annotator-item" style="color:#999;">还没有添加修改。</div>';
     } else {
       for (var i = 0; i < annotations.length; i++) {
         var a = annotations[i];
         var isRegion = a.type === "region";
         var missing = isRegion ? !regionRectDoc(a) : !(a.el && document.body.contains(a.el));
         var head2 = isRegion
-          ? '▢ 区域（' + (a.members ? a.members.length : 0) + ' 元素）' + escapeHtml(a.text ? " · " + a.text : "")
-          : '&lt;' + a.tag + '&gt; ' + escapeHtml(a.text);
+          ? '框选区域（' + (a.members ? a.members.length : 0) + ' 项内容）' + escapeHtml(a.text ? " · " + a.text : "")
+          : escapeHtml(describeElement(a.el));
         html += '<div class="annotator-item' + (missing ? ' annotator-missing' : '') + '" data-item="' + a.id + '">' +
           '<span class="annotator-ops">' +
             '<span class="annotator-edit" data-edit="' + a.id + '">编辑</span>' +
             '<span class="annotator-del" data-del="' + a.id + '">删除</span>' +
           '</span>' +
           '<span class="annotator-idx' + (isRegion ? ' annotator-idx-region' : '') + '">' + a.id + '</span>' +
-          head2 + (missing ? ' <em style="color:#e23c3c;">(元素已变化)</em>' : '') +
+          head2 + (missing ? ' <em style="color:#e23c3c;">原来的位置已经变化，请重新选择</em>' : '') +
           '<div class="annotator-note">' + escapeHtml(a.note) + '</div>' +
-          '<div class="annotator-sel">' + escapeHtml(a.selector || "(无容器选择器)") + '</div>' +
           '</div>';
       }
     }
@@ -1106,19 +1106,24 @@
       var modal = document.createElement("div");
       modal.id = "ann-modal";
       modal.innerHTML =
-        '<header><span>导出标注（已尝试自动复制，可在此手动复制）</span><span class="annotator-del" style="cursor:pointer;color:#999;">✕</span></header>';
+        '<header><div><h2 style="margin:0;font-size:16px;">修改要求已经准备好</h2></div>' +
+        '<button class="annotator-icon-button" data-action="close" aria-label="关闭">' + iconSvg("close") + '</button></header>' +
+        '<div style="padding:14px 16px 2px;color:var(--ann-secondary);font-size:13px;line-height:1.6;">' +
+        '系统已整理好页面位置、参考图片和你的全部要求。<br><b style="color:var(--ann-text);">下一步：回到 Agent 对话，粘贴并发送</b></div>';
 
       var ta = document.createElement("textarea");
       ta.value = text;
+      ta.setAttribute("aria-label", "机器可读的修改要求");
+      ta.style.display = "none";
       modal.appendChild(ta);
 
       // —— 参考图提示 + 缩略图（兜底下载）——
       if (refCount) {
         var refBar = document.createElement("div");
         refBar.style.cssText = "margin:8px 0 2px;font-size:12px;color:#237804;line-height:1.5;";
-        refBar.innerHTML = embedCount
-          ? "✅ 已把 <b>" + embedCount + "</b> 张参考图<b>内嵌进上面的文本</b>，直接<b>整段复制粘贴给我即可，无需再单独上传图片</b>。<br><span style='color:#999;'>（兜底：万一粘贴时图片数据被截断，下面缩略图也已自动下载为文件，可手动拖入。）</span>"
-          : "📎 检测到参考图但未能内嵌，请点下方缩略图逐张下载后拖进对话。";
+        refBar.textContent = embedCount
+          ? "参考图片已经随修改要求一起准备好。"
+          : "参考图片需要从下方重新添加。";
         modal.appendChild(refBar);
 
         var gallery = document.createElement("div");
@@ -1158,7 +1163,8 @@
       var footer = document.createElement("footer");
       var copyBtn = document.createElement("button");
       copyBtn.className = "annotator-primary";
-      copyBtn.textContent = "再次复制";
+      copyBtn.setAttribute("data-action", "copy");
+      copyBtn.textContent = "复制修改要求";
       var closeBtn = document.createElement("button");
       closeBtn.className = "annotator-ghost";
       closeBtn.textContent = "关闭";
@@ -1184,15 +1190,16 @@
 
       function close() { if (mask.parentNode) mask.parentNode.removeChild(mask); }
       closeBtn.onclick = close;
-      modal.querySelector("header .annotator-del").onclick = close;
+      modal.querySelector('[data-action="close"]').onclick = close;
       mask.addEventListener("click", function (e) { if (e.target === mask) close(); });
 
       copyBtn.onclick = function () {
         ta.focus();
         ta.select();
         copyText(ta.value, function (ok) {
-          copyBtn.textContent = ok ? "✓ 已复制" : "请手动 Ctrl/Cmd+C";
-          setTimeout(function () { copyBtn.textContent = "再次复制"; }, 1800);
+          copyBtn.textContent = ok ? "已复制" : "请手动复制";
+          if (!ok) ta.style.display = "block";
+          setTimeout(function () { copyBtn.textContent = "复制修改要求"; }, 1800);
         });
       };
     } catch (err) {
