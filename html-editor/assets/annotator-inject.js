@@ -735,6 +735,7 @@
   function closeInput() {
     if (inputBox && inputBox.parentNode) inputBox.parentNode.removeChild(inputBox);
     inputBox = null;
+    if (toggleBtn && typeof toggleBtn.focus === "function") toggleBtn.focus();
   }
 
   // ---------- 新增 / 删除 / 编辑 / 清空 ----------
@@ -1082,6 +1083,14 @@
       buildEmbedBlock(function (embedBlock, embedCount) {
         var text = baseText + (embedBlock || "");
         copyText(text, function (ok) {
+          if (!ok) {
+            var manual = document.querySelector("#ann-modal textarea");
+            if (manual) {
+              manual.style.display = "block";
+              manual.focus();
+              manual.select();
+            }
+          }
           showToast(ok
             ? (embedCount ? "✓ 已复制（含 " + embedCount + " 张参考图数据），整段粘贴发我即可，无需再单独上传图片" : "✓ 已复制到剪贴板，直接粘贴发我即可")
             : "复制受限，请在弹窗里手动全选复制");
@@ -1246,7 +1255,10 @@
 
   // ---------- 全局键盘 & 点击外部关闭输入框 ----------
   function onGlobalKey(e) {
-    if (e.key === "Escape" && active && !inputBox && !dragging) {
+    if (e.key === "Escape" && inputBox) {
+      e.preventDefault();
+      closeInput();
+    } else if (e.key === "Escape" && active && !dragging) {
       toggleMode();
     }
   }

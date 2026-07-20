@@ -26,6 +26,9 @@ function bootFixture(options = {}) {
     configurable: true,
     value: { writeText: text => options.copyRejects ? Promise.reject(new Error('denied')) : Promise.resolve(text) }
   });
+  if (options.savedAnnotations) {
+    window.localStorage.setItem('ann::/demo', JSON.stringify(options.savedAnnotations));
+  }
   window.document.elementFromPoint = () => window.document.querySelector('#target-title');
   window.eval(source);
   window.document.dispatchEvent(new window.Event('DOMContentLoaded', { bubbles: true }));
@@ -120,6 +123,36 @@ test('visible annotation chrome contains no emoji or technical labels', () => {
   ].filter(Boolean).map(element => element.textContent).join(' ');
   assert.doesNotMatch(chromeText, /🎨|📎|✎|✅|✓|✕/u);
   assert.doesNotMatch(chromeText, /CSS 选择器|HTML 片段|base64|导出标注/);
+});
+
+test('Escape closes the Inspector and returns focus to mark action', () => {
+  const { document } = bootFixture();
+  selectTarget(document);
+  assert.ok(document.querySelector('#ann-inspector'));
+  document.dispatchEvent(new document.defaultView.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  assert.equal(document.querySelector('#ann-inspector'), null);
+  assert.equal(document.activeElement, document.querySelector('[data-action="mark"]'));
+});
+
+test('old annotations with stale selectors show a human recovery message', () => {
+  const { document } = bootFixture({
+    savedAnnotations: {
+      seq: 1,
+      items: [{ id: 1, selector: '#removed-element', tag: 'div', text: '旧内容', note: '保留修改', page: '', snippet: '<div>旧内容</div>' }]
+    }
+  });
+  click(document, '[data-action="list"]');
+  assert.match(document.querySelector('#ann-list').textContent, /原来的位置已经变化，请重新选择/);
+});
+
+test('clipboard rejection reveals manual copy without losing machine text', async () => {
+  const { document, window } = bootFixture({ copyRejects: true, copySucceeds: false });
+  annotateTarget(document);
+  click(document, '[data-action="finish"]');
+  await new Promise(resolve => window.setTimeout(resolve, 0));
+  const textarea = document.querySelector('#ann-modal textarea');
+  assert.notEqual(textarea.style.display, 'none');
+  assert.match(textarea.value, /页面:|批注:/);
 });
 
 module.exports = { bootFixture, click, selectTarget, annotateTarget };
