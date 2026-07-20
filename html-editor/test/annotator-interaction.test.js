@@ -38,6 +38,23 @@ function click(document, selector) {
   element.dispatchEvent(new document.defaultView.MouseEvent('click', { bubbles: true }));
 }
 
+function selectTarget(document) {
+  click(document, '[data-action="mark"]');
+  const target = document.querySelector('#target-title');
+  target.dispatchEvent(new document.defaultView.MouseEvent('pointerdown', {
+    bubbles: true,
+    clientX: 120,
+    clientY: 100,
+    button: 0
+  }));
+  target.dispatchEvent(new document.defaultView.MouseEvent('pointerup', {
+    bubbles: true,
+    clientX: 120,
+    clientY: 100,
+    button: 0
+  }));
+}
+
 test('boots a compact three-action annotation toolbar', () => {
   const { document } = bootFixture();
   const toolbar = document.querySelector('#ann-toolbar');
@@ -49,4 +66,20 @@ test('boots a compact three-action annotation toolbar', () => {
   assert.equal(toolbar.querySelectorAll('svg').length, 3);
 });
 
-module.exports = { bootFixture, click };
+test('opens a macOS Inspector with plain-language actions', () => {
+  const { document } = bootFixture();
+  selectTarget(document);
+  const inspector = document.querySelector('#ann-inspector');
+  assert.ok(inspector);
+  assert.equal(inspector.querySelector('h2').textContent, '添加修改');
+  assert.match(inspector.querySelector('[data-role="context"]').textContent, /已选中.*AI 试穿/);
+  assert.equal(inspector.querySelector('[data-role="question"]').textContent, '你希望这里怎么调整？');
+  assert.deepEqual(
+    [...inspector.querySelectorAll('[data-quick-action]')].map(element => element.textContent.trim()),
+    ['修改文字', '更换图片', '调整位置或大小', '参考其他样式']
+  );
+  assert.equal(inspector.querySelector('[data-action="save"]').textContent, '保存修改');
+  assert.equal(inspector.querySelector('[data-role="secondary"]'), null);
+});
+
+module.exports = { bootFixture, click, selectTarget };
