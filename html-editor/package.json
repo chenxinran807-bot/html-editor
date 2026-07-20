@@ -1,0 +1,11 @@
+{
+  "name": "html-editor-skill",
+  "version": "1.1.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/*.test.js && python3 -m unittest discover -s test -p 'test_*.py'"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0"
+  }
+}

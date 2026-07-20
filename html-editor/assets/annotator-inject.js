@@ -1,0 +1,1226 @@
+/*
+ * html-editor :: annotator-inject.js
+ * 寄生式无侵入标注交互层。整体用 IIFE 自执行，不向全局作用域写任何变量。
+ * 所有 DOM 类名统一 `annotator-` 前缀、id 统一 `ann-` 前缀，避免与用户页面冲突。
+ * 设计目标：让用户在任意 HTML 预览里点选元素 / 拖拽框选区域 + 写批注，
+ * 导出成 AI 可解析的结构化文本。
+ *
+ * v1.2.0：
+ *  - 拖拽框选区域（rubber-band）：框住一片区域，自动识别区域内元素 + 公共容器
+ *  - 移动端触摸支持：Pointer 事件统一鼠标/触摸/手写笔
+ * v1.1.0：
+ *  - localStorage 持久化（刷新/切页不丢，按页面路径隔离）
+ *  - 「清空全部」按钮、批注可编辑
+ *  - 导出附带页面标题/URL + 每条元素 outerHTML 片段
+ *  - 批注输入框点击外部关闭、全局 Esc 退出标注模式
+ */
+(function () {
+  "use strict";
+
+  // 防止对同一页面重复注入
+  if (window.__ANNOTATOR_LOADED__) return;
+  window.__ANNOTATOR_LOADED__ = true;
+
+  var STORAGE_KEY = "ann::" + (location.pathname || "/") + (location.search || "");
+  var DRAG_THRESHOLD = 8; // 位移超过此像素判定为"拖拽框选"，否则为"点选"
+
+  var annotations = []; // { id, type:'element'|'region', selector, tag, text, note, page, snippet, el, members, rectDoc }
+  var seq = 0;
+  var active = false;   // 是否处于标注模式
+  var hoverEl = null;   // 当前 hover 的用户元素
+
+  // 指针拖拽状态
+  var pointerDown = false;
+  var dragging = false;
+  var startX = 0, startY = 0;
+  var dragBox = null;
+
+  // ---------- 工具：判断是否为标注层自身元素（避免自己点自己） ----------
+  function isAnnotatorElement(el) {
+    while (el) {
+      if (el.nodeType === 1) {
+        if (el.getAttribute && el.getAttribute("data-annotator") === "true") return true;
+        if (el.id && el.id.indexOf("ann-") === 0) return true;
+        if (el.classList) {
+          for (var i = 0; i < el.classList.length; i++) {
+            var c = el.classList[i];
+            if (c.indexOf("annotator-") === 0 && c !== "annotator-hl") return true;
+          }
+        }
+      }
+      el = el.parentNode;
+    }
+    return false;
+  }
+
+  // ---------- 核心：生成稳定唯一的 CSS 选择器 ----------
+  function computeSelector(el) {
+    if (!el || el.nodeType !== 1) return "";
+    if (el.id && el.id.indexOf("ann-") !== 0) {
+      return "#" + cssEscape(el.id);
+    }
+    var parts = [];
+    var node = el;
+    while (node && node.nodeType === 1 && node.tagName.toLowerCase() !== "html") {
+      var tag = node.tagName.toLowerCase();
+      if (node.id && node.id.indexOf("ann-") !== 0) {
+        parts.unshift("#" + cssEscape(node.id));
+        break;
+      }
+      var seg = tag;
+      var parent = node.parentNode;
+      if (parent) {
+        var sameTag = [];
+        var kids = parent.children;
+        for (var i = 0; i < kids.length; i++) {
+          if (kids[i].tagName && kids[i].tagName.toLowerCase() === tag) sameTag.push(kids[i]);
+        }
+        if (sameTag.length > 1) {
+          var idx = sameTag.indexOf(node) + 1;
+          seg += ":nth-of-type(" + idx + ")";
+        }
+      }
+      parts.unshift(seg);
+      node = parent;
+    }
+    return parts.join(" > ");
+  }
+
+  function cssEscape(s) {
+    if (window.CSS && typeof window.CSS.escape === "function") return window.CSS.escape(s);
+    return String(s).replace(/([^a-zA-Z0-9_-])/g, "\\$1");
+  }
+
+  function shortText(el) {
+    var t = (el.textContent || "").replace(/\s+/g, " ").trim();
+    if (t.length > 40) t = t.slice(0, 40) + "…";
+    return t;
+  }
+
+  function snippetOf(el) {
+    if (!el || !el.outerHTML) return "";
+    var html = el.outerHTML;
+    html = html.replace(/\s*class="([^"]*)"/, function (m, cls) {
+      var kept = cls.split(/\s+/).filter(function (c) { return c && c !== "annotator-hl"; });
+      return kept.length ? ' class="' + kept.join(" ") + '"' : "";
+    });
+    html = html.replace(/\s+/g, " ").trim();
+    if (html.length > 220) html = html.slice(0, 220) + "…";
+    return html;
+  }
+
+  function currentPage() {
+    var p = document.querySelector(".page.active");
+    if (p) return p.id || p.getAttribute("data-page") || "page";
+    return "";
+  }
+
+  // ---------- 持久化 ----------
+  function buildSaveData(includeDataURL) {
+    return annotations.map(function (a) {
+      return {
+        id: a.id, type: a.type || "element", selector: a.selector, tag: a.tag,
+        text: a.text, note: a.note, page: a.page, snippet: a.snippet,
+        members: a.members, rectDoc: a.rectDoc,
+        refs: (a.refs || []).map(function (r) {
+          return includeDataURL ? { name: r.name, dataURL: r.dataURL } : { name: r.name };
+        })
+      };
+    });
+  }
+  function save() {
+    try {
+      // 优先连同参考图 dataURL 一起持久化，刷新后缩略图/下载不丢
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ seq: seq, items: buildSaveData(true) }));
+    } catch (e) {
+      // 超出配额（参考图过大）时降级：只存文件名，避免整体保存失败
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ seq: seq, items: buildSaveData(false) }));
+      } catch (e2) { /* 沙箱/隐私模式禁用 localStorage，静默降级 */ }
+    }
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var obj = JSON.parse(raw);
+      if (!obj || !obj.items) return;
+      seq = obj.seq || 0;
+      annotations = obj.items.map(function (a) {
+        if (!a.type) a.type = "element";
+        if (a.type === "element") {
+          var el = null;
+          try { el = document.querySelector(a.selector); } catch (e2) { el = null; }
+          a.el = el;
+        }
+        return a;
+      });
+    } catch (e) { /* 忽略解析失败 */ }
+  }
+
+  // ---------- 样式注入 ----------
+  function injectStyle() {
+    var css = [
+      ".annotator-hl{outline:2px solid #2f7fff!important;outline-offset:1px!important;cursor:crosshair!important;}",
+      "html.annotator-grabbing{touch-action:none!important;}",
+      "#ann-bar{position:fixed;right:16px;bottom:16px;z-index:2147483000;display:flex;flex-direction:row-reverse;align-items:center;gap:8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',sans-serif;}",
+      "#ann-toggle{background:#2f7fff;color:#fff;border:none;border-radius:22px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);}",
+      "#ann-toggle.on{background:#e23c3c;}",
+      ".annotator-mini{background:#fff;color:#333;border:1px solid #ddd;border-radius:18px;padding:8px 12px;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);}",
+      ".annotator-mini[disabled]{opacity:.5;cursor:not-allowed;}",
+      "#ann-dragbox{position:fixed;z-index:2147482500;border:1.5px dashed #2f7fff;background:rgba(47,127,255,.12);pointer-events:none;}",
+      ".annotator-region{position:absolute;z-index:2147481500;border:1.5px dashed #e23c3c;background:rgba(226,60,60,.06);pointer-events:none;border-radius:4px;}",
+      ".annotator-pin{position:absolute;z-index:2147482000;min-width:18px;height:18px;line-height:18px;padding:0 4px;background:#e23c3c;color:#fff;font-size:11px;font-weight:700;text-align:center;border-radius:9px;box-shadow:0 1px 4px rgba(0,0,0,.35);transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;font-family:sans-serif;}",
+      ".annotator-pin.annotator-pin-region{background:#c0392b;border:1px solid #fff;}",
+      "#ann-input{position:fixed;z-index:2147483200;width:280px;background:#fff;border:1px solid #ccc;border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.25);padding:10px;font-family:inherit;}",
+      "#ann-input textarea{width:100%;box-sizing:border-box;min-height:64px;border:1px solid #ddd;border-radius:6px;padding:8px;font-size:13px;resize:vertical;outline:none;}",
+      "#ann-input .annotator-tip{font-size:11px;color:#999;margin-top:6px;}",
+      "#ann-input .annotator-target{font-size:11px;color:#2f7fff;margin-bottom:6px;word-break:break-all;}",
+      "#ann-list{position:fixed;right:16px;bottom:64px;z-index:2147483100;width:300px;max-height:50vh;overflow:auto;background:#fff;border:1px solid #e2e2e2;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.2);display:none;font-family:inherit;}",
+      "#ann-list h4{margin:0;padding:10px 12px;font-size:13px;border-bottom:1px solid #eee;color:#333;display:flex;justify-content:space-between;align-items:center;}",
+      "#ann-list h4 .annotator-clear{color:#e23c3c;cursor:pointer;font-size:12px;font-weight:normal;}",
+      ".annotator-item{padding:8px 12px;border-bottom:1px solid #f2f2f2;font-size:12px;color:#444;}",
+      ".annotator-item .annotator-idx{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;background:#e23c3c;color:#fff;border-radius:8px;font-size:10px;margin-right:6px;}",
+      ".annotator-item .annotator-idx.annotator-idx-region{background:#c0392b;}",
+      ".annotator-item .annotator-note{color:#111;margin:4px 0;}",
+      ".annotator-item .annotator-sel{color:#888;word-break:break-all;font-family:monospace;font-size:11px;}",
+      ".annotator-item .annotator-ops{float:right;}",
+      ".annotator-item .annotator-ops span{cursor:pointer;font-size:11px;margin-left:8px;}",
+      ".annotator-item .annotator-edit{color:#2f7fff;}",
+      ".annotator-item .annotator-del{color:#e23c3c;}",
+      ".annotator-item.annotator-missing{opacity:.55;}",
+      "#ann-modal-mask{position:fixed;inset:0;z-index:2147483400;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;font-family:inherit;}",
+      "#ann-modal{width:560px;max-width:90vw;max-height:80vh;background:#fff;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.35);}",
+      "#ann-modal header{padding:12px 16px;font-size:14px;font-weight:600;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}",
+      "#ann-modal textarea{flex:1;min-height:280px;border:none;padding:12px 16px;font-family:monospace;font-size:12px;resize:none;outline:none;white-space:pre;overflow:auto;}",
+      "#ann-modal footer{padding:10px 16px;border-top:1px solid #eee;display:flex;gap:8px;justify-content:flex-end;}",
+      "#ann-modal button{border:none;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;}",
+      "#ann-modal .annotator-primary{background:#2f7fff;color:#fff;}",
+      "#ann-modal .annotator-ghost{background:#eee;color:#333;}",
+      "#ann-input .annotator-chips{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 4px;}",
+      "#ann-input .annotator-chip{background:#f1f3f5;color:#333;border:1px solid #e2e5e9;border-radius:14px;padding:3px 9px;font-size:12px;cursor:pointer;user-select:none;}",
+      "#ann-input .annotator-chip:hover{background:#e6efff;border-color:#bcd4ff;}",
+      "#ann-input .annotator-swatches{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0;}",
+      "#ann-input .annotator-sw{width:20px;height:20px;border-radius:50%;cursor:pointer;border:1px solid rgba(0,0,0,.15);}",
+      "#ann-input .annotator-refs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0;}",
+      "#ann-input .annotator-thumb{position:relative;width:44px;height:44px;border-radius:6px;overflow:hidden;border:1px solid #ddd;}",
+      "#ann-input .annotator-thumb img{width:100%;height:100%;object-fit:cover;}",
+      "#ann-input .annotator-thumb .annotator-thumb-del{position:absolute;top:-6px;right:-6px;width:16px;height:16px;line-height:14px;text-align:center;background:#e23c3c;color:#fff;border-radius:50%;font-size:11px;cursor:pointer;}"
+    ].join("\n");
+    var style = document.createElement("style");
+    style.setAttribute("data-annotator", "true");
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
+  // ---------- 顶层容器与工具条 ----------
+  var bar, toggleBtn, listBtn, exportBtn, listPanel, inputBox;
+
+  function buildUI() {
+    bar = document.createElement("div");
+    bar.id = "ann-bar";
+    bar.setAttribute("data-annotator", "true");
+
+    toggleBtn = document.createElement("button");
+    toggleBtn.id = "ann-toggle";
+    toggleBtn.textContent = "✎ 开始标注";
+    toggleBtn.onclick = toggleMode;
+
+    listBtn = document.createElement("button");
+    listBtn.className = "annotator-mini";
+    listBtn.textContent = "标注列表 (0)";
+    listBtn.onclick = function () { toggleList(); };
+
+    exportBtn = document.createElement("button");
+    exportBtn.className = "annotator-mini";
+    exportBtn.textContent = "导出";
+    exportBtn.onclick = openExport;
+
+    bar.appendChild(toggleBtn);
+    bar.appendChild(listBtn);
+    bar.appendChild(exportBtn);
+    document.body.appendChild(bar);
+
+    listPanel = document.createElement("div");
+    listPanel.id = "ann-list";
+    listPanel.setAttribute("data-annotator", "true");
+    document.body.appendChild(listPanel);
+  }
+
+  function refreshCount() {
+    listBtn.textContent = "标注列表 (" + annotations.length + ")";
+  }
+
+  // ---------- 标注模式开关 ----------
+  function toggleMode() {
+    active = !active;
+    toggleBtn.classList.toggle("on", active);
+    toggleBtn.textContent = active ? "✓ 退出标注" : "✎ 开始标注";
+    if (!active) {
+      clearHover();
+      endDrag();
+    } else {
+      showToast("标注模式：点选单个元素，或拖拽框选一片区域");
+    }
+  }
+
+  function clearHover() {
+    if (hoverEl) {
+      hoverEl.classList.remove("annotator-hl");
+      hoverEl = null;
+    }
+  }
+
+  // ---------- Hover 高亮（仅桌面，未拖拽时） ----------
+  function onMouseOver(e) {
+    if (!active || dragging || pointerDown) return;
+    var el = e.target;
+    if (isAnnotatorElement(el)) return;
+    clearHover();
+    hoverEl = el;
+    el.classList.add("annotator-hl");
+  }
+
+  function onMouseOut(e) {
+    if (!active) return;
+    if (e.target === hoverEl) clearHover();
+  }
+
+  // 吞掉标注模式下的原生 click，避免触发页面跳转/交互
+  function onClick(e) {
+    if (!active) return;
+    if (isAnnotatorElement(e.target)) return;
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  // ---------- Pointer：统一鼠标/触摸，区分点选与拖拽框选 ----------
+  function onPointerDown(e) {
+    if (!active) return;
+    if (isAnnotatorElement(e.target)) return; // 点工具条，放行
+    if (e.button !== undefined && e.button !== 0) return; // 只响应主键
+    pointerDown = true;
+    dragging = false;
+    startX = e.clientX;
+    startY = e.clientY;
+    document.documentElement.classList.add("annotator-grabbing");
+    e.preventDefault();
+  }
+
+  function onPointerMove(e) {
+    if (!active || !pointerDown) return;
+    var dx = e.clientX - startX, dy = e.clientY - startY;
+    if (!dragging && Math.sqrt(dx * dx + dy * dy) > DRAG_THRESHOLD) {
+      dragging = true;
+      clearHover();
+      createDragBox();
+    }
+    if (dragging) {
+      e.preventDefault();
+      updateDragBox(startX, startY, e.clientX, e.clientY);
+    }
+  }
+
+  function onPointerUp(e) {
+    if (!active || !pointerDown) return;
+    pointerDown = false;
+    document.documentElement.classList.remove("annotator-grabbing");
+    if (dragging) {
+      dragging = false;
+      var r = boxRect(startX, startY, e.clientX, e.clientY);
+      removeDragBox();
+      if (r.w > 6 && r.h > 6) {
+        handleRegion(r, e.clientX, e.clientY);
+      }
+    } else {
+      // 点选单个元素
+      var el = document.elementFromPoint(e.clientX, e.clientY);
+      if (el && !isAnnotatorElement(el)) {
+        openInput(el, e.clientX, e.clientY);
+      }
+    }
+  }
+
+  function endDrag() {
+    pointerDown = false;
+    dragging = false;
+    removeDragBox();
+    document.documentElement.classList.remove("annotator-grabbing");
+  }
+
+  function boxRect(x1, y1, x2, y2) {
+    return { left: Math.min(x1, x2), top: Math.min(y1, y2), w: Math.abs(x2 - x1), h: Math.abs(y2 - y1) };
+  }
+
+  function createDragBox() {
+    if (dragBox) return;
+    dragBox = document.createElement("div");
+    dragBox.id = "ann-dragbox";
+    dragBox.setAttribute("data-annotator", "true");
+    document.body.appendChild(dragBox);
+  }
+
+  function updateDragBox(x1, y1, x2, y2) {
+    if (!dragBox) return;
+    var r = boxRect(x1, y1, x2, y2);
+    dragBox.style.left = r.left + "px";
+    dragBox.style.top = r.top + "px";
+    dragBox.style.width = r.w + "px";
+    dragBox.style.height = r.h + "px";
+  }
+
+  function removeDragBox() {
+    if (dragBox && dragBox.parentNode) dragBox.parentNode.removeChild(dragBox);
+    dragBox = null;
+  }
+
+  // ---------- 框选区域：收集区域内元素 + 公共容器 ----------
+  function handleRegion(vpRect, x, y) {
+    // vpRect 为视口坐标；转成文档坐标存储
+    var rectDoc = {
+      left: vpRect.left + window.scrollX,
+      top: vpRect.top + window.scrollY,
+      width: vpRect.w,
+      height: vpRect.h
+    };
+    var members = collectMembers(vpRect);
+    var container = members.length ? commonAncestor(members.map(function (m) { return m.el; })) : null;
+
+    openRegionInput(rectDoc, members, container, x, y, null);
+  }
+
+  // 收集"大部分落在框内"的最外层元素
+  function collectMembers(vpRect) {
+    var all = document.body ? document.body.querySelectorAll("*") : [];
+    var matched = [];
+    var boxArea = vpRect.w * vpRect.h;
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      if (isAnnotatorElement(el)) continue;
+      var tag = el.tagName.toLowerCase();
+      if (tag === "script" || tag === "style" || tag === "br" || tag === "meta" || tag === "link") continue;
+      var r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) continue;
+      var elArea = r.width * r.height;
+      // 跳过比选框大很多的容器（避免选到 body/大 wrapper）
+      if (elArea > boxArea * 2.2) continue;
+      var ix = Math.max(0, Math.min(vpRect.left + vpRect.w, r.right) - Math.max(vpRect.left, r.left));
+      var iy = Math.max(0, Math.min(vpRect.top + vpRect.h, r.bottom) - Math.max(vpRect.top, r.top));
+      var inter = ix * iy;
+      if (inter <= 0) continue;
+      // 元素 60% 以上落在框内才算命中
+      if (inter / elArea >= 0.6) matched.push(el);
+    }
+    // 去掉"祖先也在命中集"的元素，只保留最外层
+    var outer = matched.filter(function (el) {
+      for (var j = 0; j < matched.length; j++) {
+        if (matched[j] !== el && matched[j].contains(el)) return false;
+      }
+      return true;
+    });
+    return outer.map(function (el) {
+      return { el: el, selector: computeSelector(el), tag: el.tagName.toLowerCase(), text: shortText(el) };
+    });
+  }
+
+  function commonAncestor(els) {
+    if (!els.length) return null;
+    var a = els[0];
+    for (var i = 1; i < els.length; i++) {
+      var b = els[i];
+      while (a && !a.contains(b)) a = a.parentNode;
+    }
+    return (a && a.nodeType === 1) ? a : null;
+  }
+
+  // ---------- 批注输入框（元素：新增/编辑） ----------
+  function openInput(el, x, y, editItem) {
+    closeInput();
+    var selector = editItem ? editItem.selector : computeSelector(el);
+    inputBox = buildInputBox(
+      (editItem ? "✎ 编辑 · " : "") + "<" + (editItem ? editItem.tag : el.tagName.toLowerCase()) + "> " + selector,
+      editItem ? editItem.note : "",
+      x, y,
+      function (note, refs) {
+        if (editItem) {
+          editItem.note = note; editItem.refs = refs; save(); renderList();
+        } else {
+          addElementAnnotation(el, selector, note, refs);
+        }
+      },
+      editItem ? editItem.refs : null
+    );
+  }
+
+  // ---------- 批注输入框（区域：新增/编辑） ----------
+  function openRegionInput(rectDoc, members, container, x, y, editItem) {
+    closeInput();
+    var label = "▢ 区域框选（含 " + (editItem ? editItem.members.length : members.length) + " 个元素）";
+    inputBox = buildInputBox(
+      label,
+      editItem ? editItem.note : "",
+      x, y,
+      function (note, refs) {
+        if (editItem) {
+          editItem.note = note; editItem.refs = refs; save(); renderList();
+        } else {
+          addRegionAnnotation(rectDoc, members, container, note, refs);
+        }
+      },
+      editItem ? editItem.refs : null
+    );
+  }
+
+  function buildInputBox(labelText, presetNote, x, y, onSubmit, presetRefs) {
+    var box = document.createElement("div");
+    box.id = "ann-input";
+    box.setAttribute("data-annotator", "true");
+    var refs = (presetRefs || []).slice(); // [{name,dataURL}]
+
+    var target = document.createElement("div");
+    target.className = "annotator-target";
+    target.textContent = labelText;
+
+    var ta = document.createElement("textarea");
+    ta.placeholder = "写下修改意见，或用下面的快捷按钮…";
+    if (presetNote) ta.value = presetNote;
+
+    function appendNote(txt) {
+      var v = ta.value.trim();
+      ta.value = (v ? v + (/[；;。\n]$/.test(v) ? " " : "；") : "") + txt;
+      ta.focus();
+    }
+
+    // ——快捷意图 chips——
+    var chips = document.createElement("div");
+    chips.className = "annotator-chips";
+    var CHIPS = [
+      ["🎨 颜色", pickColor],
+      ["🔤 字号大", function () { appendNote("字号调大一号"); }],
+      ["🔡 字号小", function () { appendNote("字号调小一号"); }],
+      ["𝐁 加粗", function () { appendNote("加粗"); }],
+      ["⬛ 圆角", function () { appendNote("增加圆角"); }],
+      ["↔ 间距", function () { appendNote("增大内边距/元素间距"); }],
+      ["⊞ 居中", function () { appendNote("水平居中对齐"); }],
+      ["🖼 换图标/图", function () { appendNote("更换为参考图中的图标/样式（见附图）"); addRef(); }],
+      ["📎 参考图", addRef]
+    ];
+    CHIPS.forEach(function (c) {
+      var b = document.createElement("span");
+      b.className = "annotator-chip";
+      b.textContent = c[0];
+      b.onmousedown = function (e) { e.preventDefault(); }; // 防止 textarea 失焦
+      b.onclick = c[1];
+      chips.appendChild(b);
+    });
+
+    // ——色卡（点击追加颜色）——
+    var swatches = document.createElement("div");
+    swatches.className = "annotator-swatches";
+    swatches.style.display = "none";
+    var PRESET_COLORS = pageThemeColors();
+    PRESET_COLORS.forEach(function (col) {
+      var s = document.createElement("span");
+      s.className = "annotator-sw";
+      s.style.background = col;
+      s.title = col;
+      s.onmousedown = function (e) { e.preventDefault(); };
+      s.onclick = function () { appendNote("颜色改为 " + col); };
+      swatches.appendChild(s);
+    });
+    // 原生取色器
+    var colorInput = document.createElement("input");
+    colorInput.type = "color";
+    colorInput.setAttribute("data-annotator", "true");
+    colorInput.style.cssText = "width:24px;height:24px;border:none;background:none;cursor:pointer;padding:0;";
+    colorInput.onchange = function () { appendNote("颜色改为 " + colorInput.value); };
+    swatches.appendChild(colorInput);
+    // 屏幕吸色（EyeDropper API）
+    if (window.EyeDropper) {
+      var ed = document.createElement("span");
+      ed.className = "annotator-chip";
+      ed.textContent = "💧 屏幕吸色";
+      ed.onmousedown = function (e) { e.preventDefault(); };
+      ed.onclick = function () {
+        try {
+          new window.EyeDropper().open().then(function (r) { appendNote("颜色改为 " + r.sRGBHex); }, function () {});
+        } catch (e2) { /* 用户取消 */ }
+      };
+      swatches.appendChild(ed);
+    }
+
+    function pickColor() {
+      swatches.style.display = swatches.style.display === "none" ? "flex" : "none";
+    }
+
+    // ——参考图附件——
+    var refsWrap = document.createElement("div");
+    refsWrap.className = "annotator-refs";
+    var fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.multiple = true;
+    fileInput.setAttribute("data-annotator", "true");
+    fileInput.style.display = "none";
+    fileInput.onchange = function () {
+      var files = fileInput.files || [];
+      for (var i = 0; i < files.length; i++) {
+        (function (f) {
+          var reader = new FileReader();
+          reader.onload = function () { refs.push({ name: f.name, dataURL: reader.result }); renderRefs(); };
+          reader.readAsDataURL(f);
+        })(files[i]);
+      }
+      fileInput.value = "";
+    };
+    function addRef() { fileInput.click(); }
+    function renderRefs() {
+      refsWrap.innerHTML = "";
+      refs.forEach(function (r, idx) {
+        var t = document.createElement("div");
+        t.className = "annotator-thumb";
+        var img = document.createElement("img");
+        img.src = r.dataURL || "";
+        t.appendChild(img);
+        var del = document.createElement("span");
+        del.className = "annotator-thumb-del";
+        del.textContent = "×";
+        del.onclick = function () { refs.splice(idx, 1); renderRefs(); };
+        t.appendChild(del);
+        refsWrap.appendChild(t);
+      });
+    }
+    renderRefs();
+
+    var tip = document.createElement("div");
+    tip.className = "annotator-tip";
+    tip.textContent = "回车提交 · Shift+回车换行 · Esc 取消 · 附参考图记得也拖进对话";
+
+    box.appendChild(target);
+    box.appendChild(chips);
+    box.appendChild(swatches);
+    box.appendChild(ta);
+    box.appendChild(refsWrap);
+    box.appendChild(fileInput);
+    box.appendChild(tip);
+    document.body.appendChild(box);
+
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var left = Math.min(x + 8, vw - 300);
+    var top = Math.min(y + 8, vh - 260);
+    box.style.left = Math.max(8, left) + "px";
+    box.style.top = Math.max(8, top) + "px";
+    ta.focus();
+    if (presetNote) ta.select();
+
+    ta.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter" && !ev.shiftKey) {
+        ev.preventDefault();
+        var note = ta.value.trim();
+        if (note || refs.length) onSubmit(note, refs.slice());
+        closeInput();
+      } else if (ev.key === "Escape") {
+        ev.preventDefault();
+        closeInput();
+      }
+    });
+    return box;
+  }
+
+  // 从页面 CSS 变量/常见处采集几个主题色作为色卡候选
+  function pageThemeColors() {
+    var colors = [];
+    try {
+      var cs = getComputedStyle(document.documentElement);
+      ["--brand", "--primary", "--main", "--accent", "--ink", "--color-primary"].forEach(function (v) {
+        var c = cs.getPropertyValue(v).trim();
+        if (c) colors.push(c);
+      });
+      var bodyColor = getComputedStyle(document.body).color;
+      if (bodyColor) colors.push(rgbToHex(bodyColor));
+    } catch (e) { /* ignore */ }
+    // 常用兜底色卡
+    ["#2f7fff", "#e23c3c", "#f5a623", "#2ecc71", "#111111", "#666666", "#ffffff"].forEach(function (c) {
+      if (colors.indexOf(c) === -1) colors.push(c);
+    });
+    return colors.slice(0, 10);
+  }
+
+  function rgbToHex(rgb) {
+    var m = String(rgb).match(/\d+/g);
+    if (!m || m.length < 3) return rgb;
+    return "#" + m.slice(0, 3).map(function (n) {
+      var h = parseInt(n, 10).toString(16);
+      return h.length === 1 ? "0" + h : h;
+    }).join("");
+  }
+
+  function closeInput() {
+    if (inputBox && inputBox.parentNode) inputBox.parentNode.removeChild(inputBox);
+    inputBox = null;
+  }
+
+  // ---------- 新增 / 删除 / 编辑 / 清空 ----------
+  function addElementAnnotation(el, selector, note, refs) {
+    seq += 1;
+    annotations.push({
+      id: seq, type: "element", selector: selector, tag: el.tagName.toLowerCase(),
+      text: shortText(el), note: note, page: currentPage(), snippet: snippetOf(el), el: el,
+      refs: refs || []
+    });
+    afterChange();
+  }
+
+  function addRegionAnnotation(rectDoc, members, container, note, refs) {
+    seq += 1;
+    annotations.push({
+      id: seq, type: "region",
+      selector: container ? computeSelector(container) : "",
+      tag: container ? container.tagName.toLowerCase() : "(区域)",
+      text: members.length ? members.map(function (m) { return m.text; }).filter(Boolean).slice(0, 3).join(" / ") : "空白区域",
+      note: note, page: currentPage(),
+      members: members.map(function (m) { return { selector: m.selector, tag: m.tag, text: m.text }; }),
+      rectDoc: rectDoc, refs: refs || []
+    });
+    afterChange();
+  }
+
+  function afterChange() {
+    save();
+    refreshCount();
+    renderPins();
+    renderList();
+  }
+
+  function removeAnnotation(id) {
+    for (var i = 0; i < annotations.length; i++) {
+      if (annotations[i].id === id) { annotations.splice(i, 1); break; }
+    }
+    afterChange();
+  }
+
+  function editAnnotation(id) {
+    var a = null;
+    for (var i = 0; i < annotations.length; i++) { if (annotations[i].id === id) { a = annotations[i]; break; } }
+    if (!a) return;
+    var x = window.innerWidth / 2 - 140, y = window.innerHeight / 2 - 80;
+    if (a.type === "region") {
+      openRegionInput(a.rectDoc, a.members, null, x, y, a);
+    } else {
+      if (a.el && document.body.contains(a.el)) {
+        var r = a.el.getBoundingClientRect(); x = r.left; y = r.top;
+      }
+      openInput(a.el, x, y, a);
+    }
+  }
+
+  function clearAll() {
+    if (!annotations.length) return;
+    if (!window.confirm("确定清空全部 " + annotations.length + " 条标注？此操作不可撤销。")) return;
+    annotations = [];
+    seq = 0;
+    afterChange();
+  }
+
+  // ---------- 区域实时矩形（优先按成员并集，回退到存储的 rectDoc） ----------
+  function regionRectDoc(a) {
+    if (a.members && a.members.length) {
+      var union = null;
+      for (var i = 0; i < a.members.length; i++) {
+        var el = null;
+        try { el = document.querySelector(a.members[i].selector); } catch (e) { el = null; }
+        if (!el || !document.body.contains(el)) continue;
+        var r = el.getBoundingClientRect();
+        if (r.width === 0 && r.height === 0) continue;
+        var box = { left: r.left + window.scrollX, top: r.top + window.scrollY, right: r.right + window.scrollX, bottom: r.bottom + window.scrollY };
+        if (!union) union = box;
+        else {
+          union.left = Math.min(union.left, box.left);
+          union.top = Math.min(union.top, box.top);
+          union.right = Math.max(union.right, box.right);
+          union.bottom = Math.max(union.bottom, box.bottom);
+        }
+      }
+      if (union) return { left: union.left, top: union.top, width: union.right - union.left, height: union.bottom - union.top };
+    }
+    return a.rectDoc || null;
+  }
+
+  // ---------- 渲染 pin 与区域轮廓 ----------
+  function renderPins() {
+    var old = document.querySelectorAll(".annotator-pin, .annotator-region");
+    for (var i = 0; i < old.length; i++) old[i].parentNode.removeChild(old[i]);
+
+    var page = currentPage();
+    for (var j = 0; j < annotations.length; j++) {
+      var a = annotations[j];
+      if (page && a.page && a.page !== page) continue;
+
+      var px, py, isRegion = a.type === "region";
+      if (isRegion) {
+        var rd = regionRectDoc(a);
+        if (!rd) continue;
+        // 区域轮廓
+        var box = document.createElement("div");
+        box.className = "annotator-region";
+        box.setAttribute("data-annotator", "true");
+        box.style.left = rd.left + "px";
+        box.style.top = rd.top + "px";
+        box.style.width = rd.width + "px";
+        box.style.height = rd.height + "px";
+        document.body.appendChild(box);
+        px = rd.left; py = rd.top;
+      } else {
+        var el = a.el;
+        if (!el || !document.body.contains(el)) continue;
+        var rect = el.getBoundingClientRect();
+        if (rect.width === 0 && rect.height === 0) continue;
+        px = rect.left + window.scrollX + 6;
+        py = rect.top + window.scrollY + 6;
+      }
+
+      var pin = document.createElement("div");
+      pin.className = "annotator-pin" + (isRegion ? " annotator-pin-region" : "");
+      pin.setAttribute("data-annotator", "true");
+      pin.textContent = a.id;
+      pin.style.left = px + "px";
+      pin.style.top = py + "px";
+      (function (id) {
+        pin.onclick = function (e) { e.stopPropagation(); toggleList(true); highlightListItem(id); };
+      })(a.id);
+      document.body.appendChild(pin);
+    }
+  }
+
+  // ---------- 标注列表面板 ----------
+  function toggleList(forceOpen) {
+    var open = forceOpen === true ? true : listPanel.style.display !== "block";
+    listPanel.style.display = open ? "block" : "none";
+    if (open) renderList();
+  }
+
+  function highlightListItem(id) {
+    var node = listPanel.querySelector('[data-item="' + id + '"]');
+    if (node) {
+      node.scrollIntoView({ block: "nearest" });
+      node.style.background = "#fff7d6";
+      setTimeout(function () { node.style.background = ""; }, 1400);
+    }
+  }
+
+  function renderList() {
+    if (listPanel.style.display !== "block") return;
+    var head = '<h4><span>标注列表（' + annotations.length + '）</span>' +
+      (annotations.length ? '<span class="annotator-clear" data-clear="1">清空全部</span>' : '') +
+      '</h4>';
+    var html = head;
+    if (annotations.length === 0) {
+      html += '<div class="annotator-item" style="color:#999;">还没有标注。点选单个元素，或拖拽框选一片区域。</div>';
+    } else {
+      for (var i = 0; i < annotations.length; i++) {
+        var a = annotations[i];
+        var isRegion = a.type === "region";
+        var missing = isRegion ? !regionRectDoc(a) : !(a.el && document.body.contains(a.el));
+        var head2 = isRegion
+          ? '▢ 区域（' + (a.members ? a.members.length : 0) + ' 元素）' + escapeHtml(a.text ? " · " + a.text : "")
+          : '&lt;' + a.tag + '&gt; ' + escapeHtml(a.text);
+        html += '<div class="annotator-item' + (missing ? ' annotator-missing' : '') + '" data-item="' + a.id + '">' +
+          '<span class="annotator-ops">' +
+            '<span class="annotator-edit" data-edit="' + a.id + '">编辑</span>' +
+            '<span class="annotator-del" data-del="' + a.id + '">删除</span>' +
+          '</span>' +
+          '<span class="annotator-idx' + (isRegion ? ' annotator-idx-region' : '') + '">' + a.id + '</span>' +
+          head2 + (missing ? ' <em style="color:#e23c3c;">(元素已变化)</em>' : '') +
+          '<div class="annotator-note">' + escapeHtml(a.note) + '</div>' +
+          '<div class="annotator-sel">' + escapeHtml(a.selector || "(无容器选择器)") + '</div>' +
+          '</div>';
+      }
+    }
+    listPanel.innerHTML = html;
+
+    var clear = listPanel.querySelector("[data-clear]");
+    if (clear) clear.onclick = clearAll;
+    var dels = listPanel.querySelectorAll("[data-del]");
+    for (var k = 0; k < dels.length; k++) {
+      (function (btn) { btn.onclick = function () { removeAnnotation(parseInt(btn.getAttribute("data-del"), 10)); }; })(dels[k]);
+    }
+    var edits = listPanel.querySelectorAll("[data-edit]");
+    for (var m = 0; m < edits.length; m++) {
+      (function (btn) { btn.onclick = function () { editAnnotation(parseInt(btn.getAttribute("data-edit"), 10)); }; })(edits[m]);
+    }
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  // ---------- 结构化导出（给 AI 看的协议格式） ----------
+  function serializeAnnotations() {
+    if (annotations.length === 0) return "（当前没有任何标注）";
+    var lines = [];
+    lines.push("页面: " + (document.title || "(无标题)") + " (" + location.href + ")");
+    lines.push("");
+    for (var i = 0; i < annotations.length; i++) {
+      var a = annotations[i];
+      if (a.type === "region") {
+        lines.push("[标注 " + a.id + "] 区域框选（含 " + (a.members ? a.members.length : 0) + " 个元素）");
+        if (a.page) lines.push("  页面区块: " + a.page);
+        if (a.selector) lines.push("  容器选择器: " + a.selector);
+        if (a.members && a.members.length) {
+          lines.push("  区域内元素:");
+          for (var m = 0; m < a.members.length; m++) {
+            var mm = a.members[m];
+            lines.push("    - <" + mm.tag + "> \"" + mm.text + "\"  选择器: " + mm.selector);
+          }
+        }
+        lines.push("  批注: " + a.note);
+      } else {
+        lines.push("[标注 " + a.id + "] 元素: <" + a.tag + "> \"" + a.text + "\"");
+        if (a.page) lines.push("  页面区块: " + a.page);
+        lines.push("  选择器: " + a.selector);
+        if (a.snippet) lines.push("  片段: " + a.snippet);
+        lines.push("  批注: " + a.note);
+      }
+      if (a.refs && a.refs.length) {
+        var names = a.refs.map(function (r, k) { return refFileName(a, r, k); });
+        lines.push("  参考图: " + a.refs.length + " 张（文件名：" + names.join("、") + "；图片数据已内嵌在本文本末尾，AI 会自动解析）");
+      }
+      lines.push("");
+    }
+    lines.push("---");
+    lines.push("请根据以上标注逐一修改对应元素（元素类用「选择器」定位、「片段」辅助确认；区域类需综合调整「区域内元素」整体），并输出修改后的完整 HTML。");
+    return lines.join("\n");
+  }
+
+  // ---------- 参考图：文件名 & 导出下载 ----------
+  function refExt(r) {
+    var du = r.dataURL || "";
+    var m = /^data:image\/([a-zA-Z0-9.+-]+)/.exec(du);
+    var ext = m ? m[1].toLowerCase() : "";
+    if (ext === "jpeg") ext = "jpg";
+    if (!ext && r.name && r.name.indexOf(".") >= 0) ext = r.name.split(".").pop().toLowerCase();
+    return ext || "png";
+  }
+  function refFileName(a, r, k) {
+    return "标注" + a.id + "-参考图" + (k + 1) + "." + refExt(r);
+  }
+  function dataURLtoBlob(dataURL) {
+    var parts = dataURL.split(",");
+    var meta = parts[0] || "";
+    var isB64 = meta.indexOf("base64") >= 0;
+    var mime = (/data:([^;]+)/.exec(meta) || [])[1] || "image/png";
+    var body = parts[1] || "";
+    if (isB64) {
+      var bin = atob(body);
+      var arr = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      return new Blob([arr], { type: mime });
+    }
+    return new Blob([decodeURIComponent(body)], { type: mime });
+  }
+  // 触发浏览器下载所有带 dataURL 的参考图，返回成功下载的数量
+  function downloadRefImages() {
+    var n = 0;
+    for (var i = 0; i < annotations.length; i++) {
+      var a = annotations[i];
+      if (!a.refs || !a.refs.length) continue;
+      for (var k = 0; k < a.refs.length; k++) {
+        var r = a.refs[k];
+        if (!r || !r.dataURL) continue;
+        try {
+          var blob = dataURLtoBlob(r.dataURL);
+          var url = URL.createObjectURL(blob);
+          var link = document.createElement("a");
+          link.href = url;
+          link.download = refFileName(a, r, k);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(function (u) { return function () { URL.revokeObjectURL(u); }; }(url), 4000);
+          n++;
+        } catch (e) { /* 单张失败不阻塞其它 */ }
+      }
+    }
+    return n;
+  }
+  function totalRefCount() {
+    var n = 0;
+    for (var i = 0; i < annotations.length; i++) n += (annotations[i].refs || []).length;
+    return n;
+  }
+
+  // 压缩参考图（等比缩到 ≤1280，JPEG 0.72），减小内嵌到文本里的 base64 体积
+  function compressDataURL(dataURL, cb) {
+    try {
+      var img = new Image();
+      img.onload = function () {
+        try {
+          var maxD = 1280, w = img.width || 1, h = img.height || 1;
+          var scale = Math.min(1, maxD / Math.max(w, h));
+          var cw = Math.max(1, Math.round(w * scale)), ch = Math.max(1, Math.round(h * scale));
+          var cv = document.createElement("canvas");
+          cv.width = cw; cv.height = ch;
+          cv.getContext("2d").drawImage(img, 0, 0, cw, ch);
+          cb(cv.toDataURL("image/jpeg", 0.72));
+        } catch (e) { cb(dataURL); }
+      };
+      img.onerror = function () { cb(dataURL); };
+      img.src = dataURL;
+    } catch (e) { cb(dataURL); }
+  }
+
+  // 异步收集所有参考图并压缩，拼成可粘贴的内嵌数据块（供 AI 自动解析）
+  function buildEmbedBlock(cb) {
+    var jobs = [];
+    for (var i = 0; i < annotations.length; i++) {
+      var a = annotations[i];
+      if (!a.refs) continue;
+      for (var k = 0; k < a.refs.length; k++) {
+        if (a.refs[k] && a.refs[k].dataURL) {
+          jobs.push({ name: refFileName(a, a.refs[k], k), dataURL: a.refs[k].dataURL });
+        }
+      }
+    }
+    if (!jobs.length) { cb("", 0); return; }
+    var out = [], done = 0;
+    jobs.forEach(function (job, idx) {
+      compressDataURL(job.dataURL, function (cdu) {
+        out[idx] = "[[[IMG:" + job.name + "]]]\n" + cdu + "\n[[[/IMG]]]";
+        done++;
+        if (done === jobs.length) {
+          var block = "\n\n=====参考图内嵌数据（base64；AI 自动解析，用户无需手动处理）=====\n" +
+                      out.join("\n") +
+                      "\n=====参考图数据结束=====";
+          cb(block, jobs.length);
+        }
+      });
+    });
+  }
+
+  function openExport() {
+    try {
+      var baseText = serializeAnnotations();
+      // 先把参考图压缩并内嵌到文本，实现"一次导出、整段粘贴即带图"
+      buildEmbedBlock(function (embedBlock, embedCount) {
+        var text = baseText + (embedBlock || "");
+        copyText(text, function (ok) {
+          showToast(ok
+            ? (embedCount ? "✓ 已复制（含 " + embedCount + " 张参考图数据），整段粘贴发我即可，无需再单独上传图片" : "✓ 已复制到剪贴板，直接粘贴发我即可")
+            : "复制受限，请在弹窗里手动全选复制");
+        });
+        showExportModal(text, embedCount);
+      });
+    } catch (err) {
+      showToast("导出出错：" + (err && err.message ? err.message : err));
+    }
+  }
+
+  function showExportModal(text, embedCount) {
+    try {
+      // 参考图同时下载为文件，作为"粘贴时图片数据被截断"的兜底
+      var refCount = totalRefCount();
+      var dl = refCount ? downloadRefImages() : 0;
+
+      var mask = document.createElement("div");
+      mask.id = "ann-modal-mask";
+      mask.setAttribute("data-annotator", "true");
+
+      var modal = document.createElement("div");
+      modal.id = "ann-modal";
+      modal.innerHTML =
+        '<header><span>导出标注（已尝试自动复制，可在此手动复制）</span><span class="annotator-del" style="cursor:pointer;color:#999;">✕</span></header>';
+
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      modal.appendChild(ta);
+
+      // —— 参考图提示 + 缩略图（兜底下载）——
+      if (refCount) {
+        var refBar = document.createElement("div");
+        refBar.style.cssText = "margin:8px 0 2px;font-size:12px;color:#237804;line-height:1.5;";
+        refBar.innerHTML = embedCount
+          ? "✅ 已把 <b>" + embedCount + "</b> 张参考图<b>内嵌进上面的文本</b>，直接<b>整段复制粘贴给我即可，无需再单独上传图片</b>。<br><span style='color:#999;'>（兜底：万一粘贴时图片数据被截断，下面缩略图也已自动下载为文件，可手动拖入。）</span>"
+          : "📎 检测到参考图但未能内嵌，请点下方缩略图逐张下载后拖进对话。";
+        modal.appendChild(refBar);
+
+        var gallery = document.createElement("div");
+        gallery.style.cssText = "display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 2px;";
+        for (var gi = 0; gi < annotations.length; gi++) {
+          var ga = annotations[gi];
+          if (!ga.refs || !ga.refs.length) continue;
+          for (var gk = 0; gk < ga.refs.length; gk++) {
+            (function (a, r, k) {
+              if (!r.dataURL) return;
+              var cell = document.createElement("div");
+              cell.style.cssText = "width:72px;text-align:center;font-size:10px;color:#666;";
+              var im = document.createElement("img");
+              im.src = r.dataURL;
+              im.title = refFileName(a, r, k) + "（点击下载）";
+              im.style.cssText = "width:72px;height:72px;object-fit:cover;border:1px solid #e6e6e6;border-radius:6px;cursor:pointer;display:block;";
+              im.onclick = function () {
+                try {
+                  var b = dataURLtoBlob(r.dataURL), u = URL.createObjectURL(b),
+                      lk = document.createElement("a");
+                  lk.href = u; lk.download = refFileName(a, r, k);
+                  document.body.appendChild(lk); lk.click(); document.body.removeChild(lk);
+                  setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+                } catch (e) {}
+              };
+              var cap = document.createElement("div");
+              cap.textContent = refFileName(a, r, k);
+              cap.style.cssText = "margin-top:2px;word-break:break-all;line-height:1.2;";
+              cell.appendChild(im); cell.appendChild(cap);
+              gallery.appendChild(cell);
+            })(ga, ga.refs[gk], gk);
+          }
+        }
+        modal.appendChild(gallery);
+      }
+
+      var footer = document.createElement("footer");
+      var copyBtn = document.createElement("button");
+      copyBtn.className = "annotator-primary";
+      copyBtn.textContent = "再次复制";
+      var closeBtn = document.createElement("button");
+      closeBtn.className = "annotator-ghost";
+      closeBtn.textContent = "关闭";
+      if (refCount) {
+        var dlBtn = document.createElement("button");
+        dlBtn.className = "annotator-ghost";
+        dlBtn.textContent = "重新下载参考图";
+        dlBtn.onclick = function () {
+          var m = downloadRefImages();
+          showToast(m ? "已重新下载 " + m + " 张参考图" : "没有可下载的参考图");
+        };
+        footer.appendChild(dlBtn);
+      }
+      footer.appendChild(copyBtn);
+      footer.appendChild(closeBtn);
+      modal.appendChild(footer);
+
+      mask.appendChild(modal);
+      document.body.appendChild(mask);
+
+      ta.focus();
+      ta.select();
+
+      function close() { if (mask.parentNode) mask.parentNode.removeChild(mask); }
+      closeBtn.onclick = close;
+      modal.querySelector("header .annotator-del").onclick = close;
+      mask.addEventListener("click", function (e) { if (e.target === mask) close(); });
+
+      copyBtn.onclick = function () {
+        ta.focus();
+        ta.select();
+        copyText(ta.value, function (ok) {
+          copyBtn.textContent = ok ? "✓ 已复制" : "请手动 Ctrl/Cmd+C";
+          setTimeout(function () { copyBtn.textContent = "再次复制"; }, 1800);
+        });
+      };
+    } catch (err) {
+      showToast("导出出错：" + (err && err.message ? err.message : err));
+    }
+  }
+
+  // ---------- 轻量 toast ----------
+  function showToast(msg) {
+    var t = document.createElement("div");
+    t.setAttribute("data-annotator", "true");
+    t.textContent = msg;
+    t.style.cssText = "position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:2147483600;background:rgba(0,0,0,.85);color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;font-family:-apple-system,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3);max-width:80vw;text-align:center;";
+    document.body.appendChild(t);
+    setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 2600);
+  }
+
+  // ---------- 沙箱兼容复制 ----------
+  function copyText(str, cb) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(str).then(function () { cb(true); }, function () { fallbackCopy(str, cb); });
+    } else {
+      fallbackCopy(str, cb);
+    }
+  }
+
+  function fallbackCopy(str, cb) {
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = str;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      ta.setAttribute("data-annotator", "true");
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      var ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      cb(ok);
+    } catch (e) {
+      cb(false);
+    }
+  }
+
+  // ---------- 全局键盘 & 点击外部关闭输入框 ----------
+  function onGlobalKey(e) {
+    if (e.key === "Escape" && active && !inputBox && !dragging) {
+      toggleMode();
+    }
+  }
+
+  function onGlobalMouseDown(e) {
+    if (inputBox && !isAnnotatorElement(e.target) && !inputBox.contains(e.target)) {
+      closeInput();
+    }
+  }
+
+  // ---------- 多页面 pin 跟随 ----------
+  function watchPages() {
+    if (typeof MutationObserver === "undefined") return;
+    var pages = document.querySelectorAll(".page");
+    if (!pages.length) return;
+    var obs = new MutationObserver(function () { renderPins(); });
+    for (var i = 0; i < pages.length; i++) {
+      obs.observe(pages[i], { attributes: true, attributeFilter: ["class"] });
+    }
+  }
+
+  // ---------- 启动 ----------
+  function boot() {
+    injectStyle();
+    buildUI();
+    load();
+    refreshCount();
+    renderPins();
+
+    document.addEventListener("mouseover", onMouseOver, true);
+    document.addEventListener("mouseout", onMouseOut, true);
+    document.addEventListener("click", onClick, true);
+    document.addEventListener("mousedown", onGlobalMouseDown, true);
+    document.addEventListener("keydown", onGlobalKey, true);
+
+    // Pointer 事件统一鼠标 + 触摸 + 手写笔
+    if (window.PointerEvent) {
+      document.addEventListener("pointerdown", onPointerDown, true);
+      document.addEventListener("pointermove", onPointerMove, true);
+      document.addEventListener("pointerup", onPointerUp, true);
+      document.addEventListener("pointercancel", endDrag, true);
+    } else {
+      // 老浏览器降级：鼠标事件
+      document.addEventListener("mousedown", onPointerDown, true);
+      document.addEventListener("mousemove", onPointerMove, true);
+      document.addEventListener("mouseup", onPointerUp, true);
+    }
+
+    window.addEventListener("scroll", renderPins, true);
+    window.addEventListener("resize", renderPins);
+    watchPages();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
