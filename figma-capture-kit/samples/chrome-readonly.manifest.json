@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0",
+  "exporter": {
+    "type": "chrome-extension",
+    "version": "1.2.2",
+    "capabilities": ["frame-png"]
+  },
+  "source": {
+    "fileKey": "abc123DEF456",
+    "fileName": null,
+    "url": "https://www.figma.com/design/abc123DEF456/chuanda?node-id=12-34",
+    "exportedAt": "2026-07-19T01:00:00.000Z"
+  },
+  "pages": [
+    {
+      "id": "page-12-34",
+      "nodeId": "12:34",
+      "layerName": null,
+      "png": "abc123DEF456-12-34-20260719-010000-000.png",
+      "width": 375,
+      "height": 812,
+      "scale": null,
+      "role": "page-reference",
+      "fidelity": "strict"
+    }
+  ],
+  "assets": [],
+  "tokens": {},
+  "constraints": {
+    "prohibited": ["redraw-provided-assets"],
+    "lockedRegions": [],
+    "editableRegions": ["content-area"]
+  }
+}

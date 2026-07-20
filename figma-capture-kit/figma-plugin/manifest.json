@@ -1,0 +1,14 @@
+{
+  "name": "Figma Capture Kit — Batch",
+  "id": "figma-capture-kit-local",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "networkAccess": {
+    "allowedDomains": ["none"],
+    "reasoning": "本地批量导出并生成任务 ZIP，不做任何网络请求，不消耗 REST 配额。"
+  },
+  "capabilities": [],
+  "permissions": []
+}

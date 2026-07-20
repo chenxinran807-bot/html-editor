@@ -1,0 +1,9 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><style>
+body{font:12px/1.5 -apple-system,"PingFang SC",sans-serif;width:320px;margin:0;padding:14px;color:#1a1a1a}h1{font-size:15px;margin:0}.hint{color:#666}.switch{display:flex;justify-content:space-between;align-items:center;padding:12px;margin:12px 0;background:#f5f5f5;border-radius:8px}label{display:block;margin:9px 0 3px;color:#666}input,select{box-sizing:border-box;width:100%;padding:7px;border:1px solid #ddd;border-radius:5px}button{width:100%;margin-top:10px;padding:9px;border:0;border-radius:6px;background:#0d99ff;color:#fff}.ghost{background:#eee;color:#222}.status{margin-top:10px;white-space:pre-wrap;color:#666}.error{color:#d93025}.ok{color:#188038}</style></head><body>
+<h1>Figma Frame 采集</h1><div class="hint">默认手动采集：先选中 Frame，再点击下方按钮。</div>
+<div class="switch"><div><strong>连续采集模式</strong><div class="hint">开启后，每次选择新 Frame 都会下载</div></div><input id="enabled" type="checkbox" style="width:auto"></div>
+<label>用途</label><select id="role"><option value="page-reference">页面参考</option><option value="global-shell">基础框架</option><option value="component-reference">组件参考</option><option value="interaction-state">交互状态</option></select>
+<label>还原强度</label><select id="fidelity"><option value="strict">严格还原</option><option value="high">高度参考</option><option value="partial">局部借鉴</option></select>
+<label>可设计区域（逗号分隔）</label><input id="editable" value="content-area">
+<button id="capture">采集当前 Frame</button><button id="reset" class="ghost">允许重新采集当前 Frame</button>
+<div id="status" class="status"></div><script src="popup.js"></script></body></html>

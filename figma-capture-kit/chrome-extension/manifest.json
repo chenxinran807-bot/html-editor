@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Figma Capture Kit (Browser)",
+  "version": "1.2.2",
+  "description": "选中 Figma Frame 后按需采集 PNG + manifest，也可主动开启连续采集。",
+  "permissions": ["activeTab", "tabs", "downloads", "storage", "clipboardRead", "debugger", "offscreen", "webNavigation"],
+  "host_permissions": ["https://www.figma.com/*", "https://figma.com/*"],
+  "action": {
+    "default_title": "Figma Capture Kit",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": { "service_worker": "background.js" }
+}
