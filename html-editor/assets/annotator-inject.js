@@ -35,6 +35,22 @@
   var startX = 0, startY = 0;
   var dragBox = null;
 
+  // ---------- 统一图标：内联 SVG，不依赖字体或网络 ----------
+  function iconSvg(name) {
+    var paths = {
+      add: '<path d="M12 5v14M5 12h14"/>',
+      list: '<path d="M5 7h14M5 12h14M5 17h10"/>',
+      done: '<path d="m5 12 4 4L19 6"/>',
+      close: '<path d="m7 7 10 10M17 7 7 17"/>',
+      text: '<path d="M4 6h16M8 6v12M5 18h6"/>',
+      image: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="m5 17 5-5 4 4 2-2 3 3"/>',
+      resize: '<path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/>',
+      reference: '<path d="M4 15 15 4l5 5L9 20H4v-5Z"/><path d="m13 6 5 5"/>',
+      attach: '<path d="m20 12-8 8a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8"/>'
+    };
+    return '<svg aria-hidden="true" viewBox="0 0 24 24">' + (paths[name] || paths.add) + '</svg>';
+  }
+
   // ---------- 工具：判断是否为标注层自身元素（避免自己点自己） ----------
   function isAnnotatorElement(el) {
     while (el) {
@@ -162,6 +178,9 @@
   // ---------- 样式注入 ----------
   function injectStyle() {
     var css = [
+      ":root{--ann-accent:#0A84FF;--ann-danger:#FF453A;--ann-text:#1D1D1F;--ann-secondary:#6E6E73;--ann-border:rgba(0,0,0,.13);--ann-surface:rgba(249,249,250,.96);}",
+      "[data-annotator=\"true\"]{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;-webkit-font-smoothing:antialiased;}",
+      "[data-annotator=\"true\"] svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;}",
       ".annotator-hl{outline:2px solid #2f7fff!important;outline-offset:1px!important;cursor:crosshair!important;}",
       "html.annotator-grabbing{touch-action:none!important;}",
       "#ann-bar{position:fixed;right:16px;bottom:16px;z-index:2147483000;display:flex;flex-direction:row-reverse;align-items:center;gap:8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',sans-serif;}",
