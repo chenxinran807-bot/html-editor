@@ -22,7 +22,7 @@ test('status recognizes an existing user login', async () => {
 
 test('beginLogin returns a QR image generated from verification URL', async () => {
   const runner = fakeRunner([
-    { verification_uri_complete: 'https://open.feishu.cn/device?code=ABCD', device_code: 'device-1' },
+    { verification_url: 'https://accounts.feishu.cn/oauth/v1/device/verify?flow_id=ABCD&user_code=EFGH', device_code: 'device-1' },
     { ok: true }
   ]);
   const auth = createAuthService({ runner, qrPath: '/tmp/figma-helper/qr.png', ensureDirectory: async () => {} });
@@ -30,7 +30,7 @@ test('beginLogin returns a QR image generated from verification URL', async () =
   assert.equal(result.deviceCode, 'device-1');
   assert.equal(result.qrPath, '/tmp/figma-helper/qr.png');
   assert.deepEqual(runner.calls[1], {
-    args: ['auth', 'qrcode', 'https://open.feishu.cn/device?code=ABCD', '--output', 'qr.png'],
+    args: ['auth', 'qrcode', 'https://accounts.feishu.cn/oauth/v1/device/verify?flow_id=ABCD&user_code=EFGH', '--output', 'qr.png'],
     options: { cwd: '/tmp/figma-helper' }
   });
 });

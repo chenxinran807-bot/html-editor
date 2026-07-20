@@ -5,7 +5,7 @@ const { promisify } = require('node:util');
 const { join, relative, resolve } = require('node:path');
 
 const execFileAsync = promisify(execFile);
-const VERSION = '2.0.0';
+const VERSION = require('../package.json').version;
 
 async function listFiles(root, current = root) {
   const entries = await readdir(current, { withFileTypes: true });

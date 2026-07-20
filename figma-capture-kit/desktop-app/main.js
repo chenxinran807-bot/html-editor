@@ -1,6 +1,7 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain, shell, nativeImage } = require('electron');
 const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
+const { readFile } = require('node:fs/promises');
 const { join } = require('node:path');
 const { homedir } = require('node:os');
 const { createAuthService } = require('./auth');
@@ -22,7 +23,7 @@ function resourcePath(...parts) {
 function larkEntryPath() {
   return app.isPackaged
     ? resourcePath('lark-cli', 'scripts', 'run.js')
-    : '/opt/homebrew/lib/node_modules/@larksuite/cli/scripts/run.js';
+    : resourcePath('node_modules', '@larksuite', 'cli', 'scripts', 'run.js');
 }
 
 async function runLark(args, options = {}) {
@@ -94,17 +95,26 @@ async function initialize() {
 
   ipcMain.handle('state:get', () => currentState);
   ipcMain.handle('auth:begin', async () => {
-    updateState({ phase: 'authorizing' });
-    const result = await auth.beginLogin();
-    pendingDeviceCode = result.deviceCode;
-    updateState({ phase: 'awaiting-scan', qrPath: result.qrPath, verificationUrl: result.verificationUrl });
+    try {
+      updateState({ phase: 'authorizing', message: null, canRetryAuth: false });
+      const result = await auth.beginLogin();
+      pendingDeviceCode = result.deviceCode;
+      const qrData = `data:image/png;base64,${(await readFile(result.qrPath)).toString('base64')}`;
+      updateState({ phase: 'awaiting-scan', qrData, verificationUrl: result.verificationUrl });
+    } catch (error) {
+      updateState({ phase: 'error', message: `授权二维码生成失败：${error.message}`, canRetryAuth: true });
+    }
     return currentState;
   });
   ipcMain.handle('auth:finish', async (_event, deviceCode) => {
-    const result = await auth.finishLogin(deviceCode || pendingDeviceCode);
-    updateState({ ...result, qrPath: null, verificationUrl: null });
-    startUploader();
-    app.setLoginItemSettings({ openAtLogin: true, openAsHidden: true });
+    try {
+      const result = await auth.finishLogin(deviceCode || pendingDeviceCode);
+      updateState({ ...result, qrData: null, verificationUrl: null, message: null, canRetryAuth: false });
+      startUploader();
+      app.setLoginItemSettings({ openAtLogin: true, openAsHidden: true });
+    } catch (error) {
+      updateState({ phase: 'error', message: `授权未完成：${error.message}`, canRetryAuth: true });
+    }
     return currentState;
   });
   ipcMain.handle('plugin:open-folder', () => shell.openPath(resourcePath('figma-plugin')));

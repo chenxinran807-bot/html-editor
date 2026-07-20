@@ -9,7 +9,7 @@ function userFromStatus(result) {
 
 function deviceFlowFromResult(result) {
   const data = result?.data || result || {};
-  const verificationUrl = data.verification_uri_complete || data.verification_uri || data.verificationUrl;
+  const verificationUrl = data.verification_url || data.verification_uri_complete || data.verification_uri || data.verificationUrl;
   const deviceCode = data.device_code || data.deviceCode;
   if (!verificationUrl || !deviceCode) throw new Error('飞书登录未返回二维码地址或设备码');
   return { verificationUrl, deviceCode };

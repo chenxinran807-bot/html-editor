@@ -9,7 +9,7 @@ const copy = {
   ready: ['已连接飞书', '正在启动下载目录监听。'],
   idle: ['等待采集', '在 Figma 中多选页面并运行批量采集插件，任务会自动上传。'],
   uploading: ['正在上传', '任务已通过本地校验，正在上传飞书。'],
-  success: ['上传完成', '刚采集的页面已经可以由 Aime 使用。'],
+  success: ['上传完成', '刚采集的页面已经可以由兼容 prd-demo Skill 的 Agent 使用。'],
   error: ['上传失败', '本地任务仍然保留，请检查网络或重新登录后重试。']
 };
 
@@ -19,11 +19,11 @@ function render(next) {
   elements.title.textContent = title;
   elements.message.textContent = state.message ? `${message} ${state.message}` : message;
   elements.dot.className = `dot ${state.phase}`;
-  elements.login.hidden = state.phase !== 'auth-required';
+  elements.login.hidden = state.phase !== 'auth-required' && !state.canRetryAuth;
   elements.completeLogin.hidden = state.phase !== 'awaiting-scan';
-  elements.retry.hidden = state.phase !== 'error';
-  elements.qr.hidden = state.phase !== 'awaiting-scan' || !state.qrPath;
-  if (!elements.qr.hidden) elements.qr.src = `file://${state.qrPath}?t=${Date.now()}`;
+  elements.retry.hidden = state.phase !== 'error' || state.canRetryAuth;
+  elements.qr.hidden = state.phase !== 'awaiting-scan' || !state.qrData;
+  if (!elements.qr.hidden) elements.qr.src = state.qrData;
   elements.task.hidden = !state.taskId;
   elements.task.textContent = state.taskId ? `任务 ID：${state.taskId}` : '';
 }

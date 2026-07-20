@@ -1,11 +1,12 @@
 import { packager } from '@electron/packager';
-import { cp, mkdir, rm, access } from 'node:fs/promises';
+import { cp, mkdir, rm, access, readFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const projectRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const { version } = JSON.parse(await readFile(join(projectRoot, 'package.json'), 'utf8'));
 const outDir = join(projectRoot, 'dist', 'desktop');
-const larkCliSource = process.env.LARK_CLI_SOURCE || '/opt/homebrew/lib/node_modules/@larksuite/cli';
+const larkCliSource = process.env.LARK_CLI_SOURCE || join(projectRoot, 'node_modules', '@larksuite', 'cli');
 
 await access(join(larkCliSource, 'scripts', 'run.js')).catch(() => {
   throw new Error(`找不到可打包的 lark-cli：${larkCliSource}。请先在构建机安装 @larksuite/cli。`);
@@ -20,8 +21,8 @@ const [bundleDirectory] = await packager({
   name: 'Figma采集助手',
   executableName: 'Figma采集助手',
   appBundleId: 'com.bytedance.internal.figma-capture-helper',
-  appVersion: '2.0.0',
-  buildVersion: '2.0.0',
+  appVersion: version,
+  buildVersion: version,
   platform: 'darwin',
   arch: 'arm64',
   overwrite: true,
