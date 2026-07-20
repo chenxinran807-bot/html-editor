@@ -211,7 +211,7 @@
       "#ann-inspector .annotator-inspector-foot button{min-height:32px;padding:0 12px;border:0;border-radius:8px;font:500 13px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;cursor:pointer;}",
       "#ann-inspector [data-action=cancel]{background:rgba(0,0,0,.065);color:var(--ann-text);}",
       "#ann-inspector [data-action=save]{background:var(--ann-accent);color:#fff;}",
-      "@media(max-width:640px){#ann-inspector{left:8px!important;right:8px!important;top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom));width:auto;max-height:72vh;overflow:auto;}#ann-inspector button{min-height:44px!important;}#ann-toolbar{bottom:calc(8px + env(safe-area-inset-bottom));}#ann-toolbar button span:not(.annotator-count){display:none;}}",
+      "@media(max-width:640px){#ann-inspector{left:8px!important;right:8px!important;top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom));width:auto;max-height:72vh;overflow:auto;}#ann-inspector button{min-height:44px!important;}#ann-toolbar{bottom:calc(8px + env(safe-area-inset-bottom));gap:1px;padding:4px;}#ann-toolbar button{gap:4px;padding:0 7px;font-size:11px;}#ann-toolbar svg{width:15px;height:15px;}}",
       ".annotator-hl{outline:2px solid #2f7fff!important;outline-offset:1px!important;cursor:crosshair!important;}",
       "html.annotator-grabbing{touch-action:none!important;}",
       "#ann-toolbar{position:fixed;left:50%;bottom:18px;z-index:2147483000;display:flex;align-items:center;gap:4px;transform:translateX(-50%);padding:5px;background:var(--ann-surface);border:1px solid var(--ann-border);border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.08);backdrop-filter:blur(24px);}",
@@ -1092,7 +1092,7 @@
             }
           }
           showToast(ok
-            ? (embedCount ? "✓ 已复制（含 " + embedCount + " 张参考图数据），整段粘贴发我即可，无需再单独上传图片" : "✓ 已复制到剪贴板，直接粘贴发我即可")
+            ? (embedCount ? "已复制，包含 " + embedCount + " 张参考图，回到 Agent 对话粘贴即可" : "已复制，回到 Agent 对话粘贴即可")
             : "复制受限，请在弹窗里手动全选复制");
         });
         showExportModal(text, embedCount);

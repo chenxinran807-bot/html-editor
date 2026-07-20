@@ -21,3 +21,8 @@ test('uses one inline SVG icon factory and macOS visual tokens', () => {
   assert.match(source, /--ann-danger:\s*#FF453A/i);
   assert.match(source, /-apple-system/);
 });
+
+test('keeps action labels visible on narrow screens', () => {
+  assert.doesNotMatch(source, /#ann-toolbar button span:not\([^)]*\)\{display:none/);
+  assert.match(source, /@media\(max-width:640px\).*#ann-toolbar button\{[^}]*font-size:11px/s);
+});
