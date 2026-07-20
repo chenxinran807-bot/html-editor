@@ -183,11 +183,12 @@
       "[data-annotator=\"true\"] svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;}",
       ".annotator-hl{outline:2px solid #2f7fff!important;outline-offset:1px!important;cursor:crosshair!important;}",
       "html.annotator-grabbing{touch-action:none!important;}",
-      "#ann-bar{position:fixed;right:16px;bottom:16px;z-index:2147483000;display:flex;flex-direction:row-reverse;align-items:center;gap:8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',sans-serif;}",
-      "#ann-toggle{background:#2f7fff;color:#fff;border:none;border-radius:22px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);}",
-      "#ann-toggle.on{background:#e23c3c;}",
-      ".annotator-mini{background:#fff;color:#333;border:1px solid #ddd;border-radius:18px;padding:8px 12px;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12);}",
-      ".annotator-mini[disabled]{opacity:.5;cursor:not-allowed;}",
+      "#ann-toolbar{position:fixed;left:50%;bottom:18px;z-index:2147483000;display:flex;align-items:center;gap:4px;transform:translateX(-50%);padding:5px;background:var(--ann-surface);border:1px solid var(--ann-border);border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.08);backdrop-filter:blur(24px);}",
+      "#ann-toolbar button{appearance:none;display:flex;align-items:center;gap:7px;min-height:38px;padding:0 12px;border:0;border-radius:9px;background:transparent;color:var(--ann-text);font:500 13px/1 -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;cursor:pointer;white-space:nowrap;}",
+      "#ann-toolbar button:hover{background:rgba(0,0,0,.055);}",
+      "#ann-toolbar [data-action=mark][aria-pressed=true]{background:rgba(10,132,255,.12);color:var(--ann-accent);}",
+      "#ann-toolbar [data-action=finish]{background:var(--ann-accent);color:#fff;}",
+      "#ann-toolbar .annotator-count{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:rgba(0,0,0,.08);font-size:10px;}",
       "#ann-dragbox{position:fixed;z-index:2147482500;border:1.5px dashed #2f7fff;background:rgba(47,127,255,.12);pointer-events:none;}",
       ".annotator-region{position:absolute;z-index:2147481500;border:1.5px dashed #e23c3c;background:rgba(226,60,60,.06);pointer-events:none;border-radius:4px;}",
       ".annotator-pin{position:absolute;z-index:2147482000;min-width:18px;height:18px;line-height:18px;padding:0 4px;background:#e23c3c;color:#fff;font-size:11px;font-weight:700;text-align:center;border-radius:9px;box-shadow:0 1px 4px rgba(0,0,0,.35);transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;font-family:sans-serif;}",
@@ -238,22 +239,26 @@
 
   function buildUI() {
     bar = document.createElement("div");
-    bar.id = "ann-bar";
+    bar.id = "ann-toolbar";
     bar.setAttribute("data-annotator", "true");
+    bar.setAttribute("role", "toolbar");
+    bar.setAttribute("aria-label", "页面标注工具");
 
     toggleBtn = document.createElement("button");
     toggleBtn.id = "ann-toggle";
-    toggleBtn.textContent = "✎ 开始标注";
+    toggleBtn.setAttribute("data-action", "mark");
+    toggleBtn.setAttribute("aria-pressed", "false");
+    toggleBtn.innerHTML = iconSvg("add") + "<span>标记修改</span>";
     toggleBtn.onclick = toggleMode;
 
     listBtn = document.createElement("button");
-    listBtn.className = "annotator-mini";
-    listBtn.textContent = "标注列表 (0)";
+    listBtn.setAttribute("data-action", "list");
+    listBtn.innerHTML = iconSvg("list") + '<span>我的修改</span><span id="ann-count" class="annotator-count">0</span>';
     listBtn.onclick = function () { toggleList(); };
 
     exportBtn = document.createElement("button");
-    exportBtn.className = "annotator-mini";
-    exportBtn.textContent = "导出";
+    exportBtn.setAttribute("data-action", "finish");
+    exportBtn.innerHTML = iconSvg("done") + "<span>完成标注</span>";
     exportBtn.onclick = openExport;
 
     bar.appendChild(toggleBtn);
@@ -268,14 +273,17 @@
   }
 
   function refreshCount() {
-    listBtn.textContent = "标注列表 (" + annotations.length + ")";
+    var count = document.getElementById("ann-count");
+    if (count) count.textContent = annotations.length;
   }
 
   // ---------- 标注模式开关 ----------
   function toggleMode() {
     active = !active;
     toggleBtn.classList.toggle("on", active);
-    toggleBtn.textContent = active ? "✓ 退出标注" : "✎ 开始标注";
+    toggleBtn.setAttribute("aria-pressed", active ? "true" : "false");
+    var label = toggleBtn.querySelector("span");
+    if (label) label.textContent = active ? "退出标记" : (annotations.length ? "继续标记" : "标记修改");
     if (!active) {
       clearHover();
       endDrag();
