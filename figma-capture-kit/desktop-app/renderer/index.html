@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Figma 采集助手</title>
+  <style>
+    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; background:#f5f6f8; color:#1f2329; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:28px; }
+    .shell { min-height:560px; display:flex; flex-direction:column; }
+    .brand { display:flex; gap:12px; align-items:center; margin-bottom:24px; }
+    .mark { width:44px; height:44px; border-radius:13px; display:grid; place-items:center; background:#161823; color:white; font-weight:800; font-size:22px; }
+    h1 { font-size:22px; margin:0; }
+    .sub { color:#646a73; font-size:13px; margin-top:4px; }
+    .card { background:white; border:1px solid #e5e6eb; border-radius:16px; padding:20px; box-shadow:0 8px 24px rgba(31,35,41,.06); }
+    .status { display:flex; align-items:center; gap:10px; font-weight:650; margin-bottom:12px; }
+    .dot { width:10px; height:10px; border-radius:50%; background:#bbbfc4; }
+    .dot.ready,.dot.idle,.dot.success { background:#34c759; }
+    .dot.uploading,.dot.authorizing { background:#3370ff; }
+    .dot.error,.dot.auth-required { background:#f54a45; }
+    p { color:#4e5969; line-height:1.65; font-size:14px; }
+    button { width:100%; border:0; border-radius:10px; padding:12px 14px; font-size:15px; font-weight:650; cursor:pointer; background:#3370ff; color:white; margin-top:10px; }
+    button.secondary { background:#eef1f8; color:#1f2329; }
+    button.ghost { background:transparent; color:#3370ff; }
+    .qr { width:220px; height:220px; object-fit:contain; display:block; margin:16px auto; background:white; }
+    .privacy { font-size:12px; color:#8f959e; }
+    .task { font-family:ui-monospace, SFMono-Regular, monospace; background:#f2f3f5; border-radius:8px; padding:10px; word-break:break-all; font-size:12px; }
+    .footer { margin-top:auto; display:flex; gap:8px; }
+    .footer button { font-size:12px; padding:8px; }
+    [hidden] { display:none !important; }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand"><div class="mark">F</div><div><h1>Figma 采集助手</h1><div class="sub">批量采集 · 自动校验 · 上传飞书</div></div></div>
+    <section class="card">
+      <div class="status"><span id="dot" class="dot"></span><span id="title">正在启动…</span></div>
+      <p id="message">正在检查飞书登录状态。</p>
+      <img id="qr" class="qr" alt="飞书登录二维码" hidden>
+      <div id="task" class="task" hidden></div>
+      <button id="login" hidden>扫码登录飞书</button>
+      <button id="completeLogin" hidden>我已扫码，完成授权</button>
+      <button id="plugin" class="secondary">打开 Figma 插件文件夹</button>
+      <button id="retry" hidden>重新尝试上传</button>
+      <p class="privacy">首次授权后，助手会把你主动采集的 PNG、SVG、图层文字和素材上传到个人飞书云空间。不会上传原始 .fig 文件。</p>
+    </section>
+    <div class="footer"><button id="drive" class="ghost">打开飞书云空间</button><button id="quit" class="ghost">退出助手</button></div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

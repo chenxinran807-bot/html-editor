@@ -1,0 +1,18 @@
+{
+  "name": "figma-capture-kit",
+  "version": "2.0.0",
+  "private": true,
+  "bin": {
+    "figma-capture-uploader": "uploader/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "build:plugin": "node scripts/build-plugin.mjs",
+    "check": "node --check chrome-extension/core.js && node --check chrome-extension/background.js && node --check chrome-extension/offscreen.js && node --check chrome-extension/popup.js && node --check figma-plugin/code.js"
+  },
+  "dependencies": {
+    "@noble/hashes": "^1.8.0",
+    "esbuild": "^0.25.6",
+    "jszip": "^3.10.1"
+  }
+}
