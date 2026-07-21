@@ -54,6 +54,20 @@ function click(document, selector) {
   element.dispatchEvent(new document.defaultView.MouseEvent('click', { bubbles: true }));
 }
 
+function drag(document, selector, from, to) {
+  const handle = document.querySelector(selector);
+  assert.ok(handle, `missing handle: ${selector}`);
+  handle.dispatchEvent(new document.defaultView.MouseEvent('pointerdown', {
+    bubbles: true, clientX: from.x, clientY: from.y, button: 0
+  }));
+  document.dispatchEvent(new document.defaultView.MouseEvent('pointermove', {
+    bubbles: true, clientX: to.x, clientY: to.y, button: 0
+  }));
+  document.dispatchEvent(new document.defaultView.MouseEvent('pointerup', {
+    bubbles: true, clientX: to.x, clientY: to.y, button: 0
+  }));
+}
+
 function selectTarget(document) {
   click(document, '[data-action="mark"]');
   const target = document.querySelector('#target-title');
@@ -222,6 +236,57 @@ test('shows image-specific crop and radius controls', () => {
   click(document, '[data-value="border-radius:small"]');
   assert.equal(image.style.objectFit, 'cover');
   assert.equal(image.style.borderRadius, '8px');
+});
+
+test('drags the selected edge to change external spacing with a live guide', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-button');
+  target.style.marginRight = '0px';
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  click(document, '[data-spacing-mode="external"]');
+  drag(document, '[data-spacing-handle="right"]', { x: 200, y: 120 }, { x: 212, y: 120 });
+  assert.equal(target.style.marginRight, '12px');
+  assert.match(document.querySelector('[data-spacing-readout]').textContent, /12/);
+});
+
+test('drags the selected edge to change internal spacing', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-button');
+  target.style.paddingLeft = '0px';
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  click(document, '[data-spacing-mode="internal"]');
+  drag(document, '[data-spacing-handle="left"]', { x: 100, y: 120 }, { x: 108, y: 120 });
+  assert.equal(target.style.paddingLeft, '8px');
+  assert.equal(document.querySelector('.annotator-spacing-overlay').getAttribute('data-annotator'), 'true');
+});
+
+test('does not guess external spacing when no adjacent content exists', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('main');
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  const external = document.querySelector('[data-spacing-mode="external"]');
+  assert.equal(external.disabled, true);
+  assert.match(document.querySelector('[data-section="spacing"]').textContent, /附近没有可作为参照的内容/);
+  assert.equal(document.querySelector('[data-spacing-mode="internal"]').getAttribute('aria-pressed'), 'true');
+});
+
+test('Escape cancels an in-progress spacing drag and restores the original value', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-button');
+  target.style.paddingLeft = '3px';
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  click(document, '[data-spacing-mode="internal"]');
+  const handle = document.querySelector('[data-spacing-handle="left"]');
+  handle.dispatchEvent(new window.MouseEvent('pointerdown', { bubbles: true, clientX: 100, clientY: 100, button: 0 }));
+  document.dispatchEvent(new window.MouseEvent('pointermove', { bubbles: true, clientX: 112, clientY: 100, button: 0 }));
+  assert.equal(target.style.paddingLeft, '15px');
+  document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  assert.equal(target.style.paddingLeft, '3px');
+  assert.equal(document.querySelector('.annotator-spacing-overlay'), null);
 });
 
 test('reviews changes in plain language and prepares Agent handoff', () => {

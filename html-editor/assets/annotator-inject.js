@@ -32,6 +32,8 @@
   // 指针拖拽状态
   var pointerDown = false;
   var previewDraft = null;
+  var spacingOverlay = null;
+  var spacingDragState = null;
   var dragging = false;
   var startX = 0, startY = 0;
   var dragBox = null;
@@ -247,6 +249,13 @@
       "#ann-inspector .annotator-segmented{display:flex;gap:1px;padding:2px;border-radius:8px;background:rgba(0,0,0,.065);}",
       "#ann-inspector .annotator-segmented button{flex:1;min-height:30px;padding:0 7px;border:0;border-radius:6px;background:transparent;color:var(--ann-text);font:500 11px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;cursor:pointer;}",
       "#ann-inspector .annotator-segmented button[aria-pressed=true]{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.14);}",
+      ".annotator-spacing-overlay{position:fixed;z-index:2147483150;pointer-events:none;border:1px solid var(--ann-accent);box-sizing:border-box;}",
+      ".annotator-spacing-handle{position:absolute;width:18px;height:18px;padding:0;border:2px solid #fff;border-radius:9px;background:var(--ann-accent);box-shadow:0 1px 5px rgba(0,0,0,.3);pointer-events:auto;cursor:ew-resize;}",
+      ".annotator-spacing-handle[data-spacing-handle=left]{left:-10px;top:calc(50% - 9px);}",
+      ".annotator-spacing-handle[data-spacing-handle=right]{right:-10px;top:calc(50% - 9px);}",
+      ".annotator-spacing-handle[data-spacing-handle=top]{top:-10px;left:calc(50% - 9px);cursor:ns-resize;}",
+      ".annotator-spacing-handle[data-spacing-handle=bottom]{bottom:-10px;left:calc(50% - 9px);cursor:ns-resize;}",
+      ".annotator-spacing-readout{position:absolute;left:50%;top:-34px;transform:translateX(-50%);min-width:44px;padding:4px 7px;border-radius:6px;background:#1d1d1f;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;text-align:center;white-space:nowrap;}",
       "#ann-inspector details.annotator-section summary{font-size:12px;font-weight:600;color:var(--ann-secondary);cursor:pointer;}",
       "#ann-inspector .annotator-actions{margin:0 8px;border:1px solid var(--ann-border);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.64);}",
       "#ann-inspector .annotator-action{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:0 11px;border:0;border-bottom:1px solid var(--ann-border);background:transparent;color:var(--ann-text);font:500 13px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;text-align:left;cursor:pointer;}",
@@ -690,6 +699,134 @@
     return Math.round(size * ratio * 10) / 10 + "px";
   }
 
+  function spacingProperty(mode, direction) {
+    var suffix = direction.charAt(0).toUpperCase() + direction.slice(1);
+    return mode === "internal" ? "padding" + suffix : "margin" + suffix;
+  }
+
+  function positionSpacingOverlay(el) {
+    if (!spacingOverlay || !el) return;
+    var rect = el.getBoundingClientRect();
+    spacingOverlay.style.left = rect.left + "px";
+    spacingOverlay.style.top = rect.top + "px";
+    spacingOverlay.style.width = Math.max(1, rect.width) + "px";
+    spacingOverlay.style.height = Math.max(1, rect.height) + "px";
+  }
+
+  function destroySpacingOverlay() {
+    spacingDragState = null;
+    if (spacingOverlay && spacingOverlay.parentNode) spacingOverlay.parentNode.removeChild(spacingOverlay);
+    spacingOverlay = null;
+  }
+
+  function createSpacingOverlay(el, draft, getMode) {
+    destroySpacingOverlay();
+    spacingOverlay = document.createElement("div");
+    spacingOverlay.className = "annotator-spacing-overlay";
+    spacingOverlay.setAttribute("data-annotator", "true");
+    var readout = document.createElement("div");
+    readout.className = "annotator-spacing-readout";
+    readout.setAttribute("data-spacing-readout", "true");
+    readout.textContent = "拖动边缘";
+    spacingOverlay.appendChild(readout);
+    ["top", "right", "bottom", "left"].forEach(function (direction) {
+      var handle = document.createElement("button");
+      handle.type = "button";
+      handle.className = "annotator-spacing-handle";
+      handle.setAttribute("data-spacing-handle", direction);
+      handle.setAttribute("aria-label", "调整" + direction + "方向间距");
+      handle.addEventListener("pointerdown", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var mode = getMode();
+        var property = spacingProperty(mode, direction);
+        spacingDragState = {
+          el: el, draft: draft, mode: mode, direction: direction, property: property,
+          startX: event.clientX, startY: event.clientY,
+          startValue: parseFloat(getComputedStyle(el)[property]) || 0,
+          readout: readout
+        };
+      });
+      spacingOverlay.appendChild(handle);
+    });
+    document.body.appendChild(spacingOverlay);
+    positionSpacingOverlay(el);
+  }
+
+  function spacingDelta(state, event) {
+    var dx = event.clientX - state.startX;
+    var dy = event.clientY - state.startY;
+    if (state.mode === "external") {
+      if (state.direction === "right") return dx;
+      if (state.direction === "left") return -dx;
+      if (state.direction === "bottom") return dy;
+      return -dy;
+    }
+    if (state.direction === "left") return dx;
+    if (state.direction === "right") return -dx;
+    if (state.direction === "top") return dy;
+    return -dy;
+  }
+
+  function onSpacingPointerMove(event) {
+    if (!spacingDragState) return;
+    var state = spacingDragState;
+    var value = Math.max(0, Math.min(160, Math.round(state.startValue + spacingDelta(state, event))));
+    previewStyle(state.draft, state.mode === "internal" ? "internal-spacing" : "external-spacing", state.property.replace(/[A-Z]/g, function (c) { return "-" + c.toLowerCase(); }), value + "px", "px", state.direction);
+    state.readout.textContent = value + " px";
+    positionSpacingOverlay(state.el);
+    event.preventDefault();
+  }
+
+  function onSpacingPointerUp() {
+    spacingDragState = null;
+  }
+
+  function hasAdjacentContent(el) {
+    if (!el || !el.parentElement) return false;
+    var siblings = el.parentElement.children;
+    for (var i = 0; i < siblings.length; i++) {
+      var sibling = siblings[i];
+      if (sibling === el || isAnnotatorElement(sibling)) continue;
+      var tag = sibling.tagName ? sibling.tagName.toLowerCase() : "";
+      if (tag !== "script" && tag !== "style" && tag !== "link" && tag !== "meta") return true;
+    }
+    return false;
+  }
+
+  function renderSpacingControls(sectionNode, el, draft) {
+    var canUseExternal = hasAdjacentContent(el);
+    var mode = canUseExternal ? "external" : "internal";
+    var row = document.createElement("div");
+    row.className = "annotator-segmented";
+    [["external", "和旁边元素的距离"], ["internal", "内部留白"]].forEach(function (item) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.textContent = item[1];
+      button.setAttribute("data-spacing-mode", item[0]);
+      button.setAttribute("aria-pressed", item[0] === mode ? "true" : "false");
+      if (item[0] === "external" && !canUseExternal) button.disabled = true;
+      button.onclick = function () {
+        mode = item[0];
+        var buttons = row.querySelectorAll("button");
+        for (var i = 0; i < buttons.length; i++) buttons[i].setAttribute("aria-pressed", buttons[i] === button ? "true" : "false");
+      };
+      row.appendChild(button);
+    });
+    sectionNode.appendChild(row);
+    var help = document.createElement("div");
+    help.className = "annotator-field-label";
+    help.textContent = "拖动页面中蓝色边缘，直接看效果";
+    sectionNode.appendChild(help);
+    if (!canUseExternal) {
+      var warning = document.createElement("div");
+      warning.className = "annotator-field-label";
+      warning.textContent = "附近没有可作为参照的内容，可改用内部留白";
+      sectionNode.appendChild(warning);
+    }
+    createSpacingOverlay(el, draft, function () { return mode; });
+  }
+
   function renderRadiusControl(sectionNode, el, draft) {
     var current = getComputedStyle(el).borderRadius || "0px";
     var known = { "0px": "square", "8px": "small", "16px": "large", "999px": "pill" };
@@ -848,6 +985,7 @@
       }, false);
       renderRadiusControl(sectionNodes.appearance, previewEl, previewDraft);
     } else if (sectionNodes.appearance && previewEl) {
+      renderSpacingControls(sectionNodes.spacing, previewEl, previewDraft);
       renderAppearanceControls(sectionNodes.appearance, previewEl, previewDraft);
     }
 
@@ -1024,6 +1162,7 @@
   }
 
   function closeInput() {
+    destroySpacingOverlay();
     rollbackDraft(previewDraft);
     previewDraft = null;
     if (inputBox && inputBox.parentNode) inputBox.parentNode.removeChild(inputBox);
@@ -1638,6 +1777,8 @@
       document.addEventListener("pointerdown", onPointerDown, true);
       document.addEventListener("pointermove", onPointerMove, true);
       document.addEventListener("pointerup", onPointerUp, true);
+      document.addEventListener("pointermove", onSpacingPointerMove, true);
+      document.addEventListener("pointerup", onSpacingPointerUp, true);
       document.addEventListener("pointercancel", endDrag, true);
     } else {
       // 老浏览器降级：鼠标事件
