@@ -5,7 +5,7 @@
  * 设计目标：让用户在任意 HTML 预览里点选元素 / 拖拽框选区域 + 写批注，
  * 导出成 AI 可解析的结构化文本。
  *
- * v1.2.0：
+ * v1.3.0：
  *  - 拖拽框选区域（rubber-band）：框住一片区域，自动识别区域内元素 + 公共容器
  *  - 移动端触摸支持：Pointer 事件统一鼠标/触摸/手写笔
  * v1.1.0：
@@ -1082,8 +1082,14 @@
     var top = Math.min(y + 12, vh - 480);
     box.style.left = Math.max(8, left) + "px";
     box.style.top = Math.max(8, top) + "px";
-    ta.focus();
-    if (presetNote) ta.select();
+    if (presetNote) {
+      ta.focus();
+      ta.select();
+    } else if (typeof contentInput !== "undefined" && contentInput) {
+      contentInput.focus();
+    } else {
+      closeBtn.focus();
+    }
 
     function submit() {
       var note = ta.value.trim();
@@ -1450,18 +1456,16 @@
     lines.push("---");
     lines.push("请根据以上标注逐一修改对应元素（元素类用「选择器」定位、「片段」辅助确认；区域类需综合调整「区域内元素」整体），并输出修改后的完整 HTML。");
     var context = workflowContext();
-    if (context.taskId || context.sessionId || context.prdFingerprint) {
-      lines.push("");
-      lines.push("```prd-demo-annotations");
-      lines.push(JSON.stringify({
-        schemaVersion: "1.0",
-        taskId: context.taskId,
-        sessionId: context.sessionId,
-        prdFingerprint: context.prdFingerprint,
-        annotations: structuredAnnotations()
-      }, null, 2));
-      lines.push("```");
-    }
+    lines.push("");
+    lines.push("```prd-demo-annotations");
+    lines.push(JSON.stringify({
+      schemaVersion: "1.0",
+      taskId: context.taskId || null,
+      sessionId: context.sessionId || null,
+      prdFingerprint: context.prdFingerprint || null,
+      annotations: structuredAnnotations()
+    }, null, 2));
+    lines.push("```");
     return lines.join("\n");
   }
 

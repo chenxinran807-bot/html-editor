@@ -127,6 +127,21 @@ test('saves exact visual changes beside the plain-language intent', () => {
   }]);
 });
 
+test('exports exact changes for standalone HTML without workflow metadata', () => {
+  const { document } = bootFixture();
+  const target = document.querySelector('#target-title');
+  target.style.fontSize = '16px';
+  selectTarget(document);
+  click(document, '[data-control="font-size-increase"]');
+  document.querySelector('#ann-inspector textarea').value = '字号按当前效果';
+  click(document, '#ann-inspector [data-action="save"]');
+  click(document, '[data-action="finish"]');
+  const payload = structuredPayload(document);
+  assert.equal(payload.taskId, null);
+  assert.equal(payload.sessionId, null);
+  assert.equal(payload.annotations[0].changes[0].after, '17px');
+});
+
 test('cancel restores every previewed inline style', () => {
   const { document } = bootFixture();
   const target = document.querySelector('#target-title');
@@ -163,6 +178,7 @@ test('shows only text controls for a text selection', () => {
   assert.equal(inspector.querySelector('[data-section="image"]'), null);
   assert.doesNotMatch(inspector.textContent, /字大一点|文字更醒目|增加间距/);
   assert.equal(inspector.querySelector('[data-action="save"]').textContent, '保存修改');
+  assert.equal(document.activeElement, inspector.querySelector('[data-control="text-content"]'));
 });
 
 test('shows appearance and spacing controls for a container selection', () => {

@@ -17,7 +17,7 @@ description: 给任意 HTML 页面注入可视化标注层，让用户在 AI 生
 
 ## 核心设计（为什么这样做）
 
-- **注入而非改写**：脚本只把标注层 `<script data-annotator="true">` 贴到 `</body>` 前，原页面的结构和逻辑一字不动。这是它能作用于任意 HTML 的前提。
+- **注入而非改写**：脚本只把标注层 `<script data-annotator="true">` 贴到 `</body>` 前。控件操作会临时预览，取消或保存后恢复业务页面原状；真正修改仍由 Agent 根据标注执行。
 - **零污染零冲突**：交互代码整体用 IIFE 包裹，不写全局变量；所有类名 `annotator-` 前缀、id `ann-` 前缀，不会撞用户样式。
 - **捕获阶段拦截**：标注模式下 `mouseover/click` 以捕获阶段绑定并 `preventDefault + stopPropagation`，即便原页面有点击逻辑也会被优先拦截，点了不误触发。
 - **点选 + 拖拽框选**：基于 Pointer 事件统一鼠标/触摸/手写笔，位移超阈值判为「拖拽框选」，收集区域内 60% 以上落框的最外层元素并算出公共容器，作为「区域标注」；否则判为「点选」单元素。
@@ -63,7 +63,10 @@ python3 scripts/wrap_annotator.py <input.html> -o <output.html> \
 - 点「标记修改」后，hover 元素蓝框高亮；点击内容后打开 macOS Inspector 风格的修改面板。
 - **两种标注方式**：①**点选**单个元素；②**拖拽框选**一片区域（橡皮筋框），自动识别区域内元素与公共容器，作为一条「区域标注」。
 - **移动端支持**：基于 Pointer 事件，手机/平板可点选与拖拽框选（标注模式下页面暂停滚动，退出即恢复）。
-- 修改面板先问「你希望这里怎么调整？」，提供四个普通用户可以直接理解的入口：**修改文字 / 更换图片 / 调整位置或大小 / 参考其他样式**；也可以直接写要求或添加参考图。
+- 选中页面内容后，面板只展示与它相关的设置：文字可改内容、字号、字重、行距、对齐和颜色；按钮或卡片可改间距、背景、边框、圆角和阴影；图片可选择替换参考、裁切方式和圆角。
+- 颜色可从**当前页面常用颜色 / 屏幕吸色 / 系统取色器**选择。屏幕吸色仅在浏览器支持时出现，其余入口始终可用。
+- 间距不要求用户理解像素、margin 或 padding：直接拖动选中元素四边，通过页面实时效果调整；面板只使用“**和旁边元素的距离 / 内部留白**”。
+- 技术数值、选择器和色值默认收在“高级信息”；自然语言输入仍用于补充控件无法表达的要求或添加参考图。
 - **回车保存 · Shift+回车换行 · Esc 取消**；保存后元素/区域上出现数字 pin（区域另有虚线轮廓）。
 - 「我的修改」可查看、编辑、删除单条，或清空全部；不会向用户展示 CSS 选择器、HTML 片段和图片编码等技术字段。
 - 「完成标注」会整理并复制修改要求，明确提示用户回到 Agent 对话粘贴发送；剪贴板受限时才展开手动复制区。
@@ -81,7 +84,10 @@ python3 scripts/wrap_annotator.py <input.html> -o <output.html> \
 
 ### 3. 用户把修改要求粘回对话
 
-完成标注时一次复制两部分：普通用户可读的修改摘要，以及 fenced `prd-demo-annotations` JSON。结构化部分包含 `taskId`、`sessionId`、prdFingerprint 和每条标注的 `targetClauseId`、targetNodeSelector、intent、`scope: target-only`。
+完成标注时一次复制两部分：普通用户可读的修改摘要，以及 fenced `prd-demo-annotations` JSON。结构化部分包含 `taskId`、`sessionId`、prdFingerprint 和每条标注的 `targetClauseId`、targetNodeSelector、intent、`scope: target-only`、`changes[]`。
+
+- `changes[]` 保存控件产生的确定值：`category / property / before / after / unit / direction`。消费 Agent 应优先执行这些确定值，再用 `intent` 补充控件无法表达的要求。
+- 旧 HTML 导出的标注没有 `changes` 时按空数组处理，继续只消费 `intent`，不得因此拒绝旧标注。
 
 - 业务节点带 `data-prd-clause` 时优先用 `targetClauseId` 稳定定位。
 - 旧 HTML 没有 clause 时保留 selector，并把 `targetClauseId` 设为 `null`，不得编造。
