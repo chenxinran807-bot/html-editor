@@ -8,6 +8,7 @@ const { execFileSync } = require('node:child_process');
 const expected = [
   'html-editor/CHANGELOG.md',
   'html-editor/SKILL.md',
+  'html-editor/agents/openai.yaml',
   'html-editor/assets/annotator-inject.js',
   'html-editor/scripts/wrap_annotator.py'
 ];
@@ -22,5 +23,5 @@ test('release ZIP contains only Skill runtime and documentation files', async ()
     .filter(entry => !entry.endsWith('/'))
     .sort();
   assert.deepEqual(entries, expected);
-  assert.match(fs.readFileSync(result.checksumPath, 'utf8'), /^[a-f0-9]{64}  html-editor-1\.1\.0\.zip\n$/);
+  assert.match(fs.readFileSync(result.checksumPath, 'utf8'), /^[a-f0-9]{64}  html-editor-1\.2\.0\.zip\n$/);
 });

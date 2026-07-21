@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0 — Workflow Handoff
+
+- 包装器新增 taskId、sessionId 和 prdFingerprint 三项可选绑定参数。
+- 导出同时包含普通用户摘要与 `prd-demo-annotations` 结构化 JSON。
+- 带 `data-prd-clause` 的节点优先输出稳定 `targetClauseId`；旧页面不伪造条款 ID。
+- 所有修改请求明确为 `target-only`，供消费 Agent 做未受影响页面回归。
+- 强制升级会同时移除旧 workflow meta，避免一个 HTML 绑定多个生成会话。
+- 标注层继续只记录意图，不修改任何业务页面 DOM。
+
 ## 1.1.0 — macOS Overlay
 
 - 将原有 emoji 密集工具条升级为 macOS 原生 Inspector 风格的 HTML 浮层。

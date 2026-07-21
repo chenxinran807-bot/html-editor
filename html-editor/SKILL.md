@@ -1,7 +1,6 @@
 ---
 name: html-editor
 description: 给任意 HTML 页面注入可视化标注层，让用户在 AI 生成的 HTML 预览里"指哪打哪"地反馈——直接在页面上点选元素、写批注，再导出成结构化文本粘回对话，AI 据此精确修改对应元素。**凡是涉及生成 HTML、网页、网页原型、产品原型、demo、页面、落地页、报告页的任务，都应默认启用本技能，在产出 HTML 时注入标注层，方便用户直接在页面上圈点反馈迭代。** 也适用于对已有的任意静态 HTML 收集可视化修改意见，或迭代打磨 AI 生成的 HTML/原型/Demo/报告/落地页。触发词：生成 html、生成网页、网页原型、html 原型、产品原型、原型、prototype、做个页面、做个 demo、demo、设计页面、设计、落地页、标注、框选标注、点选批注、可视化反馈、在页面上标记、annotate html、给 HTML 加批注。
-author: chenxinran.25
 ---
 
 # HTML Editor
@@ -38,6 +37,17 @@ author: chenxinran.25
 python3 scripts/wrap_annotator.py <input.html> -o <output.html>
 ```
 
+由 `prd-demo` 生成的页面必须同时绑定生成上下文：
+
+```bash
+python3 scripts/wrap_annotator.py <input.html> -o <output.html> \
+  --task-id <taskId> \
+  --session-id <sessionId> \
+  --prd-fingerprint <sha256:...>
+```
+
+三个参数必须同时提供。包装器只写入不可见的 workflow meta 和标注脚本，不修改业务 DOM。
+
 - 不带 `-o` 时默认输出到 `<input>.annotated.html`（不覆盖原文件）。
 - 幂等：对已注入过的 HTML 不会重复注入。
 - **升级老页面**：如果 HTML 里已注入过旧版本标注层，用 `--force`（或 `--replace`）会先剥离旧的 `<script/style data-annotator>` 再注入最新版：
@@ -70,6 +80,12 @@ python3 scripts/wrap_annotator.py <input.html> -o <output.html>
 ```
 
 ### 3. 用户把修改要求粘回对话
+
+完成标注时一次复制两部分：普通用户可读的修改摘要，以及 fenced `prd-demo-annotations` JSON。结构化部分包含 `taskId`、`sessionId`、prdFingerprint 和每条标注的 `targetClauseId`、targetNodeSelector、intent、`scope: target-only`。
+
+- 业务节点带 `data-prd-clause` 时优先用 `targetClauseId` 稳定定位。
+- 旧 HTML 没有 clause 时保留 selector，并把 `targetClauseId` 设为 `null`，不得编造。
+- 消费 Agent 必须核对 taskId/sessionId 后再修改，并证明未受影响页面保持不变。
 
 导出格式固定如下：
 

@@ -7,10 +7,11 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const ALLOWED = [
   'SKILL.md',
   'CHANGELOG.md',
+  'agents/openai.yaml',
   'assets/annotator-inject.js',
   'scripts/wrap_annotator.py'
 ];
