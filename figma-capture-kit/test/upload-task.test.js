@@ -27,18 +27,54 @@ test('uploadValidatedTask creates folders and uploads completion marker last', a
   const adapter = {
     async currentUser() { return { openId: 'ou_me' }; },
     async ensureFolder(name, parent) { calls.push(['folder', name, parent]); return `${parent || 'root'}/${name}`; },
+    async findFile(name, parent) { calls.push(['find', name, parent]); return null; },
     async uploadBytes(name, bytes, folder) { calls.push(['upload', name, folder, bytes.length]); return { token: name }; }
   };
-  await uploadValidatedTask(fixture(), { adapter, rootFolderToken: 'root-token', now: () => '2026-07-20T01:00:00.000Z' });
+  const result = await uploadValidatedTask(fixture(), { adapter, rootFolderToken: 'root-token', now: () => '2026-07-20T01:00:00.000Z' });
 
-  assert.deepEqual(calls.slice(0, 3), [
+  assert.deepEqual(calls.filter(call => call[0] === 'folder').slice(0, 3), [
     ['folder', 'prd-demo-tasks', 'root-token'],
     ['folder', '123e4567-e89b-42d3-a456-426614174000', 'root-token/prd-demo-tasks'],
     ['folder', 'pages', 'root-token/prd-demo-tasks/123e4567-e89b-42d3-a456-426614174000']
   ]);
+  const marker = calls.find(call => call[0] === 'upload' && call[1] === '_PRD_DEMO_ROOT.json');
+  assert.ok(marker, '首次上传应创建任务根目录标记');
+  assert.ok(calls.indexOf(marker) < calls.findIndex(call => call[0] === 'folder' && call[1] === fixture().task.taskId));
   assert.equal(calls.at(-1)[1], '_COMPLETE.json');
   const taskUpload = calls.find(call => call[0] === 'upload' && call[1] === 'task.json');
   assert.ok(taskUpload);
+  assert.equal(result.pageCount, 0);
+});
+
+test('uploadValidatedTask reuses a matching immutable root marker', async () => {
+  const uploads = [];
+  const adapter = {
+    async currentUser() { return { openId: 'ou_me' }; },
+    async ensureFolder(name, parent) { return `${parent || 'root'}/${name}`; },
+    async findFile() { return { token: 'marker-token', name: '_PRD_DEMO_ROOT.json', type: 'file' }; },
+    async downloadJson(token) {
+      assert.equal(token, 'marker-token');
+      return { rootSchemaVersion: '1.0', kind: 'prd-demo-task-root', ownerOpenId: 'ou_me', createdBy: 'figma-capture-helper' };
+    },
+    async uploadBytes(name) { uploads.push(name); }
+  };
+  await uploadValidatedTask(fixture(), { adapter });
+  assert.equal(uploads.filter(name => name === '_PRD_DEMO_ROOT.json').length, 0);
+});
+
+test('uploadValidatedTask rejects a root marker owned by another user before creating task folder', async () => {
+  const folders = [];
+  const adapter = {
+    async currentUser() { return { openId: 'ou_me' }; },
+    async ensureFolder(name, parent) { folders.push(name); return `${parent || 'root'}/${name}`; },
+    async findFile() { return { token: 'marker-token', name: '_PRD_DEMO_ROOT.json', type: 'file' }; },
+    async downloadJson() {
+      return { rootSchemaVersion: '1.0', kind: 'prd-demo-task-root', ownerOpenId: 'ou_someone_else', createdBy: 'figma-capture-helper' };
+    },
+    async uploadBytes() { throw new Error('should not upload'); }
+  };
+  await assert.rejects(() => uploadValidatedTask(fixture(), { adapter }), /不属于当前飞书用户/);
+  assert.deepEqual(folders, ['prd-demo-tasks']);
 });
 
 test('uploadValidatedTask never uploads completion after a payload failure', async () => {
@@ -46,6 +82,7 @@ test('uploadValidatedTask never uploads completion after a payload failure', asy
   const adapter = {
     async currentUser() { return { openId: 'ou_me' }; },
     async ensureFolder(name) { return name; },
+    async findFile() { return null; },
     async uploadBytes(name) {
       names.push(name);
       if (name === '1-2.png') throw new Error('network failed');

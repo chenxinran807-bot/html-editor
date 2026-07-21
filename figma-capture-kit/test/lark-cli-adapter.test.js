@@ -1,5 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const { writeFile } = require('node:fs/promises');
 const { createLarkCliAdapter } = require('../uploader/lark-cli');
 
 test('adapter prepends bundled cli entry and electron node mode', async () => {
@@ -37,4 +38,36 @@ test('adapter keeps notifier suppression when custom env is provided', async () 
   assert.equal(calls[0].options.env.CUSTOM_VALUE, 'yes');
   assert.equal(calls[0].options.env.LARKSUITE_CLI_NO_UPDATE_NOTIFIER, '1');
   assert.equal(calls[0].options.env.LARKSUITE_CLI_NO_SKILLS_NOTIFIER, '1');
+});
+
+test('adapter finds only an exact file match in a folder', async () => {
+  const adapter = createLarkCliAdapter({
+    execFile: async () => ({
+      stdout: JSON.stringify({ ok: true, data: { files: [
+        { type: 'file', name: '_PRD_DEMO_ROOT.json.backup', token: 'wrong-1' },
+        { type: 'folder', name: '_PRD_DEMO_ROOT.json', token: 'wrong-2' },
+        { type: 'file', name: '_PRD_DEMO_ROOT.json', token: 'right' }
+      ] } })
+    })
+  });
+  assert.deepEqual(await adapter.findFile('_PRD_DEMO_ROOT.json', 'root-token'), {
+    type: 'file', name: '_PRD_DEMO_ROOT.json', token: 'right'
+  });
+});
+
+test('adapter downloads and parses JSON through a relative output path', async () => {
+  const calls = [];
+  const adapter = createLarkCliAdapter({
+    execFile: async (binary, args, options) => {
+      calls.push({ binary, args, options });
+      const outputIndex = args.indexOf('--output');
+      assert.notEqual(outputIndex, -1);
+      assert.equal(args[outputIndex + 1], '_PRD_DEMO_ROOT.json');
+      await writeFile(`${options.cwd}/${args[outputIndex + 1]}`, '{"kind":"prd-demo-task-root"}\n');
+      return { stdout: JSON.stringify({ ok: true, data: { path: args[outputIndex + 1] } }) };
+    }
+  });
+  assert.deepEqual(await adapter.downloadJson('file-token'), { kind: 'prd-demo-task-root' });
+  assert.ok(calls[0].args.includes('+download'));
+  assert.ok(calls[0].args.includes('file-token'));
 });

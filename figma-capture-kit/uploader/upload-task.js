@@ -4,11 +4,37 @@ function jsonBytes(value) {
   return new TextEncoder().encode(`${JSON.stringify(value, null, 2)}\n`);
 }
 
+async function ensureRootMarker(adapter, rootFolderToken, user) {
+  const expected = {
+    rootSchemaVersion: '1.0',
+    kind: 'prd-demo-task-root',
+    ownerOpenId: user.openId,
+    createdBy: 'figma-capture-helper'
+  };
+  const existing = await adapter.findFile('_PRD_DEMO_ROOT.json', rootFolderToken);
+  if (!existing) {
+    await adapter.uploadBytes('_PRD_DEMO_ROOT.json', jsonBytes(expected), rootFolderToken);
+    return expected;
+  }
+  const actual = await adapter.downloadJson(existing.token);
+  if (actual.rootSchemaVersion !== expected.rootSchemaVersion) {
+    throw new Error('任务根目录协议版本不受支持');
+  }
+  if (actual.kind !== expected.kind || actual.createdBy !== expected.createdBy) {
+    throw new Error('任务根目录标记无效');
+  }
+  if (actual.ownerOpenId !== expected.ownerOpenId) {
+    throw new Error('任务根目录不属于当前飞书用户');
+  }
+  return actual;
+}
+
 async function uploadValidatedTask(validated, options) {
   const adapter = options.adapter;
   const user = await adapter.currentUser();
   if (!user?.openId) throw new Error('无法取得当前飞书用户 openId');
   const root = await adapter.ensureFolder('prd-demo-tasks', options.rootFolderToken || null);
+  await ensureRootMarker(adapter, root, user);
   const taskFolder = await adapter.ensureFolder(validated.task.taskId, root);
   const directories = new Map([['', taskFolder]]);
   const requiredDirectories = [...validated.files.keys()]
@@ -49,7 +75,12 @@ async function uploadValidatedTask(validated, options) {
     fileCount: validated.task.files.length + 1
   };
   await adapter.uploadBytes('_COMPLETE.json', jsonBytes(completion), taskFolder);
-  return { taskId: validated.task.taskId, folderToken: taskFolder, completion };
+  return {
+    taskId: validated.task.taskId,
+    folderToken: taskFolder,
+    completion,
+    pageCount: Array.isArray(validated.manifest?.pages) ? validated.manifest.pages.length : 0
+  };
 }
 
-module.exports = { jsonBytes, uploadValidatedTask };
+module.exports = { jsonBytes, ensureRootMarker, uploadValidatedTask };

@@ -1,6 +1,6 @@
 const { execFile } = require('node:child_process');
 const { promisify } = require('node:util');
-const { mkdtemp, writeFile, rm } = require('node:fs/promises');
+const { mkdtemp, writeFile, readFile, rm } = require('node:fs/promises');
 const { tmpdir } = require('node:os');
 const { join } = require('node:path');
 
@@ -51,6 +51,22 @@ function createLarkCliAdapter(options = {}) {
       const token = created.folder_token || created.token;
       if (!token) throw new Error(`创建飞书文件夹后未返回 token: ${name}`);
       return token;
+    },
+    async findFile(name, folderToken) {
+      return (await list(folderToken)).find(item => item.type === 'file' && item.name === name) || null;
+    },
+    async downloadJson(fileToken) {
+      const temporary = await mkdtemp(join(tmpdir(), 'figma-task-download-'));
+      const name = '_PRD_DEMO_ROOT.json';
+      try {
+        await run([
+          'drive', '+download', '--file-token', fileToken, '--output', name,
+          '--as', 'user', '--json'
+        ], { cwd: temporary });
+        return JSON.parse(await readFile(join(temporary, name), 'utf8'));
+      } finally {
+        await rm(temporary, { recursive: true, force: true });
+      }
     },
     async uploadBytes(name, bytes, folderToken) {
       const temporary = await mkdtemp(join(tmpdir(), 'figma-task-upload-'));
