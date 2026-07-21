@@ -1,65 +1,99 @@
-# Figma 任务交接（飞书云空间）
+# Figma 任务交接协议
 
-当 Figma 素材不是零散文件，而是由 Figma 插件**多选 Frame 批量导出并上传飞书云空间**形成的"任务"时，按本文件消费。目的——让用户能稳定地把"一批页面"作为一个任务交给 skill，浏览器 Agent 侧只需触发 prd-demo，由 skill 自动取当前用户最新任务再进 Grounding。
+本文件用于消费 Figma 插件多选 Frame 后形成的一批设计任务。云空间操作使用宿主 Agent 已有的飞书云空间能力；不要把具体 MCP 名称、私有脚本路径或凭证写死在 Skill 中。
 
-> 依赖隔离：所有云空间操作以**意图声明**表达——"使用 lark-drive skill 完成云空间列目录 / 下载"——不在本文件写死具体 MCP 脚本路径，也不穿透调用其实现。
+## 目录
 
-## 端到端链路
-
-```
-Figma 插件多选 Frame 批量导出
-   → 上传飞书云空间统一任务目录，返回 taskId
-   → 浏览器 Agent 调 prd-demo
-   → skill 用 lark-drive 读当前用户最新 completed 任务
-   → 下载 manifest / PNG / SVG
-   → 进阶段① Grounding
-```
-
-## 固定任务目录
-
-飞书云空间下固定路径：
-
-```
-/prd-demo-tasks/{userId}__{taskId}/
-├── task.json            # 任务元信息
-├── *.manifest.json      # 统一 Figma Capture Manifest（schema 1.0）
-└── <素材>               # PNG / SVG，路径以 manifest 目录为基准解析
+```text
+/prd-demo-tasks/
+├── _PRD_DEMO_ROOT.json
+└── {taskId}/
+    ├── task.json
+    ├── figma-export.manifest.json
+    ├── pages/
+    ├── assets/
+    ├── _COMPLETE.json
+    └── consumption/
+        └── {sessionId}.json
 ```
 
-### task.json 字段
+任务目录必须是 `/prd-demo-tasks/{taskId}/`。用户身份不编码进目录名，而由根标记和 `task.json.ownerOpenId` 双重校验。
 
-| 字段 | 说明 |
-|---|---|
-| `userId` | 任务所属用户，用于筛选"当前用户"的任务 |
-| `taskId` | 任务唯一 ID |
-| `fileKey` | Figma 文件 key |
-| `nodeId[]` | 本次批量导出的 Frame nodeId 列表 |
-| `status` | `pending` / `completed`（两段式，见下） |
-| `createdAt` | 创建时间（ISO8601），取最新一条的依据 |
-| `manifest` | 关联的 `*.manifest.json` 文件名（可多份） |
-| `schemaVersion` | 任务协议版本 |
-| `consumedAt` | 被 skill 消费后回写的时间戳 |
+## 根目录发现
 
-`*.manifest.json` 沿用统一 Figma Capture Manifest schema 1.0（`exporter/capabilities/pages/assets/tokens/constraints`），消费规则完全复用 [figma-materials.md](figma-materials.md)。
+按精确名称搜索 `prd-demo-tasks`，只接受包含以下不可变 `_PRD_DEMO_ROOT.json` 的目录：
 
-## 两段式 status（避免读到半成品）
+```json
+{
+  "rootSchemaVersion": "1.0",
+  "kind": "prd-demo-task-root",
+  "ownerOpenId": "<当前飞书用户>",
+  "createdBy": "figma-capture-helper"
+}
+```
 
-上传方**先传素材，最后才写 task.json 并置 `status=completed`**。因此：
+- 忽略其他用户的根目录。
+- 当前用户只有一个合法根目录时继续。
+- 当前用户存在多个合法根目录时停止，让用户选择；不得合并任务或按更新时间猜测。
 
-- skill **只消费 `status=completed`** 的任务，忽略 `pending`（素材可能还没传完）。
-- 在 `completed` 任务中取 `createdAt` **最新一条**消费。
-- 消费完成后**回写 `consumedAt`**，便于区分已处理任务、避免重复消费。
+## 完成信号与最新任务
 
-## 消费流程（skill 侧）
+`_COMPLETE.json` 是唯一完成信号。不存在该文件的目录是半成品，直接忽略。
 
-1. **列目录**：使用 lark-drive skill 列 `/prd-demo-tasks/` 下属于当前用户（`userId` 前缀匹配 `{userId}__`）的任务目录。
-2. **选任务**：读各 `task.json`，筛 `status=completed`，按 `createdAt` 取最新一条。
-3. **下载素材**：使用 lark-drive skill 下载该任务目录的 `*.manifest.json` 与其引用的 PNG/SVG 到本地工作目录；素材相对路径以 manifest 所在目录为基准解析（`resolve(dirname(manifestPath), pages[].png)`）。
-4. **回写消费标记**：使用 lark-drive skill 在该 `task.json` 写入 `consumedAt`。
-5. **进 Grounding**：把下载的 manifest 交给 [figma-materials.md](figma-materials.md) 探测形状 / 能力降级，再进阶段① 建立映射与合同。
+在所有完成任务中按 `_COMPLETE.json.completedAt` 降序选最新候选，不得按 `task.json.createdAt`。最新候选损坏时拒绝，并询问一次是否检查上一条完整任务；未经用户确认不得静默回退。
 
-## 边界
+## 下载后的强校验
 
-- 找不到 `completed` 任务：告知用户当前无可消费任务，或回退到常规"用户直接上传 PRD/截图/manifest"的输入流程（SKILL.md 阶段①）。
-- 当前用户信息可从环境变量 `AIME_CURRENT_USER` 获取，用于匹配任务目录的 `userId`。
-- 本文件只处理"云空间任务"这一输入来源；无任务时不改变其他输入（PRD/截图/本地 manifest）的既有流程。
+将候选下载到会话隔离目录，再运行：
+
+```bash
+python3 scripts/figma_task_runtime.py --owner <当前用户 openId> <候选任务目录...>
+```
+
+校验必须覆盖：
+
+1. 目录名、`task.json.taskId` 和 `_COMPLETE.json.taskId` 一致。
+2. `ownerOpenId` 等于当前飞书用户。
+3. manifest 是 `exporter + pages` 的 unified 结构，capabilities 显式声明。
+4. `task.files[]` 的相对路径、`bytes` 与逐文件 SHA-256 一致。
+5. `_COMPLETE.json.manifestSha256` 与真实 manifest 一致。
+6. manifest 引用的 PNG/SVG 均已登记且位于任务目录内。
+7. fileKey + nodeId[] 与本次任务一起进入生成会话，防止同名 Frame 或多个 Figma 标签串稿。
+
+任何一项失败都不得进入生成。
+
+## 消费规则
+
+校验通过后，把 manifest 交给 [figma-materials.md](figma-materials.md) 解析：
+
+- capability 缺失表示“未知”，不能推断成“原设计没有”。
+- `variable/style` token 才能作为正式 locked 值；`observed` 仅作参考。
+- 素材文件绑定关系进入 locked；`redraw-provided-assets` 进入 prohibited。
+- `fidelity=strict` 不等于锁死整页；只锁 `lockedRegions`，`editableRegions` 保持可设计。
+
+## 不可变消费回执
+
+生成与 html-editor 注入成功后，新增 `consumption/{sessionId}.json`。不得修改 `task.json` 或 `_COMPLETE.json`；`consumedAt` 只存在于独立回执中。
+
+```json
+{
+  "consumptionSchemaVersion": "1.0",
+  "sessionId": "<生成会话>",
+  "taskId": "<设计任务>",
+  "prdFingerprint": "sha256:<PRD 摘要>",
+  "agentUserOpenId": "<当前用户>",
+  "consumedAt": "<ISO-8601>",
+  "result": {
+    "status": "completed",
+    "demoUrl": "<可选>",
+    "artifact": "<产物定位>"
+  },
+  "decisions": {
+    "pageScope": [],
+    "primaryFlow": "",
+    "frameBindings": []
+  }
+}
+```
+
+回执上传失败时保留本地待重试文件，明确提示用户；不能改写原任务或声称完整闭环成功。

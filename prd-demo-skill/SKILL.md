@@ -1,58 +1,78 @@
 ---
 name: prd-demo
 description: >-
-  从 PRD / 截图 / 参考图 / Figma 导出稿生成高保真、可交互、可预览的产品原型。
-  这个 skill 只做一件底座默认不做、但对做原型最关键的事：**生成前先与用户逐个确认关键设计决策——一次只问一个问题，关键项没拿到用户回答就不动手生成。**
-  视觉还原本身信任 Aime 底座能力，skill 不规定还原手法（只保留"高保真、别退化成线框"这一句提醒）。
-  EN triggers: prototype, high-fidelity prototype, mockup, interactive demo, build page from PRD,
-  restore screenshot, restore design, Figma export to prototype, refine prototype, iterate on prototype.
-  中文触发词：做原型、高保真原型、可交互原型、做demo、生成原型、根据PRD生成页面、还原截图、还原设计稿、
-  Figma导出稿生成原型、改原型、精修原型、迭代原型。
-author: chenxinran.25
+  从 PRD、截图、参考图或 Figma 批量采集任务生成高保真、可交互、可预览且可标注回改的产品 Demo。
+  使用场景包括：根据 PRD 做原型/交互 Demo、还原设计稿或截图、消费刚采集的 Figma Frame、精修或迭代已有原型。
+  生成前必须一次只确认一个关键决策；页面范围、主用户动线和 Frame 用途与还原强度不可跳过。
+  EN triggers: prototype, interactive demo, PRD to demo, Figma task to prototype, restore design, refine prototype.
 ---
 
-# PRD → 高保真交互原型
+# PRD → 高保真交互 Demo
 
-这个 skill 的存在只有一个核心理由：**Aime 底座本身已经很会还原设计图和写高保真 HTML，唯独不会主动"先问你、再动手"。** 所以本 skill 只补这一件事，其余交给底座，别添乱。
+## 核心目标
 
-## 唯一铁律：生成前逐个确认（不可跳过）
+让用户负责产品意图和选择参考 Frame，让 Agent 负责发现、校验、映射、生成、注入和回归。不要让用户搬运 manifest、taskId、nodeId 或本机路径。
 
-**收到做原型的需求后，你的第一步不是写代码，而是先问用户。** 违反这条就是任务失败。
+## 固定流程
 
-1. 先读完所有能拿到的材料（PRD、截图、参考图、Figma 导出），在心里列出**关键设计决策清单**：
-   页面范围 / 信息架构 / 主用户动线 / 关键组件形态 / 参考图各区域是"严格还原·结构参考·不采用" / 图片素材用途 / 整体视觉方向。
-2. **一次只问一个问题**：从清单里挑**当前影响最大的一个**未决点，给出**你的默认推荐**，让用户一句话确认或纠偏；拿到回答后**再问下一个**。
-3. **严格禁止**：
-   - 一次性抛一长串问题 / 大批量 A/B/C 选项 / 一屏几十项让用户逐条回；
-   - 自己替用户拍板关键决策、或自问自答当成"已确认"；
-   - 把用户沉默当作同意；
-   - 在还有关键决策悬空时就开始生成。
-4. 已在材料里写清楚的**不要问**；无关紧要的细节自己按惯例定，别打扰用户。
-5. 当"关键决策都拿到用户答复"后，用 **3–5 行小结**复述你将怎么做（做哪些页面、怎么还原、主要交互），再开始生成。
+### 1. 读取输入
 
-**为什么只做这件事**：真实数据显示，不确认就生成 = 靠猜、猜错就整体返工，这是做原型最大的痛点；而"教模型怎么还原"几乎不提升还原度、反而分散注意力拖累质量。所以确认交给这个 skill，还原交给底座。
+先读取当前对话中的 PRD、截图、参考图和用户刚才的说明。
 
-## 生成时：一句话提醒
+- 缺少 PRD：只要求用户补充 PRD，不同时追问设计细节。
+- 只有普通截图或本地素材：按常规输入继续，不强行连接飞书。
+- 用户提到“刚采集的设计 / Figma 任务 / 批量 Frame”：读取 [unified-workflow.md](references/unified-workflow.md) 和 [figma-task-handoff.md](references/figma-task-handoff.md)，执行 Figma 任务主路径。
 
-有参考图/设计稿/Figma 导出时，**高保真还原、别退化成黑白线框或"意思到了"的近似；有真实素材（PNG/SVG/token）就直接用**。产物零运行时依赖、双击即可预览，关键状态（空/加载/错误/成功）都做出来。除此之外，怎么还原信任你自己的判断，不需要额外方法论。
+### 2. 自动取得可信 Figma 任务
 
-## 精修（用户对已有原型提修改时）
+具备飞书云空间能力时，使用当前飞书用户身份发现唯一有效任务根目录。只把存在 `_COMPLETE.json` 的目录视为完成任务，并按 `_COMPLETE.json.completedAt` 选择最新候选；再校验 `ownerOpenId`、taskId、fileKey + nodeId、manifest capability、相对路径、字节数和 SHA-256。
 
-优先用 html-editor skill 让用户在预览上圈选+批注，拿到标注后**只改目标元素、不误伤其它页面**。未安装 html-editor 时把安装链接发给用户（Mira 市场标注 skill，一次安装长期复用）：
-`https://mira.bytedance.com/app-link/customize?page=skills%2Fdetail&skill_key=html-annotator&type=market&source=market`
+下载后运行：
 
-## 进阶：可回归 / 可验收的工程化交付（可选，默认不启用）
+```bash
+python3 scripts/figma_task_runtime.py --owner <当前用户 openId> <候选任务目录...>
+```
 
-**默认完全不需要下面这些**，也不要主动加载。仅当用户或项目**明确要求**"可机器校验、可回归、工程化验收"的原型时，才按需引用（用哪份读哪份，不要一次性全读）：
+- 最新完成任务损坏：说明时间与失败原因，只问一次是否检查上一条完整任务；未确认不得自动回退。
+- 没有飞书能力：明确降级为任务文件夹链接或本地 ZIP，不得声称已自动读取。
+- 没有完成任务：只提示用户回到 Figma 批量采集。
 
-- 逐个确认的话术与范式：[clarification.md](references/clarification.md)
-- 机器可读设计合同 + 稳定 ID 追踪：[contract-schema.md](references/contract-schema.md)、[contract.schema.json](references/contract.schema.json)
-- `data-prd-*` 追踪属性与生成细则：[prototype-builder.md](references/prototype-builder.md)
-- 设计语言分层（official/observed/inferred）：[design-language.md](references/design-language.md)
-- 受保护素材白名单与哈希校验：[asset-whitelist.md](references/asset-whitelist.md)
-- 质量门禁与确定性校验器：[quality-gates.md](references/quality-gates.md)、`scripts/validate_prototype.py`
-- 需求映射与视觉参考判定：[requirements-ir.md](references/requirements-ir.md)、[visual-reference.md](references/visual-reference.md)
-- Figma 素材/任务消费：[figma-materials.md](references/figma-materials.md)、[figma-task-handoff.md](references/figma-task-handoff.md)
-- 标注驱动的精修闭环细则：[iteration-handoff.md](references/iteration-handoff.md)
+### 3. 逐个确认三个核心问题
 
-> 即便走工程化交付，"生成前逐个确认"依然优先——合同、门禁只是把已确认的决策固化下来，不能替代向用户确认。
+创建或恢复 `workflow-state/{sessionId}.json`，严格按顺序一次只问一个：
+
+1. `pageScope`：本次生成哪些页面和状态；给出材料支持的推荐清单。
+2. `primaryFlow`：用户如何进入、操作、看到结果并返回；用一句可观察路径表达。
+3. `frameBindings`：每个 Frame 用于基础框架、严格还原、组件参考、交互状态还是不采用，并确认还原强度。
+
+三个问题不可跳过。材料已经明确时，不要求用户重新描述，只给出推荐并让用户一句话确认。仅当存在会改变核心结果的歧义或冲突时，才在三问后追加一个问题。完整话术和状态规则见 [clarification.md](references/clarification.md)。
+
+每次回答后立即保存状态。授权、下载或工具中断后从下一未确认项继续，不重复提问。PRD 改变时重新计算 `prdFingerprint`，只重开受影响决策；无法判定影响范围时明确说明并从 `pageScope` 重新确认。
+
+### 4. 生成并直接交付
+
+全部关键项确认后，用 **3–5 行**复述页面范围、主流程、Frame 绑定和关键状态，然后直接生成，不再问“是否开始”。
+
+- 有参考设计时高保真还原，禁止退化成线框或“意思到了”的近似。
+- 直接复用已提供 PNG/SVG；遵守 manifest capabilities、locked/editable/prohibited 约束。细则见 [figma-materials.md](references/figma-materials.md)。
+- 缺失 capability 表示未知，不等于设计中不存在。
+- 产物零运行时网络依赖，关键空/加载/错误/成功状态可操作。
+- 需要工程化追踪时读取 [contract-schema.md](references/contract-schema.md)、[prototype-builder.md](references/prototype-builder.md) 和 [quality-gates.md](references/quality-gates.md)。
+
+### 5. 自动注入标注层
+
+生成成功后必须用 `html-editor` 包装器注入标注层，并传入 taskId、sessionId 和 prdFingerprint。注入失败时 Demo 不算完整交付；修复后再交付，或明确提供未注入版本和失败原因。
+
+用户完成标注并粘贴回当前对话后，读取 [iteration-handoff.md](references/iteration-handoff.md)：只修改 `targetClauseId` / target-only 范围，回归所有受影响条款，并证明未受影响页面没有变化。
+
+### 6. 写独立消费回执
+
+Demo 与标注层均成功后，构造并上传 `consumption/{sessionId}.json`。不得修改 `task.json` 或 `_COMPLETE.json`。回执失败不影响已生成 Demo 的文件可用性，但必须明确提示“回执未写入”并允许重试，不能声称完整闭环成功。
+
+## 按需参考
+
+- 逐题确认与冲突处理：[clarification.md](references/clarification.md)
+- 云端任务发现、校验与降级：[unified-workflow.md](references/unified-workflow.md)、[figma-task-handoff.md](references/figma-task-handoff.md)
+- Figma manifest 与能力降级：[figma-materials.md](references/figma-materials.md)
+- 标注驱动的局部回改：[iteration-handoff.md](references/iteration-handoff.md)
+- 工程化合同与回归：[contract-schema.md](references/contract-schema.md)、[quality-gates.md](references/quality-gates.md)
