@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { mkdtemp, mkdir, writeFile, rm } = require('node:fs/promises');
+const { mkdtemp, mkdir, writeFile, readFile, rm } = require('node:fs/promises');
 const { join } = require('node:path');
 const { tmpdir } = require('node:os');
 const { listFiles, assertReleaseContents } = require('../desktop-app/release');
@@ -36,4 +36,17 @@ test('release rejects credentials and development debris', () => {
     'auth-qr.png'
   ];
   assert.throws(() => assertReleaseContents(files), /禁止文件/);
+});
+
+test('2.0.2 release documents immutable roots and daily two-step use', async () => {
+  const project = join(__dirname, '..');
+  const packageJson = JSON.parse(await readFile(join(project, 'package.json'), 'utf8'));
+  const uploader = await readFile(join(project, 'uploader', 'upload-task.js'), 'utf8');
+  const usage = await readFile(join(project, 'release-docs', '使用说明.md'), 'utf8');
+  assert.equal(packageJson.version, '2.0.2');
+  assert.match(uploader, /_PRD_DEMO_ROOT\.json/);
+  assert.match(usage, /一次安装/);
+  assert.match(usage, /日常两步/);
+  assert.match(usage, /兼容的 Agent/);
+  assert.match(usage, /任务文件夹链接或 ZIP/);
 });

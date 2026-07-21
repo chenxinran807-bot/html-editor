@@ -1,6 +1,6 @@
 # Figma 采集助手
 
-面向内部设计师的 Figma 批量采集与飞书任务上传工具。当前安装包版本为 `2.0.1`。
+面向内部设计师的 Figma 批量采集与飞书任务上传工具。当前安装包版本为 `2.0.2`。
 
 ## 用户主路径
 
@@ -39,7 +39,7 @@ npm run desktop:start
 npm run release:mvp
 ```
 
-产物位于 `dist/Figma采集助手-MVP-v2.0.1-arm64.zip`，并同时生成 SHA-256 校验文件。
+产物位于 `dist/Figma采集助手-MVP-v2.0.2-arm64.zip`，并同时生成 SHA-256 校验文件。
 
 ## 架构分工
 
