@@ -1,6 +1,13 @@
 # 跨 Agent 兼容规则
 
-采集协议不限定 Aime。任何能读取文件、理解 unified manifest 并运行 `prd-demo` 的 Agent 都能消费；区别只在任务如何交给 Agent。
+采集协议不限定 Mira 或 Aime。任何能读取文件、理解 unified manifest 并运行 `prd-demo` 的 Agent 都能消费；区别只在任务如何交给 Agent。
+
+## Mira / Aime 的统一入口
+
+- 用户在 Mira 或 Aime 中使用同一句话：`根据当前 PRD 和刚采集的设计生成交互 Demo`。
+- Skill 不读取“当前打开的 Figma 标签”，而是读取带 `_COMPLETE.json` 的最新合法任务，因此切换 Agent 不会改变任务事实源。
+- 若 Mira 或 Aime 当前会话能搜索用户飞书云空间，保持日常两步；否则自动降级为文件夹链接或 ZIP，不得假装完成自动发现。
+- 两个 Agent 可消费同一任务，但各自必须使用独立 `sessionId` 写新的消费回执，禁止覆盖对方状态。
 
 | 模式 | Agent 能力 | 用户动作 | 能否保持日常两步 |
 |---|---|---|---|

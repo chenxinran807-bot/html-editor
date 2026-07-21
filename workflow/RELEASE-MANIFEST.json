@@ -1,26 +1,26 @@
 {
   "workflowVersion": "1.0.0-mvp",
-  "builtAt": "2026-07-21T11:20:00+08:00",
+  "builtAt": "2026-07-21T11:32:00+08:00",
   "artifacts": [
     {
       "name": "Figma采集助手-MVP-v2.0.2-arm64.zip",
       "component": "figma-capture-helper",
       "version": "2.0.2",
-      "sha256": "959e13c409af85168b620c894e46d9d0949e6f3636dfb89be29e6505fd563561",
+      "sha256": "129e9385640326aea0acdaf8f285d769cefea9ac306f9a5e09da40122dd4e860",
       "tests": 42
     },
     {
       "name": "prd-demo-workflow.zip",
       "component": "prd-demo",
       "version": "workflow-1.0.0",
-      "sha256": "dda27f4641c2c57f0627e9eda20cfe75e2de94868a03e566bead3d468ea12dfc",
+      "sha256": "032cd2662b47927b6889aff7cfde4b103a063f6531eb6f344d0470b1309fc1d4",
       "tests": 29
     },
     {
       "name": "html-editor-1.2.0.zip",
       "component": "html-editor",
       "version": "1.2.0",
-      "sha256": "45db081a3c1f6f60214127b1ac81a635978b6399a4f64a545e582e4b5ead52a2",
+      "sha256": "5494d38540447c8ec61d02c0bb870b59a4c061b313bf44dce09973613832591d",
       "tests": 23
     }
   ],
@@ -35,6 +35,18 @@
       "node --test workflow/test/contract.e2e.test.mjs",
       "node --test workflow/test/adversarial.e2e.test.mjs"
     ]
+  },
+  "marketplace": {
+    "space": "skills.byted.org/AI/Recommend",
+    "prdDemo": "1.0.7",
+    "htmlEditor": "1.0.1",
+    "publishedAndInspected": true
+  },
+  "agentDeployment": {
+    "protocol": "agent-neutral",
+    "aime": "marketplace-current; workspace-import-pending-bytecloud-sso",
+    "mira": "pending-first-party-authorization-and-capability-check",
+    "fallbacks": ["lark-folder-link", "task-zip"]
   },
   "realAcceptance": {
     "taskCompletedAt": "2026-07-19T17:53:55.349Z",

@@ -14,9 +14,9 @@
 日常只有两步：
 
 1. 在有编辑权限的 Figma 文件或个人 Drafts 副本中，多选参考 Frame，运行插件并批量导出。
-2. 在 Aime 中要求 `prd-demo` 使用刚采集的 Figma 任务生成高还原交互 Demo。
+2. 在 Mira、Aime 或其他兼容 Agent 中，要求 `prd-demo` 使用刚采集的 Figma 任务生成高还原交互 Demo。
 
-同一次导出的 Frame 共用 taskId。本机助手完成全量 SHA-256 校验后上传飞书，并最后写入 `_COMPLETE.json`；消费侧只读取完成任务。
+同一次导出的 Frame 共用 taskId。本机助手完成全量 SHA-256 校验后上传飞书，并最后写入 `_COMPLETE.json`；消费侧只读取完成任务。Agent 若能以当前用户身份搜索飞书云空间，日常保持两步；只能读取链接时多粘贴一次任务文件夹链接；没有飞书能力时上传任务 ZIP。
 
 ## 开发与验证
 

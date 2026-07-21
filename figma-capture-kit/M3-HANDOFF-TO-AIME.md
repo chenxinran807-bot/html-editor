@@ -1,13 +1,15 @@
-# M3 交接给 Aime / prd-demo Skill
+# M3 交接给 Mira、Aime 与其他兼容 Agent
 
-M1 与 M2 的任务事实源已经固定。Aime 不读取浏览器当前 Figma 标签，也不读取用户 Downloads；只读取飞书个人空间 `/prd-demo-tasks/`。
+M1 与 M2 的任务事实源已经固定。任何 Agent 都不应读取浏览器当前 Figma 标签或猜测用户 Downloads；应通过飞书个人空间 `/prd-demo-tasks/`、用户提供的任务文件夹链接或任务 ZIP 取得同一份任务。
+
+以下规则与 Agent 品牌无关。Mira、Aime 或其他 Agent 只有在具备对应文件访问能力时，才能声称已自动取得“刚采集”的设计。
 
 ## 选任务
 
 1. 使用当前飞书用户身份列 `/prd-demo-tasks/*/`。
 2. 只保留存在 `_COMPLETE.json` 的任务目录。
 3. 读取 `task.json`，要求 `ownerOpenId` 等于当前用户 openId。
-4. 按 `createdAt` 降序取最新任务。
+4. 按 `_COMPLETE.json.completedAt` 降序取最新任务。
 5. 下载完整任务目录到本会话工作区的 `figma_export/incoming/<taskId>/`。
 
 ## 校验
@@ -30,4 +32,3 @@ M1 与 M2 的任务事实源已经固定。Aime 不读取浏览器当前 Figma �
 ## 消费记录
 
 生成成功后新增 `consumption/<sessionId>.json`；不得修改 `task.json` 或 `_COMPLETE.json`。记录至少包含 `sessionId`、`agentUserOpenId`、`consumedAt`、`result` 和输出地址。
-

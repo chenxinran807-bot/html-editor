@@ -7,7 +7,9 @@
 1. 在 Figma 多选参考 Frame，运行批量采集。
 2. 在当前 Agent 对话提供 PRD，并说“根据当前 PRD 和刚采集的设计生成交互 Demo”。
 
-Agent 自动发现、下载和校验设计任务；`prd-demo` 逐个确认三个核心问题；确认后直接生成并注入 html-editor。
+Mira、Aime 或其他兼容 Agent 自动发现、下载和校验设计任务；`prd-demo` 逐个确认三个核心问题；确认后直接生成并注入 html-editor。
+
+Agent 品牌不属于任务一致性键。切换 Agent 时仍以 `ownerOpenId + taskId + fileKey/nodeId + prdFingerprint` 为事实依据，并为每次消费创建新的 `sessionId`。
 
 ## 三种能力模式
 
