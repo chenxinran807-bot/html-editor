@@ -26,6 +26,11 @@ function bootFixture(options = {}) {
     configurable: true,
     value: { writeText: text => options.copyRejects ? Promise.reject(new Error('denied')) : Promise.resolve(text) }
   });
+  if (options.eyeDropper !== false) {
+    window.EyeDropper = class {
+      open() { return Promise.resolve({ sRGBHex: '#12ab34' }); }
+    };
+  }
   if (options.savedAnnotations) {
     window.localStorage.setItem('ann::/demo', JSON.stringify(options.savedAnnotations));
   }
@@ -152,6 +157,25 @@ test('shows appearance and spacing controls for a container selection', () => {
   const names = [...document.querySelectorAll('#ann-inspector [data-section]')].map(element => element.dataset.section);
   assert.deepEqual(names, ['spacing', 'appearance', 'note', 'advanced']);
   assert.equal(names.includes('text-content'), false);
+});
+
+test('offers page colors, native custom color, and screen picking', async () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-title');
+  selectTarget(document);
+  assert.ok(document.querySelectorAll('[data-page-color]').length > 0);
+  assert.equal(document.querySelector('[data-control="custom-color"]').type, 'color');
+  click(document, '[data-control="eyedropper"]');
+  await new Promise(resolve => window.setTimeout(resolve, 0));
+  assert.equal(target.style.color, 'rgb(18, 171, 52)');
+});
+
+test('hides screen picking when EyeDropper is unavailable', () => {
+  const { document } = bootFixture({ eyeDropper: false });
+  selectTarget(document);
+  assert.equal(document.querySelector('[data-control="eyedropper"]'), null);
+  assert.ok(document.querySelector('[data-control="custom-color"]'));
+  assert.ok(document.querySelectorAll('[data-page-color]').length > 0);
 });
 
 test('reviews changes in plain language and prepares Agent handoff', () => {

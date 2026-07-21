@@ -238,6 +238,11 @@
       "#ann-inspector .annotator-section h3{margin:0 0 8px;font-size:12px;line-height:16px;font-weight:650;color:var(--ann-secondary);}",
       "#ann-inspector .annotator-control-row{display:flex;align-items:center;gap:8px;}",
       "#ann-inspector .annotator-control-row button{min-width:32px;min-height:32px;border:1px solid var(--ann-border);border-radius:7px;background:#fff;color:var(--ann-text);cursor:pointer;}",
+      "#ann-inspector .annotator-color-grid{display:flex;flex-wrap:wrap;align-items:center;gap:7px;}",
+      "#ann-inspector .annotator-color-swatch{width:28px;height:28px;padding:0;border:1px solid rgba(0,0,0,.16);border-radius:7px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.4);cursor:pointer;}",
+      "#ann-inspector .annotator-color-swatch[aria-pressed=true]{outline:2px solid var(--ann-accent);outline-offset:2px;}",
+      "#ann-inspector .annotator-native-color{width:32px;height:32px;padding:2px;border:1px solid var(--ann-border);border-radius:7px;background:#fff;cursor:pointer;}",
+      "#ann-inspector .annotator-eyedropper{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 9px;border:1px solid var(--ann-border);border-radius:7px;background:#fff;color:var(--ann-text);font:500 12px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;cursor:pointer;}",
       "#ann-inspector details.annotator-section summary{font-size:12px;font-weight:600;color:var(--ann-secondary);cursor:pointer;}",
       "#ann-inspector .annotator-actions{margin:0 8px;border:1px solid var(--ann-border);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.64);}",
       "#ann-inspector .annotator-action{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:0 11px;border:0;border-bottom:1px solid var(--ann-border);background:transparent;color:var(--ann-text);font:500 13px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;text-align:left;cursor:pointer;}",
@@ -596,6 +601,55 @@
     return node;
   }
 
+  function renderColorControl(sectionNode, el, draft, property, category) {
+    var grid = document.createElement("div");
+    grid.className = "annotator-color-grid";
+    var current = rgbToHex(getComputedStyle(el).getPropertyValue(property).trim()).toLowerCase();
+    pageThemeColors().forEach(function (rawColor) {
+      var color = rgbToHex(rawColor).toLowerCase();
+      if (!/^#[0-9a-f]{6}$/i.test(color)) return;
+      var swatch = document.createElement("button");
+      swatch.type = "button";
+      swatch.className = "annotator-color-swatch";
+      swatch.setAttribute("data-page-color", color);
+      swatch.setAttribute("aria-label", "使用页面颜色 " + color);
+      swatch.setAttribute("aria-pressed", color === current ? "true" : "false");
+      swatch.style.backgroundColor = color;
+      swatch.onclick = function () {
+        previewStyle(draft, category, property, color, null);
+        var all = grid.querySelectorAll("[data-page-color]");
+        for (var i = 0; i < all.length; i++) all[i].setAttribute("aria-pressed", all[i] === swatch ? "true" : "false");
+      };
+      grid.appendChild(swatch);
+    });
+    var custom = document.createElement("input");
+    custom.type = "color";
+    custom.className = "annotator-native-color";
+    custom.setAttribute("data-control", "custom-color");
+    custom.setAttribute("aria-label", "自定义颜色");
+    custom.value = /^#[0-9a-f]{6}$/i.test(current) ? current : "#000000";
+    custom.oninput = function () { previewStyle(draft, category, property, custom.value, null); };
+    grid.appendChild(custom);
+    if (typeof window.EyeDropper === "function") {
+      var picker = document.createElement("button");
+      picker.type = "button";
+      picker.className = "annotator-eyedropper";
+      picker.setAttribute("data-control", "eyedropper");
+      picker.textContent = "屏幕吸色";
+      picker.onclick = function () {
+        var eyeDropper = new window.EyeDropper();
+        eyeDropper.open().then(function (result) {
+          if (result && result.sRGBHex) {
+            custom.value = result.sRGBHex;
+            previewStyle(draft, category, property, result.sRGBHex, null);
+          }
+        }).catch(function () { /* 用户取消吸色时保持当前颜色 */ });
+      };
+      grid.appendChild(picker);
+    }
+    sectionNode.appendChild(grid);
+  }
+
   function buildInputBox(labelText, presetNote, x, y, onSubmit, presetRefs, previewEl) {
     var box = document.createElement("div");
     box.id = "ann-inspector";
@@ -665,6 +719,9 @@
       typeRow.className = "annotator-control-row";
       typeRow.appendChild(increase);
       sectionNodes.typography.appendChild(typeRow);
+      renderColorControl(sectionNodes["text-color"], previewEl, previewDraft, "color", "text");
+    } else if (sectionNodes.appearance && previewEl) {
+      renderColorControl(sectionNodes.appearance, previewEl, previewDraft, "background-color", "appearance");
     }
 
     var noteSection = inspectorSection("note", "补充说明", false);
