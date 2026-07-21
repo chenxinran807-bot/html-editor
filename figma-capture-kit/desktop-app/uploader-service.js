@@ -44,7 +44,13 @@ function createUploaderService(options) {
         state.lastTaskId = latest.taskId;
         state.updatedAt = new Date().toISOString();
         await saveState(statePath, state);
-        emit({ phase: 'success', taskId: latest.taskId, archive: candidate.name });
+        emit({
+          phase: 'success',
+          taskId: latest.taskId,
+          completedAt: latest.completion?.completedAt,
+          message: `已上传 ${latest.pageCount} 个页面，可回到 Agent 生成 Demo`,
+          archive: candidate.name
+        });
       }
       return latest;
     } finally {

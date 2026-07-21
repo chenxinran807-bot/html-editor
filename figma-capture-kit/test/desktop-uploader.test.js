@@ -25,13 +25,27 @@ test('service remains idle when no task archive exists', async () => {
 
 test('service emits completed task id and saves processed archive', async () => {
   const candidate = { name: 'figma-task-1.zip', path: '/Downloads/figma-task-1.zip' };
-  const deps = memoryDependencies([candidate], { taskId: 'task-1' });
+  const deps = memoryDependencies([candidate], {
+    taskId: '9c5ba2e8-9e68-4bcb-82fc-bb47b61cc0ce',
+    pageCount: 3,
+    completion: { completedAt: '2026-07-21T10:13:00.000Z' }
+  });
   const service = createUploaderService({ ...deps, downloads: '/Downloads', staging: '/State', adapter: {} });
   const states = [];
   service.on('state', state => states.push(state));
   const result = await service.scanOnce();
-  assert.deepEqual(result, { taskId: 'task-1' });
-  assert.deepEqual(states.at(-1), { phase: 'success', taskId: 'task-1', archive: 'figma-task-1.zip' });
+  assert.deepEqual(result, {
+    taskId: '9c5ba2e8-9e68-4bcb-82fc-bb47b61cc0ce',
+    pageCount: 3,
+    completion: { completedAt: '2026-07-21T10:13:00.000Z' }
+  });
+  assert.deepEqual(states.at(-1), {
+    phase: 'success',
+    taskId: '9c5ba2e8-9e68-4bcb-82fc-bb47b61cc0ce',
+    completedAt: '2026-07-21T10:13:00.000Z',
+    message: '已上传 3 个页面，可回到 Agent 生成 Demo',
+    archive: 'figma-task-1.zip'
+  });
   assert.deepEqual(deps.saved.at(-1).processed, ['figma-task-1.zip']);
 });
 

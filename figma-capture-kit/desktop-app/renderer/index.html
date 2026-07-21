@@ -25,7 +25,9 @@
     button.ghost { background:transparent; color:#3370ff; }
     .qr { width:220px; height:220px; object-fit:contain; display:block; margin:16px auto; background:white; }
     .privacy { font-size:12px; color:#8f959e; }
-    .task { font-family:ui-monospace, SFMono-Regular, monospace; background:#f2f3f5; border-radius:8px; padding:10px; word-break:break-all; font-size:12px; }
+    details { margin-top:12px; color:#646a73; font-size:12px; }
+    summary { cursor:pointer; user-select:none; }
+    .task { margin-top:8px; font-family:ui-monospace, SFMono-Regular, monospace; background:#f2f3f5; border-radius:8px; padding:10px; word-break:break-all; font-size:12px; }
     .footer { margin-top:auto; display:flex; gap:8px; }
     .footer button { font-size:12px; padding:8px; }
     [hidden] { display:none !important; }
@@ -38,14 +40,14 @@
       <div class="status"><span id="dot" class="dot"></span><span id="title">正在启动…</span></div>
       <p id="message">正在检查飞书登录状态。</p>
       <img id="qr" class="qr" alt="飞书登录二维码" hidden>
-      <div id="task" class="task" hidden></div>
+      <details id="technical" hidden><summary>技术信息</summary><div id="task" class="task" hidden></div></details>
       <button id="login" hidden>扫码登录飞书</button>
       <button id="completeLogin" hidden>我已扫码，完成授权</button>
       <button id="plugin" class="secondary">打开 Figma 插件文件夹</button>
       <button id="retry" hidden>重新尝试上传</button>
       <p class="privacy">首次授权后，助手会把你主动采集的 PNG、SVG、图层文字和素材上传到个人飞书云空间。不会上传原始 .fig 文件。</p>
     </section>
-    <div class="footer"><button id="drive" class="ghost">打开飞书云空间</button><button id="quit" class="ghost">退出助手</button></div>
+    <div class="footer"><button id="drive" class="ghost">查看任务文件夹</button><button id="quit" class="ghost">退出助手</button></div>
   </main>
   <script src="app.js"></script>
 </body>
