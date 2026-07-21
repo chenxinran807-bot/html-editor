@@ -1,0 +1,52 @@
+{
+  "workflowVersion": "1.0.0-mvp",
+  "builtAt": "2026-07-21T11:20:00+08:00",
+  "artifacts": [
+    {
+      "name": "Figma采集助手-MVP-v2.0.2-arm64.zip",
+      "component": "figma-capture-helper",
+      "version": "2.0.2",
+      "sha256": "959e13c409af85168b620c894e46d9d0949e6f3636dfb89be29e6505fd563561",
+      "tests": 42
+    },
+    {
+      "name": "prd-demo-workflow.zip",
+      "component": "prd-demo",
+      "version": "workflow-1.0.0",
+      "sha256": "dda27f4641c2c57f0627e9eda20cfe75e2de94868a03e566bead3d468ea12dfc",
+      "tests": 29
+    },
+    {
+      "name": "html-editor-1.2.0.zip",
+      "component": "html-editor",
+      "version": "1.2.0",
+      "sha256": "45db081a3c1f6f60214127b1ac81a635978b6399a4f64a545e582e4b5ead52a2",
+      "tests": 23
+    }
+  ],
+  "workflowTests": {
+    "contract": 4,
+    "adversarial": 14,
+    "totalAutomated": 112,
+    "commands": [
+      "cd figma-capture-kit && npm test && npm run check",
+      "cd html-editor && npm test",
+      "python3 -m unittest discover -s prd-demo-skill/test -p 'test_*.py' -v",
+      "node --test workflow/test/contract.e2e.test.mjs",
+      "node --test workflow/test/adversarial.e2e.test.mjs"
+    ]
+  },
+  "realAcceptance": {
+    "taskCompletedAt": "2026-07-19T17:53:55.349Z",
+    "frames": 3,
+    "taskFiles": 98,
+    "receiptRoundTrip": true,
+    "browserVisualSmoke": "blocked-by-file-url-policy"
+  },
+  "privacy": {
+    "privateDesignFilesInGit": false,
+    "secretsInArchives": false,
+    "localAbsolutePathsInSkillArchives": false,
+    "status": "pass-with-browser-smoke-blocker"
+  }
+}
