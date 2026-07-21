@@ -233,6 +233,12 @@
       "#ann-inspector .annotator-icon-button{display:grid;place-items:center;width:28px;height:28px;padding:0;border:0;border-radius:7px;background:transparent;color:var(--ann-secondary);cursor:pointer;}",
       "#ann-inspector .annotator-context{margin:0 14px 12px;padding:9px 10px;border-radius:8px;background:rgba(0,0,0,.045);font-size:12px;color:var(--ann-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}",
       "#ann-inspector .annotator-question{padding:0 14px 8px;font-size:12px;font-weight:600;color:var(--ann-secondary);}",
+      "#ann-inspector .annotator-inspector-body{max-height:min(620px,72vh);overflow:auto;padding:0 8px 8px;}",
+      "#ann-inspector .annotator-section{margin:0 0 8px;padding:10px;border:1px solid var(--ann-border);border-radius:10px;background:rgba(255,255,255,.64);}",
+      "#ann-inspector .annotator-section h3{margin:0 0 8px;font-size:12px;line-height:16px;font-weight:650;color:var(--ann-secondary);}",
+      "#ann-inspector .annotator-control-row{display:flex;align-items:center;gap:8px;}",
+      "#ann-inspector .annotator-control-row button{min-width:32px;min-height:32px;border:1px solid var(--ann-border);border-radius:7px;background:#fff;color:var(--ann-text);cursor:pointer;}",
+      "#ann-inspector details.annotator-section summary{font-size:12px;font-weight:600;color:var(--ann-secondary);cursor:pointer;}",
       "#ann-inspector .annotator-actions{margin:0 8px;border:1px solid var(--ann-border);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.64);}",
       "#ann-inspector .annotator-action{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:0 11px;border:0;border-bottom:1px solid var(--ann-border);background:transparent;color:var(--ann-text);font:500 13px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;text-align:left;cursor:pointer;}",
       "#ann-inspector .annotator-action:last-child{border-bottom:0;}",
@@ -571,6 +577,25 @@
     );
   }
 
+  function targetKind(el) {
+    if (!el || !el.tagName) return "container";
+    var tag = el.tagName.toLowerCase();
+    if (tag === "img" || tag === "picture" || tag === "video") return "image";
+    if (tag === "button" || tag === "a" || el.getAttribute("role") === "button") return "container";
+    if (/^(p|span|h1|h2|h3|h4|h5|h6|label|strong|em)$/.test(tag)) return "text";
+    return el.children.length ? "container" : "text";
+  }
+
+  function inspectorSection(name, title, disclosure) {
+    var node = document.createElement(disclosure ? "details" : "section");
+    node.className = "annotator-section";
+    node.setAttribute("data-section", name);
+    var heading = document.createElement(disclosure ? "summary" : "h3");
+    heading.textContent = title;
+    node.appendChild(heading);
+    return node;
+  }
+
   function buildInputBox(labelText, presetNote, x, y, onSubmit, presetRefs, previewEl) {
     var box = document.createElement("div");
     box.id = "ann-inspector";
@@ -597,11 +622,6 @@
     target.setAttribute("data-role", "context");
     target.textContent = "已选中：" + labelText;
 
-    var question = document.createElement("div");
-    question.className = "annotator-question";
-    question.setAttribute("data-role", "question");
-    question.textContent = "你希望这里怎么调整？";
-
     var ta = document.createElement("textarea");
     ta.placeholder = "也可以直接写下你的要求";
     if (presetNote) ta.value = presetNote;
@@ -612,48 +632,27 @@
       ta.focus();
     }
 
-    var actions = document.createElement("div");
-    actions.className = "annotator-actions";
-    var ACTIONS = [
-      ["text", "修改文字", ["改文字内容", "字大一点", "字小一点", "文字更醒目"]],
-      ["image", "更换图片", ["选择一张参考图片"]],
-      ["resize", "调整位置或大小", ["向上移动", "向下移动", "放大一些", "缩小一些", "增加间距"]],
-      ["reference", "参考其他样式", ["添加样式参考图"]]
-    ];
-
-    function showSecondary(items, attach) {
-      var old = box.querySelector('[data-role="secondary"]');
-      if (old) old.parentNode.removeChild(old);
-      var secondary = document.createElement("div");
-      secondary.className = "annotator-secondary";
-      secondary.setAttribute("data-role", "secondary");
-      items.forEach(function (item) {
-        var button = document.createElement("button");
-        button.type = "button";
-        button.textContent = item;
-        button.onclick = function () {
-          if (attach) addRef();
-          else appendNote(item);
-        };
-        secondary.appendChild(button);
-      });
-      actions.parentNode.insertBefore(secondary, ta);
-    }
-
-    ACTIONS.forEach(function (action) {
-      var button = document.createElement("button");
-      button.type = "button";
-      button.className = "annotator-action";
-      button.setAttribute("data-quick-action", action[1]);
-      button.innerHTML = iconSvg(action[0]) + "<span></span>";
-      button.querySelector("span").textContent = action[1];
-      button.onclick = function () {
-        showSecondary(action[2], action[0] === "image" || action[0] === "reference");
-      };
-      actions.appendChild(button);
+    var body = document.createElement("div");
+    body.className = "annotator-inspector-body";
+    var kind = targetKind(previewEl);
+    var sectionNames = kind === "text"
+      ? [["text-content", "文字内容"], ["typography", "文字样式"], ["text-color", "文字颜色"]]
+      : kind === "image"
+        ? [["image", "图片"], ["appearance", "外观"]]
+        : [["spacing", "间距"], ["appearance", "外观"]];
+    var sectionNodes = {};
+    sectionNames.forEach(function (item) {
+      sectionNodes[item[0]] = inspectorSection(item[0], item[1], false);
+      body.appendChild(sectionNodes[item[0]]);
     });
 
-    if (previewEl && /^(h1|h2|h3|h4|h5|h6|p|span|label|strong|em)$/i.test(previewEl.tagName)) {
+    if (kind === "text") {
+      var contentInput = document.createElement("input");
+      contentInput.type = "text";
+      contentInput.value = previewEl ? previewEl.textContent.trim() : "";
+      contentInput.setAttribute("data-control", "text-content");
+      contentInput.style.cssText = "box-sizing:border-box;width:100%;min-height:32px;border:1px solid var(--ann-border);border-radius:7px;padding:0 8px;background:#fff;color:var(--ann-text);";
+      sectionNodes["text-content"].appendChild(contentInput);
       var increase = document.createElement("button");
       increase.type = "button";
       increase.setAttribute("data-control", "font-size-increase");
@@ -662,8 +661,21 @@
         var current = parseFloat(getComputedStyle(previewEl).fontSize) || 16;
         previewStyle(previewDraft, "text", "font-size", (current + 1) + "px", "px");
       };
-      actions.appendChild(increase);
+      var typeRow = document.createElement("div");
+      typeRow.className = "annotator-control-row";
+      typeRow.appendChild(increase);
+      sectionNodes.typography.appendChild(typeRow);
     }
+
+    var noteSection = inspectorSection("note", "补充说明", false);
+    noteSection.appendChild(ta);
+    body.appendChild(noteSection);
+    var advancedSection = inspectorSection("advanced", "高级信息", true);
+    var selectorInfo = document.createElement("div");
+    selectorInfo.textContent = previewEl ? computeSelector(previewEl) : "区域标注";
+    selectorInfo.style.cssText = "margin-top:8px;font-size:11px;color:var(--ann-secondary);word-break:break-all;";
+    advancedSection.appendChild(selectorInfo);
+    body.appendChild(advancedSection);
 
     // ——参考图附件——
     var refsWrap = document.createElement("div");
@@ -722,10 +734,8 @@
 
     box.appendChild(head);
     box.appendChild(target);
-    box.appendChild(question);
-    box.appendChild(actions);
-    box.appendChild(ta);
-    box.appendChild(refsWrap);
+    noteSection.appendChild(refsWrap);
+    box.appendChild(body);
     box.appendChild(fileInput);
     box.appendChild(footer);
     document.body.appendChild(box);

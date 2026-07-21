@@ -129,20 +129,29 @@ test('boots a compact three-action annotation toolbar', () => {
   assert.equal(toolbar.querySelectorAll('svg').length, 3);
 });
 
-test('opens a macOS Inspector with plain-language actions', () => {
+test('shows only text controls for a text selection', () => {
   const { document } = bootFixture();
   selectTarget(document);
   const inspector = document.querySelector('#ann-inspector');
   assert.ok(inspector);
   assert.equal(inspector.querySelector('h2').textContent, '添加修改');
   assert.match(inspector.querySelector('[data-role="context"]').textContent, /已选中.*AI 试穿/);
-  assert.equal(inspector.querySelector('[data-role="question"]').textContent, '你希望这里怎么调整？');
   assert.deepEqual(
-    [...inspector.querySelectorAll('[data-quick-action]')].map(element => element.textContent.trim()),
-    ['修改文字', '更换图片', '调整位置或大小', '参考其他样式']
+    [...inspector.querySelectorAll('[data-section]')].map(element => element.dataset.section),
+    ['text-content', 'typography', 'text-color', 'note', 'advanced']
   );
+  assert.equal(inspector.querySelector('[data-section="image"]'), null);
+  assert.doesNotMatch(inspector.textContent, /字大一点|文字更醒目|增加间距/);
   assert.equal(inspector.querySelector('[data-action="save"]').textContent, '保存修改');
-  assert.equal(inspector.querySelector('[data-role="secondary"]'), null);
+});
+
+test('shows appearance and spacing controls for a container selection', () => {
+  const { document, window } = bootFixture();
+  window.document.elementFromPoint = () => document.querySelector('main');
+  selectTarget(document);
+  const names = [...document.querySelectorAll('#ann-inspector [data-section]')].map(element => element.dataset.section);
+  assert.deepEqual(names, ['spacing', 'appearance', 'note', 'advanced']);
+  assert.equal(names.includes('text-content'), false);
 });
 
 test('reviews changes in plain language and prepares Agent handoff', () => {
