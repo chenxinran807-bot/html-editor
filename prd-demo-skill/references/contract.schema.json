@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prd-demo/contract.schema.json",
+  "title": "prd-demo 机器可读设计合同",
+  "description": "阶段① 产出、阶段②③ 回写的唯一事实源合同（v2 §4）。",
+  "type": "object",
+  "required": [
+    "contractSchemaVersion",
+    "contractId",
+    "version",
+    "source",
+    "designLanguage",
+    "assets",
+    "clauses"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "contractSchemaVersion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "合同 schema 版本，消费方按此路由"
+    },
+    "contractId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "稳定合同 ID，全流程不变"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "合同内容版本；每次精修 +1"
+    },
+    "changelog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["version"],
+        "properties": {
+          "version": { "type": "integer", "minimum": 1 },
+          "at": { "type": "string" },
+          "reason": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "source": {
+      "type": "object",
+      "description": "合同来源：manifest / PRD 引用 + hash",
+      "properties": {
+        "manifest": { "type": "string" },
+        "prd": {
+          "type": "object",
+          "properties": {
+            "ref": { "type": "string" },
+            "hash": { "type": "string" }
+          },
+          "additionalProperties": true
+        },
+        "capturedAt": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "designLanguage": {
+      "type": "object",
+      "description": "三层设计语言 token：official / observed / inferred",
+      "required": ["official", "observed", "inferred"],
+      "properties": {
+        "official": {
+          "type": "object",
+          "description": "精确事实 token，可进入 locked"
+        },
+        "observed": {
+          "type": "array",
+          "description": "截图测量推断值，只能 guardrail，带 evidence + confidence",
+          "items": {
+            "type": "object",
+            "required": ["id", "token", "value"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "token": { "type": "string", "minLength": 1 },
+              "value": {},
+              "unit": { "type": "string" },
+              "evidence": { "type": "string" },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+            },
+            "additionalProperties": true
+          }
+        },
+        "inferred": {
+          "type": "array",
+          "description": "新增区域推导 token，guardrail/open，允许后续修订",
+          "items": {
+            "type": "object",
+            "required": ["id", "token", "value"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "token": { "type": "string", "minLength": 1 },
+              "value": {},
+              "basis": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "assets": {
+      "type": "array",
+      "description": "受保护素材白名单",
+      "items": {
+        "type": "object",
+        "required": ["assetId", "file", "sha256", "type", "boundNode"],
+        "properties": {
+          "assetId": { "type": "string", "minLength": 1 },
+          "file": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "minLength": 1 },
+          "type": { "type": "string", "enum": ["svg", "png", "image"] },
+          "boundNode": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": true
+      }
+    },
+    "clauses": {
+      "type": "array",
+      "description": "可机器校验的条款集合",
+      "items": {
+        "type": "object",
+        "required": ["clauseId", "type", "category", "source", "assertion", "verify"],
+        "properties": {
+          "clauseId": { "type": "string", "minLength": 1 },
+          "type": {
+            "type": "string",
+            "enum": ["locked", "guardrail", "open", "prohibited"]
+          },
+          "category": {
+            "type": "string",
+            "enum": ["layout", "visual", "field", "behavior", "asset", "copy"]
+          },
+          "region": {
+            "type": "object",
+            "properties": {
+              "page": { "type": "string" },
+              "nodeId": { "type": "string" }
+            },
+            "additionalProperties": true
+          },
+          "source": {
+            "type": "object",
+            "required": ["kind", "ref"],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": ["manifest", "prd", "user-confirm"]
+              },
+              "ref": { "type": "string", "minLength": 1 }
+            },
+            "additionalProperties": true
+          },
+          "assetId": { "type": "string" },
+          "assertion": { "type": "string", "minLength": 1 },
+          "verify": {
+            "type": "object",
+            "required": ["method", "params"],
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": ["screenshot-diff", "attr-check", "hash-check", "interaction-test"]
+              },
+              "params": { "type": "object" }
+            },
+            "additionalProperties": true,
+            "allOf": [
+              {
+                "if": {
+                  "properties": { "method": { "const": "screenshot-diff" } }
+                },
+                "then": {
+                  "properties": {
+                    "params": {
+                      "type": "object",
+                      "required": ["metric", "viewport", "browser"],
+                      "properties": {
+                        "metric": { "type": "string", "enum": ["ssim", "pixel-diff"] },
+                        "minimum": { "type": "number", "minimum": 0, "maximum": 1 },
+                        "maximum": { "type": "number", "minimum": 0, "maximum": 1 },
+                        "viewport": {
+                          "type": "object",
+                          "required": ["width", "height"],
+                          "properties": {
+                            "width": { "type": "number", "exclusiveMinimum": 0 },
+                            "height": { "type": "number", "exclusiveMinimum": 0 }
+                          },
+                          "additionalProperties": true
+                        },
+                        "browser": { "type": "string", "minLength": 1 }
+                      },
+                      "additionalProperties": true,
+                      "allOf": [
+                        {
+                          "if": { "properties": { "metric": { "const": "ssim" } } },
+                          "then": {
+                            "required": ["minimum"],
+                            "not": { "required": ["maximum"] }
+                          }
+                        },
+                        {
+                          "if": { "properties": { "metric": { "const": "pixel-diff" } } },
+                          "then": {
+                            "required": ["maximum"],
+                            "not": { "required": ["minimum"] }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "knownDiffs": {
+      "type": "array",
+      "description": "结构化环境差异记录；只允许排除明确区域，禁止整页豁免",
+      "items": {
+        "type": "object",
+        "required": ["page", "region", "reason", "evidence", "effectiveVersion"],
+        "properties": {
+          "page": { "type": "string", "minLength": 1 },
+          "region": {
+            "type": "string",
+            "minLength": 1,
+            "description": "明确区域，禁止通配 / 整页豁免",
+            "not": {
+              "enum": ["*", "whole-page", "wholepage", "whole page", "全页", "整页", "all", "全部"]
+            }
+          },
+          "reason": { "type": "string", "minLength": 1 },
+          "evidence": { "type": "string", "minLength": 1 },
+          "effectiveVersion": { "type": "integer", "minimum": 1 }
+        },
+        "additionalProperties": true
+      }
+    }
+  }
+}
