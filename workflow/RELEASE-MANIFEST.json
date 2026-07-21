@@ -1,6 +1,6 @@
 {
   "workflowVersion": "1.0.0-mvp",
-  "builtAt": "2026-07-21T11:32:00+08:00",
+  "builtAt": "2026-07-21T13:09:07+08:00",
   "artifacts": [
     {
       "name": "Figma采集助手-MVP-v2.0.2-arm64.zip",
@@ -44,8 +44,19 @@
   },
   "agentDeployment": {
     "protocol": "agent-neutral",
-    "aime": "marketplace-current; workspace-import-pending-bytecloud-sso",
-    "mira": "pending-first-party-authorization-and-capability-check",
+    "aime": {
+      "status": "deployed-and-enabled",
+      "prdDemo": "marketplace-1.0.7",
+      "htmlEditor": "marketplace-1.0.1",
+      "verifiedAt": "2026-07-21T12:00:00+08:00"
+    },
+    "mira": {
+      "status": "deployed-and-enabled",
+      "prdDemo": "personal-current-2026-07-21",
+      "htmlEditor": "personal-current-2026-07-21",
+      "larkDriveAvailable": true,
+      "verifiedAt": "2026-07-21T12:05:00+08:00"
+    },
     "fallbacks": ["lark-folder-link", "task-zip"]
   },
   "realAcceptance": {
