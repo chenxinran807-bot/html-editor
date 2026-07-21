@@ -582,7 +582,7 @@ Expected: FAIL because the release builder does not exist.
 
 - [ ] **Step 3: Implement deterministic packaging**
 
-Walk only `SKILL.md`, `references/`, and `scripts/`; sort paths; write ZIP entries with a fixed timestamp `(2026, 1, 1, 0, 0, 0)`; scan text files for `/Users/`, `access_token`, `app_secret`, and `ownerOpenId` values beginning with `ou_` before packaging.
+Walk only `SKILL.md`, `agents/`, `references/`, and runtime `scripts/` (exclude the release builder itself); sort paths; write ZIP entries with a fixed timestamp `(2026, 1, 1, 0, 0, 0)`; scan text files for `/Users/`, `access_token`, `app_secret`, and `ownerOpenId` values beginning with `ou_` before packaging.
 
 - [ ] **Step 4: Build and test**
 
