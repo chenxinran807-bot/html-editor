@@ -31,6 +31,7 @@
 
   // 指针拖拽状态
   var pointerDown = false;
+  var previewDraft = null;
   var dragging = false;
   var startX = 0, startY = 0;
   var dragBox = null;
@@ -534,18 +535,20 @@
   function openInput(el, x, y, editItem) {
     closeInput();
     var selector = editItem ? editItem.selector : computeSelector(el);
+    previewDraft = createDraft(el);
     inputBox = buildInputBox(
       describeElement(el || (editItem && editItem.el)),
       editItem ? editItem.note : "",
       x, y,
-      function (note, refs) {
+      function (note, refs, changes) {
         if (editItem) {
-          editItem.note = note; editItem.refs = refs; save(); renderList();
+          editItem.note = note; editItem.refs = refs; editItem.changes = changes; save(); renderList();
         } else {
-          addElementAnnotation(el, selector, note, refs);
+          addElementAnnotation(el, selector, note, refs, changes);
         }
       },
-      editItem ? editItem.refs : null
+      editItem ? editItem.refs : null,
+      el
     );
   }
 
@@ -568,7 +571,7 @@
     );
   }
 
-  function buildInputBox(labelText, presetNote, x, y, onSubmit, presetRefs) {
+  function buildInputBox(labelText, presetNote, x, y, onSubmit, presetRefs, previewEl) {
     var box = document.createElement("div");
     box.id = "ann-inspector";
     box.setAttribute("data-annotator", "true");
@@ -650,6 +653,18 @@
       actions.appendChild(button);
     });
 
+    if (previewEl && /^(h1|h2|h3|h4|h5|h6|p|span|label|strong|em)$/i.test(previewEl.tagName)) {
+      var increase = document.createElement("button");
+      increase.type = "button";
+      increase.setAttribute("data-control", "font-size-increase");
+      increase.textContent = "+";
+      increase.onclick = function () {
+        var current = parseFloat(getComputedStyle(previewEl).fontSize) || 16;
+        previewStyle(previewDraft, "text", "font-size", (current + 1) + "px", "px");
+      };
+      actions.appendChild(increase);
+    }
+
     // ——参考图附件——
     var refsWrap = document.createElement("div");
     refsWrap.className = "annotator-refs";
@@ -725,7 +740,9 @@
 
     function submit() {
       var note = ta.value.trim();
-      if (note || refs.length) onSubmit(note, refs.slice());
+      var changes = previewDraft ? previewDraft.changes.slice() : [];
+      if (note || refs.length || changes.length) onSubmit(note, refs.slice(), changes);
+      if (previewDraft) previewDraft.committed = true;
       closeInput();
     }
 
@@ -769,14 +786,48 @@
     }).join("");
   }
 
+  function createDraft(el) {
+    return { el: el, originals: {}, before: {}, changes: [], committed: false };
+  }
+
+  function previewStyle(draft, category, property, after, unit, direction) {
+    if (!draft || !draft.el) return;
+    if (!Object.prototype.hasOwnProperty.call(draft.originals, property)) {
+      draft.originals[property] = draft.el.style.getPropertyValue(property);
+      draft.before[property] = getComputedStyle(draft.el).getPropertyValue(property).trim();
+    }
+    draft.el.style.setProperty(property, after);
+    var change = {
+      category: category,
+      property: property,
+      before: draft.before[property],
+      after: after,
+      unit: unit || null,
+      direction: direction || null
+    };
+    draft.changes = draft.changes.filter(function (item) { return item.property !== property; });
+    draft.changes.push(change);
+  }
+
+  function rollbackDraft(draft) {
+    if (!draft || draft.committed || !draft.el) return;
+    Object.keys(draft.originals).forEach(function (property) {
+      var value = draft.originals[property];
+      if (value) draft.el.style.setProperty(property, value);
+      else draft.el.style.removeProperty(property);
+    });
+  }
+
   function closeInput() {
+    rollbackDraft(previewDraft);
+    previewDraft = null;
     if (inputBox && inputBox.parentNode) inputBox.parentNode.removeChild(inputBox);
     inputBox = null;
     if (toggleBtn && typeof toggleBtn.focus === "function") toggleBtn.focus();
   }
 
   // ---------- 新增 / 删除 / 编辑 / 清空 ----------
-  function addElementAnnotation(el, selector, note, refs) {
+  function addElementAnnotation(el, selector, note, refs, changes) {
     seq += 1;
     var target = targetMetadata(el, selector);
     annotations.push({
@@ -785,7 +836,7 @@
       targetClauseId: target.targetClauseId,
       targetPageId: target.targetPageId,
       targetNodeSelector: target.targetNodeSelector,
-      refs: refs || []
+      refs: refs || [], changes: changes || []
     });
     afterChange();
   }
@@ -989,7 +1040,17 @@
         targetNodeSelector: a.targetNodeSelector || a.selector || null,
         action: "modify",
         intent: a.note,
-        scope: "target-only"
+        scope: "target-only",
+        changes: Array.isArray(a.changes) ? a.changes.map(function (change) {
+          return {
+            category: change.category,
+            property: change.property,
+            before: change.before,
+            after: change.after,
+            unit: change.unit || null,
+            direction: change.direction || null
+          };
+        }) : []
       };
     });
   }

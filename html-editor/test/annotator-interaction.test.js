@@ -80,6 +80,44 @@ function structuredPayload(document) {
   return JSON.parse(match[1]);
 }
 
+test('saves exact visual changes beside the plain-language intent', () => {
+  const { document } = bootFixture({
+    workflowMeta: {
+      taskId: 'task-precise',
+      sessionId: 'session-precise',
+      prdFingerprint: `sha256:${'b'.repeat(64)}`
+    }
+  });
+  const target = document.querySelector('#target-title');
+  target.style.fontSize = '16px';
+  selectTarget(document);
+  click(document, '[data-control="font-size-increase"]');
+  document.querySelector('#ann-inspector textarea').value = '标题大小按当前效果';
+  click(document, '#ann-inspector [data-action="save"]');
+  click(document, '[data-action="finish"]');
+  const item = structuredPayload(document).annotations[0];
+  assert.equal(item.intent, '标题大小按当前效果');
+  assert.deepEqual(item.changes, [{
+    category: 'text',
+    property: 'font-size',
+    before: '16px',
+    after: '17px',
+    unit: 'px',
+    direction: null
+  }]);
+});
+
+test('cancel restores every previewed inline style', () => {
+  const { document } = bootFixture();
+  const target = document.querySelector('#target-title');
+  target.style.fontSize = '16px';
+  selectTarget(document);
+  click(document, '[data-control="font-size-increase"]');
+  assert.equal(target.style.fontSize, '17px');
+  click(document, '#ann-inspector [data-action="cancel"]');
+  assert.equal(target.style.fontSize, '16px');
+});
+
 test('boots a compact three-action annotation toolbar', () => {
   const { document } = bootFixture();
   const toolbar = document.querySelector('#ann-toolbar');
@@ -208,7 +246,8 @@ test('exports a clause-aware target-only modification', () => {
     targetNodeSelector: '[data-prd-clause="cl-014"]',
     action: 'modify',
     intent: '按钮改成黑色',
-    scope: 'target-only'
+    scope: 'target-only',
+    changes: []
   });
 });
 
