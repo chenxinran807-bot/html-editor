@@ -113,6 +113,7 @@ test('saves exact visual changes beside the plain-language intent', () => {
   click(document, '[data-control="font-size-increase"]');
   document.querySelector('#ann-inspector textarea').value = '标题大小按当前效果';
   click(document, '#ann-inspector [data-action="save"]');
+  assert.equal(target.style.fontSize, '16px');
   click(document, '[data-action="finish"]');
   const item = structuredPayload(document).annotations[0];
   assert.equal(item.intent, '标题大小按当前效果');
@@ -287,6 +288,53 @@ test('Escape cancels an in-progress spacing drag and restores the original value
   document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
   assert.equal(target.style.paddingLeft, '3px');
   assert.equal(document.querySelector('.annotator-spacing-overlay'), null);
+});
+
+test('keeps technical values in a collapsed advanced disclosure', () => {
+  const { document } = bootFixture();
+  selectTarget(document);
+  const advanced = document.querySelector('details[data-section="advanced"]');
+  assert.ok(advanced);
+  assert.equal(advanced.open, false);
+  const visiblePrimaryText = [...document.querySelectorAll('#ann-inspector [data-section]:not([data-section="advanced"])')]
+    .map(element => element.textContent).join(' ');
+  assert.doesNotMatch(visiblePrimaryText, /\bmargin\b|\bpadding\b|CSS 选择器/i);
+  for (const button of document.querySelectorAll('#ann-inspector button')) {
+    if (!button.textContent.trim()) assert.ok(button.getAttribute('aria-label'));
+  }
+  for (const option of document.querySelectorAll('.annotator-segmented button')) {
+    assert.ok(['true', 'false'].includes(option.getAttribute('aria-pressed')));
+  }
+});
+
+test('supports keyboard spacing adjustment on edge handles', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-button');
+  target.style.paddingRight = '4px';
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  click(document, '[data-spacing-mode="internal"]');
+  const handle = document.querySelector('[data-spacing-handle="right"]');
+  handle.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+  assert.equal(target.style.paddingRight, '5px');
+  handle.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'ArrowRight', shiftKey: true, bubbles: true }));
+  assert.equal(target.style.paddingRight, '13px');
+});
+
+test('normalizes legacy saved annotations to an empty exact-change list', () => {
+  const { document } = bootFixture({
+    workflowMeta: {
+      taskId: 'task-legacy', sessionId: 'session-legacy', prdFingerprint: `sha256:${'c'.repeat(64)}`
+    },
+    savedAnnotations: {
+      seq: 1,
+      items: [{ id: 1, selector: '#target-title', tag: 'h1', text: 'AI 试穿', note: '保留旧标注', page: '', snippet: '<h1>AI 试穿</h1>' }]
+    }
+  });
+  click(document, '[data-action="finish"]');
+  const item = structuredPayload(document).annotations[0];
+  assert.deepEqual(item.changes, []);
+  assert.equal(item.intent, '保留旧标注');
 });
 
 test('reviews changes in plain language and prepares Agent handoff', () => {

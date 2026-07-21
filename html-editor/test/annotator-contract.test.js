@@ -33,3 +33,11 @@ test('reads workflow metadata for structured handoff', () => {
     assert.ok(source.includes(token), `missing workflow token: ${token}`);
   }
 });
+
+test('ships no emoji or external UI dependencies and keeps plain-language spacing labels', () => {
+  assert.doesNotMatch(source, /🎨|📎|✎|✅|✓|✕/u);
+  assert.doesNotMatch(source, /(?:src|href)\s*=\s*["']https?:\/\//i);
+  assert.match(source, /高级信息/);
+  assert.match(source, /和旁边元素的距离/);
+  assert.match(source, /内部留白/);
+});

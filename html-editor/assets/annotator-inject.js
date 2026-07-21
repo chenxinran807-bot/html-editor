@@ -249,6 +249,7 @@
       "#ann-inspector .annotator-segmented{display:flex;gap:1px;padding:2px;border-radius:8px;background:rgba(0,0,0,.065);}",
       "#ann-inspector .annotator-segmented button{flex:1;min-height:30px;padding:0 7px;border:0;border-radius:6px;background:transparent;color:var(--ann-text);font:500 11px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;cursor:pointer;}",
       "#ann-inspector .annotator-segmented button[aria-pressed=true]{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.14);}",
+      "#ann-inspector button:focus-visible,#ann-inspector input:focus-visible,.annotator-spacing-handle:focus-visible{outline:3px solid rgba(10,132,255,.35);outline-offset:2px;}",
       ".annotator-spacing-overlay{position:fixed;z-index:2147483150;pointer-events:none;border:1px solid var(--ann-accent);box-sizing:border-box;}",
       ".annotator-spacing-handle{position:absolute;width:18px;height:18px;padding:0;border:2px solid #fff;border-radius:9px;background:var(--ann-accent);box-shadow:0 1px 5px rgba(0,0,0,.3);pointer-events:auto;cursor:ew-resize;}",
       ".annotator-spacing-handle[data-spacing-handle=left]{left:-10px;top:calc(50% - 9px);}",
@@ -747,6 +748,20 @@
           readout: readout
         };
       });
+      handle.addEventListener("keydown", function (event) {
+        if (!/^Arrow/.test(event.key)) return;
+        var mode = getMode();
+        var property = spacingProperty(mode, direction);
+        var current = parseFloat(getComputedStyle(el)[property]) || 0;
+        var outwardKey = direction === "left" ? "ArrowLeft" : direction === "right" ? "ArrowRight" : direction === "top" ? "ArrowUp" : "ArrowDown";
+        var delta = event.shiftKey ? 8 : 1;
+        if (event.key !== outwardKey) delta = -delta;
+        var value = Math.max(0, Math.min(160, current + delta));
+        previewStyle(draft, mode === "internal" ? "internal-spacing" : "external-spacing", property.replace(/[A-Z]/g, function (c) { return "-" + c.toLowerCase(); }), value + "px", "px", direction);
+        readout.textContent = value + " px";
+        positionSpacingOverlay(el);
+        event.preventDefault();
+      });
       spacingOverlay.appendChild(handle);
     });
     document.body.appendChild(spacingOverlay);
@@ -1073,6 +1088,7 @@
     function submit() {
       var note = ta.value.trim();
       var changes = previewDraft ? previewDraft.changes.slice() : [];
+      rollbackDraft(previewDraft);
       if (note || refs.length || changes.length) onSubmit(note, refs.slice(), changes);
       if (previewDraft) previewDraft.committed = true;
       closeInput();
