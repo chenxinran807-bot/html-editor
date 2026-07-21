@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "1.0",
+  "exporter": {
+    "type": "figma-plugin",
+    "version": "2.0.2",
+    "capabilities": ["frame-png", "svg-assets", "tokens", "layer-metadata"]
+  },
+  "source": {
+    "fileKey": "sanitized-fixture-file",
+    "fileName": "AI 试穿（脱敏验收）",
+    "pageName": "主流程",
+    "exportedAt": "2026-07-21T10:12:00.000Z"
+  },
+  "pages": [
+    {
+      "id": "video-tab",
+      "name": "视频 tab",
+      "nodeId": "100:1",
+      "png": "pages/video-tab.png",
+      "svg": "assets/video-tab.svg",
+      "width": 375,
+      "height": 812,
+      "role": "page-reference",
+      "fidelity": "strict",
+      "characters": ["视频", "穿搭", "推荐"]
+    },
+    {
+      "id": "outfit-feed-empty-avatar",
+      "name": "穿搭 feed（无形象）",
+      "nodeId": "100:2",
+      "png": "pages/outfit-feed-empty-avatar.png",
+      "svg": "assets/outfit-feed-empty-avatar.svg",
+      "width": 375,
+      "height": 812,
+      "role": "page-reference",
+      "fidelity": "strict",
+      "characters": ["穿搭", "创建试穿形象", "试穿"]
+    },
+    {
+      "id": "outfit-detail",
+      "name": "穿搭详情页",
+      "nodeId": "100:3",
+      "png": "pages/outfit-detail.png",
+      "svg": "assets/outfit-detail.svg",
+      "width": 375,
+      "height": 812,
+      "role": "page-reference",
+      "fidelity": "strict",
+      "characters": ["穿搭详情", "收藏", "立即试穿"]
+    }
+  ],
+  "assets": [
+    {"name": "video-tab", "type": "icon", "file": "assets/video-tab.svg", "usage": "reference-directly"},
+    {"name": "outfit-feed-empty-avatar", "type": "icon", "file": "assets/outfit-feed-empty-avatar.svg", "usage": "reference-directly"},
+    {"name": "outfit-detail", "type": "icon", "file": "assets/outfit-detail.svg", "usage": "reference-directly"}
+  ],
+  "tokens": {
+    "colors": [{"name": "text/primary", "value": "#161823", "source": "style"}],
+    "spacing": [{"name": "page/gutter", "value": 12, "source": "variable"}]
+  },
+  "constraints": {
+    "lockedRegions": ["global-nav"],
+    "editableRegions": ["content-area"],
+    "prohibited": ["redraw-provided-assets"]
+  }
+}

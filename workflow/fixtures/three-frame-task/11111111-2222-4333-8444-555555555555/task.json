@@ -1,0 +1,21 @@
+{
+  "taskSchemaVersion": "1.0",
+  "taskId": "11111111-2222-4333-8444-555555555555",
+  "createdAt": "2026-07-21T10:12:00.000Z",
+  "ownerOpenId": "ou_workflow_fixture",
+  "figma": {
+    "fileKey": "sanitized-fixture-file",
+    "fileName": "AI 试穿（脱敏验收）",
+    "pageName": "主流程",
+    "nodeIds": ["100:1", "100:2", "100:3"]
+  },
+  "files": [
+    {"path": "figma-export.manifest.json", "kind": "manifest", "sha256": "758e6c20b91bf77c5a5b3f102bfaf31db38d8092458932e2a3130de6fdbd8deb", "bytes": 2123},
+    {"path": "pages/video-tab.png", "kind": "page-png", "nodeId": "100:1", "sha256": "ed79fcab542041a9f350fa8866ba432ac30399443fd41d98b74ce9b3c2b44a54", "bytes": 83},
+    {"path": "pages/outfit-feed-empty-avatar.png", "kind": "page-png", "nodeId": "100:2", "sha256": "ed79fcab542041a9f350fa8866ba432ac30399443fd41d98b74ce9b3c2b44a54", "bytes": 83},
+    {"path": "pages/outfit-detail.png", "kind": "page-png", "nodeId": "100:3", "sha256": "ed79fcab542041a9f350fa8866ba432ac30399443fd41d98b74ce9b3c2b44a54", "bytes": 83},
+    {"path": "assets/video-tab.svg", "kind": "svg-asset", "nodeId": "100:1", "sha256": "4d2302ac06a61c40267d580a5d73f151c06082e9804fae8290fc5f83a9f9b4c0", "bytes": 167},
+    {"path": "assets/outfit-feed-empty-avatar.svg", "kind": "svg-asset", "nodeId": "100:2", "sha256": "bcadf1ad1401cce0b4139ac38e30f26da67255ae5567aeab0e6082dd8f374f86", "bytes": 187},
+    {"path": "assets/outfit-detail.svg", "kind": "svg-asset", "nodeId": "100:3", "sha256": "647ad9628a932363c9f9c75f4c545e2413ef4cfe2a2144d99ce9545d554fd18f", "bytes": 148}
+  ]
+}
