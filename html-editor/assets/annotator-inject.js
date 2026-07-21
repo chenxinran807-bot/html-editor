@@ -139,6 +139,15 @@
     return "";
   }
 
+  function workflowContext() {
+    var node = document.querySelector('meta[name="prd-demo-workflow"]');
+    return {
+      taskId: node ? node.getAttribute("data-task-id") || "" : "",
+      sessionId: node ? node.getAttribute("data-session-id") || "" : "",
+      prdFingerprint: node ? node.getAttribute("data-prd-fingerprint") || "" : ""
+    };
+  }
+
   // ---------- 持久化 ----------
   function buildSaveData(includeDataURL) {
     return annotations.map(function (a) {
@@ -968,6 +977,19 @@
     }
     lines.push("---");
     lines.push("请根据以上标注逐一修改对应元素（元素类用「选择器」定位、「片段」辅助确认；区域类需综合调整「区域内元素」整体），并输出修改后的完整 HTML。");
+    var context = workflowContext();
+    if (context.taskId || context.sessionId || context.prdFingerprint) {
+      lines.push("");
+      lines.push("```prd-demo-annotations");
+      lines.push(JSON.stringify({
+        schemaVersion: "1.0",
+        taskId: context.taskId,
+        sessionId: context.sessionId,
+        prdFingerprint: context.prdFingerprint,
+        annotations: []
+      }, null, 2));
+      lines.push("```");
+    }
     return lines.join("\n");
   }
 

@@ -17,15 +17,17 @@ html-editor :: wrap_annotator.py
 <style data-annotator="true">，剥离后重新注入最新版本（用于技能升级后更新老页面）。
 """
 import argparse
+import html
 import os
 import re
 import sys
 
 MARKER = 'data-annotator="true"'
+WORKFLOW_NAME = "prd-demo-workflow"
 
 # 匹配已注入的标注层 <script> / <style>（含 data-annotator 标记），用于 --force 剥离
 _STRIP_RE = re.compile(
-    r'\s*<(script|style)\b[^>]*\bdata-annotator=(?:"true"|\'true\')[^>]*>.*?</\1>',
+    r'\s*(?:<(script|style)\b[^>]*\bdata-annotator=(?:"true"|\'true\')[^>]*>.*?</\1>|<meta\b[^>]*\bname=(?:"prd-demo-workflow"|\'prd-demo-workflow\')[^>]*>)',
     re.IGNORECASE | re.DOTALL,
 )
 
@@ -52,9 +54,29 @@ def read_inject_js():
     )
 
 
-def build_snippet(js_code):
+def _safe_metadata(value, label):
+    value = str(value or "")
+    if re.search(r"[\x00-\x1f\x7f]", value):
+        raise ValueError(label + " 包含控制字符")
+    return html.escape(value, quote=True)
+
+
+def build_workflow_meta(task_id, session_id, prd_fingerprint):
+    if not task_id or not session_id or not prd_fingerprint:
+        raise ValueError("workflow metadata 必须同时包含 taskId、sessionId 和 prdFingerprint")
+    if not re.fullmatch(r"sha256:[0-9a-f]{64}", prd_fingerprint):
+        raise ValueError("prdFingerprint 格式错误")
+    return (
+        '<meta name="' + WORKFLOW_NAME + '"'
+        ' data-task-id="' + _safe_metadata(task_id, "taskId") + '"'
+        ' data-session-id="' + _safe_metadata(session_id, "sessionId") + '"'
+        ' data-prd-fingerprint="' + _safe_metadata(prd_fingerprint, "prdFingerprint") + '">\n'
+    )
+
+
+def build_snippet(js_code, workflow_meta=""):
     # 用独立 <script> 标记，便于识别与后续剥离
-    return "\n<script " + MARKER + ">\n" + js_code + "\n</script>\n"
+    return "\n" + workflow_meta + "<script " + MARKER + ">\n" + js_code + "\n</script>\n"
 
 
 def inject(html, snippet):
@@ -83,6 +105,9 @@ def main():
         "-f", "--force", "--replace", dest="force", action="store_true",
         help="剥离页面里旧的标注层后重新注入最新版本（用于技能升级后更新老页面）",
     )
+    ap.add_argument("--task-id", help="Figma 批量采集 taskId")
+    ap.add_argument("--session-id", help="prd-demo 生成 sessionId")
+    ap.add_argument("--prd-fingerprint", help="当前 PRD 的 sha256 指纹")
     args = ap.parse_args()
 
     if not os.path.isfile(args.input):
@@ -102,7 +127,16 @@ def main():
     if args.force and MARKER in html:
         html, stripped = strip_injected(html)
 
-    snippet = build_snippet(js_code)
+    workflow_values = (args.task_id, args.session_id, args.prd_fingerprint)
+    if any(workflow_values) and not all(workflow_values):
+        print("❌ workflow metadata 三个参数必须同时提供", file=sys.stderr)
+        sys.exit(2)
+    try:
+        workflow_meta = build_workflow_meta(*workflow_values) if all(workflow_values) else ""
+    except ValueError as error:
+        print("❌ " + str(error), file=sys.stderr)
+        sys.exit(2)
+    snippet = build_snippet(js_code, workflow_meta)
     result, mode = inject(html, snippet)
 
     if args.output:

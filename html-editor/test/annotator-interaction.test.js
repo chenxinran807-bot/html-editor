@@ -29,6 +29,14 @@ function bootFixture(options = {}) {
   if (options.savedAnnotations) {
     window.localStorage.setItem('ann::/demo', JSON.stringify(options.savedAnnotations));
   }
+  if (options.workflowMeta) {
+    const meta = window.document.createElement('meta');
+    meta.name = 'prd-demo-workflow';
+    meta.dataset.taskId = options.workflowMeta.taskId;
+    meta.dataset.sessionId = options.workflowMeta.sessionId;
+    meta.dataset.prdFingerprint = options.workflowMeta.prdFingerprint;
+    window.document.head.appendChild(meta);
+  }
   window.document.elementFromPoint = () => window.document.querySelector('#target-title');
   window.eval(source);
   window.document.dispatchEvent(new window.Event('DOMContentLoaded', { bubbles: true }));
@@ -153,6 +161,22 @@ test('clipboard rejection reveals manual copy without losing machine text', asyn
   const textarea = document.querySelector('#ann-modal textarea');
   assert.notEqual(textarea.style.display, 'none');
   assert.match(textarea.value, /页面:|批注:/);
+});
+
+test('exports workflow identity with the modification request', () => {
+  const { document } = bootFixture({
+    workflowMeta: {
+      taskId: 'task-123',
+      sessionId: 'session-456',
+      prdFingerprint: `sha256:${'a'.repeat(64)}`
+    }
+  });
+  annotateTarget(document);
+  click(document, '[data-action="finish"]');
+  const machineText = document.querySelector('#ann-modal textarea').value;
+  assert.match(machineText, /"taskId": "task-123"/);
+  assert.match(machineText, /"sessionId": "session-456"/);
+  assert.match(machineText, new RegExp(`"prdFingerprint": "sha256:${'a'.repeat(64)}"`));
 });
 
 module.exports = { bootFixture, click, selectTarget, annotateTarget };

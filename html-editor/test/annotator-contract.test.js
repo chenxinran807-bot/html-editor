@@ -26,3 +26,10 @@ test('keeps action labels visible on narrow screens', () => {
   assert.doesNotMatch(source, /#ann-toolbar button span:not\([^)]*\)\{display:none/);
   assert.match(source, /@media\(max-width:640px\).*#ann-toolbar button\{[^}]*font-size:11px/s);
 });
+
+test('reads workflow metadata for structured handoff', () => {
+  assert.match(source, /function workflowContext\(\)/);
+  for (const token of ['prd-demo-workflow', 'taskId', 'sessionId', 'prdFingerprint']) {
+    assert.ok(source.includes(token), `missing workflow token: ${token}`);
+  }
+});
