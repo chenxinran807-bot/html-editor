@@ -73,6 +73,13 @@ function annotateTarget(document, note = '标题更醒目') {
   click(document, '#ann-inspector [data-action="save"]');
 }
 
+function structuredPayload(document) {
+  const text = document.querySelector('#ann-modal textarea').value;
+  const match = text.match(/```prd-demo-annotations\n([\s\S]*?)\n```/);
+  assert.ok(match, 'missing prd-demo-annotations payload');
+  return JSON.parse(match[1]);
+}
+
 test('boots a compact three-action annotation toolbar', () => {
   const { document } = bootFixture();
   const toolbar = document.querySelector('#ann-toolbar');
@@ -179,4 +186,47 @@ test('exports workflow identity with the modification request', () => {
   assert.match(machineText, new RegExp(`"prdFingerprint": "sha256:${'a'.repeat(64)}"`));
 });
 
-module.exports = { bootFixture, click, selectTarget, annotateTarget };
+test('exports a clause-aware target-only modification', () => {
+  const { document } = bootFixture({
+    workflowMeta: {
+      taskId: 'task-123',
+      sessionId: 'session-456',
+      prdFingerprint: `sha256:${'a'.repeat(64)}`
+    }
+  });
+  const target = document.querySelector('#target-title');
+  target.setAttribute('data-prd-clause', 'cl-014');
+  target.setAttribute('data-prd-page', 'detail');
+  annotateTarget(document, '按钮改成黑色');
+  click(document, '[data-action="finish"]');
+  const payload = structuredPayload(document);
+  assert.equal(payload.annotations.length, 1);
+  assert.deepEqual(payload.annotations[0], {
+    annId: 'ann-1',
+    targetClauseId: 'cl-014',
+    targetPageId: 'detail',
+    targetNodeSelector: '[data-prd-clause="cl-014"]',
+    action: 'modify',
+    intent: '按钮改成黑色',
+    scope: 'target-only'
+  });
+});
+
+test('does not invent a clause id for legacy HTML', () => {
+  const { document } = bootFixture({
+    workflowMeta: {
+      taskId: 'task-123',
+      sessionId: 'session-456',
+      prdFingerprint: `sha256:${'a'.repeat(64)}`
+    }
+  });
+  annotateTarget(document, '标题更醒目');
+  click(document, '[data-action="finish"]');
+  const item = structuredPayload(document).annotations[0];
+  assert.equal(item.targetClauseId, null);
+  assert.equal(item.targetPageId, null);
+  assert.equal(item.targetNodeSelector, '#target-title');
+  assert.equal(item.scope, 'target-only');
+});
+
+module.exports = { bootFixture, click, selectTarget, annotateTarget, structuredPayload };

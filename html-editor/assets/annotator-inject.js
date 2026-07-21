@@ -134,9 +134,34 @@
   }
 
   function currentPage() {
-    var p = document.querySelector(".page.active");
-    if (p) return p.id || p.getAttribute("data-page") || "page";
+    var p = document.querySelector("[data-prd-page].active, .page.active");
+    if (p) return p.getAttribute("data-prd-page") || p.id || p.getAttribute("data-page") || "page";
     return "";
+  }
+
+  function closestAttribute(el, name) {
+    var node = el;
+    while (node && node.nodeType === 1) {
+      var value = node.getAttribute && node.getAttribute(name);
+      if (value) return { node: node, value: value };
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  function attributeSelector(name, value) {
+    var escaped = String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+    return "[" + name + '=\"' + escaped + '\"]';
+  }
+
+  function targetMetadata(el, fallbackSelector) {
+    var clause = closestAttribute(el, "data-prd-clause");
+    var page = closestAttribute(el, "data-prd-page");
+    return {
+      targetClauseId: clause ? clause.value : null,
+      targetPageId: page ? page.value : null,
+      targetNodeSelector: clause ? attributeSelector("data-prd-clause", clause.value) : fallbackSelector
+    };
   }
 
   function workflowContext() {
@@ -154,6 +179,9 @@
       return {
         id: a.id, type: a.type || "element", selector: a.selector, tag: a.tag,
         text: a.text, note: a.note, page: a.page, snippet: a.snippet,
+        targetClauseId: a.targetClauseId || null,
+        targetPageId: a.targetPageId || null,
+        targetNodeSelector: a.targetNodeSelector || a.selector,
         members: a.members, rectDoc: a.rectDoc,
         refs: (a.refs || []).map(function (r) {
           return includeDataURL ? { name: r.name, dataURL: r.dataURL } : { name: r.name };
@@ -750,9 +778,13 @@
   // ---------- 新增 / 删除 / 编辑 / 清空 ----------
   function addElementAnnotation(el, selector, note, refs) {
     seq += 1;
+    var target = targetMetadata(el, selector);
     annotations.push({
       id: seq, type: "element", selector: selector, tag: el.tagName.toLowerCase(),
-      text: shortText(el), note: note, page: currentPage(), snippet: snippetOf(el), el: el,
+      text: shortText(el), note: note, page: target.targetPageId || currentPage(), snippet: snippetOf(el), el: el,
+      targetClauseId: target.targetClauseId,
+      targetPageId: target.targetPageId,
+      targetNodeSelector: target.targetNodeSelector,
       refs: refs || []
     });
     afterChange();
@@ -760,12 +792,17 @@
 
   function addRegionAnnotation(rectDoc, members, container, note, refs) {
     seq += 1;
+    var selector = container ? computeSelector(container) : "";
+    var target = targetMetadata(container, selector);
     annotations.push({
       id: seq, type: "region",
-      selector: container ? computeSelector(container) : "",
+      selector: selector,
       tag: container ? container.tagName.toLowerCase() : "(区域)",
       text: members.length ? members.map(function (m) { return m.text; }).filter(Boolean).slice(0, 3).join(" / ") : "空白区域",
-      note: note, page: currentPage(),
+      note: note, page: target.targetPageId || currentPage(),
+      targetClauseId: target.targetClauseId,
+      targetPageId: target.targetPageId,
+      targetNodeSelector: target.targetNodeSelector,
       members: members.map(function (m) { return { selector: m.selector, tag: m.tag, text: m.text }; }),
       rectDoc: rectDoc, refs: refs || []
     });
@@ -943,6 +980,20 @@
   }
 
   // ---------- 结构化导出（给 AI 看的协议格式） ----------
+  function structuredAnnotations() {
+    return annotations.map(function (a) {
+      return {
+        annId: "ann-" + a.id,
+        targetClauseId: a.targetClauseId || null,
+        targetPageId: a.targetPageId || null,
+        targetNodeSelector: a.targetNodeSelector || a.selector || null,
+        action: "modify",
+        intent: a.note,
+        scope: "target-only"
+      };
+    });
+  }
+
   function serializeAnnotations() {
     if (annotations.length === 0) return "（当前没有任何标注）";
     var lines = [];
@@ -986,7 +1037,7 @@
         taskId: context.taskId,
         sessionId: context.sessionId,
         prdFingerprint: context.prdFingerprint,
-        annotations: []
+        annotations: structuredAnnotations()
       }, null, 2));
       lines.push("```");
     }
