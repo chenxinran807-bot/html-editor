@@ -205,7 +205,7 @@ def validate_task(task_dir, expected_owner):
         path = safe_join(root, entry.get("path"))
         if not path.is_file():
             raise InvalidTask(f"任务文件不存在: {entry.get('path')}")
-        if path.stat().st_size != entry.get("size"):
+        if path.stat().st_size != entry.get("bytes"):
             raise InvalidTask(f"文件大小不一致: {entry.get('path')}")
         if sha256_file(path) != entry.get("sha256"):
             raise InvalidTask(f"SHA-256 不一致: {entry.get('path')}")
@@ -259,7 +259,7 @@ def select_root(marker_paths, expected_owner):
 2. Require directory name, task `taskId`, and completion `taskId` to match.
 3. Require `ownerOpenId == expected_owner`.
 4. Require manifest shape `exporter + pages` and explicit `capabilities`.
-5. Resolve every `task.files[].path` beneath `task_dir`; reject absolute paths, `..`, missing files, size mismatch, or SHA-256 mismatch.
+5. Resolve every `task.files[].path` beneath `task_dir`; reject absolute paths, `..`, missing files, `bytes` mismatch, or SHA-256 mismatch.
 6. Verify `completion.manifestSha256` against manifest bytes.
 7. Return `{taskId, completedAt, ownerOpenId, manifestPath, capabilities, taskDir}`.
 8. `select_root` must return only one valid current-user marker and raise `AmbiguousRoot` when more than one exists.
