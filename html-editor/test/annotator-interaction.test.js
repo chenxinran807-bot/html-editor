@@ -178,6 +178,52 @@ test('hides screen picking when EyeDropper is unavailable', () => {
   assert.ok(document.querySelectorAll('[data-page-color]').length > 0);
 });
 
+test('previews exact typography choices', () => {
+  const { document } = bootFixture();
+  selectTarget(document);
+  const content = document.querySelector('[data-control="text-content"]');
+  content.value = '新的标题';
+  content.dispatchEvent(new document.defaultView.Event('input', { bubbles: true }));
+  click(document, '[data-value="font-weight:600"]');
+  click(document, '[data-value="line-height:compact"]');
+  click(document, '[data-value="text-align:center"]');
+  const target = document.querySelector('#target-title');
+  assert.equal(target.textContent, '新的标题');
+  assert.equal(target.style.fontWeight, '600');
+  assert.equal(target.style.textAlign, 'center');
+  assert.notEqual(target.style.lineHeight, '');
+});
+
+test('previews exact appearance presets without overwriting an unmatched current value', () => {
+  const { document, window } = bootFixture();
+  const card = document.querySelector('main');
+  card.style.borderRadius = '7px';
+  window.document.elementFromPoint = () => card;
+  selectTarget(document);
+  assert.ok(document.querySelector('[data-value="border-radius:current"][aria-pressed="true"]'));
+  click(document, '[data-value="border-radius:large"]');
+  click(document, '[data-value="shadow:light"]');
+  assert.equal(card.style.borderRadius, '16px');
+  assert.equal(card.style.boxShadow, '0 2px 8px rgba(0,0,0,.12)');
+});
+
+test('shows image-specific crop and radius controls', () => {
+  const { document, window } = bootFixture();
+  const image = document.createElement('img');
+  image.id = 'target-image';
+  image.src = 'data:image/png;base64,AA==';
+  document.querySelector('main').appendChild(image);
+  window.document.elementFromPoint = () => image;
+  selectTarget(document);
+  assert.ok(document.querySelector('[data-section="image"]'));
+  assert.ok(document.querySelector('[data-control="replace-image"]'));
+  assert.ok(document.querySelector('[data-control="add-image-reference"]'));
+  click(document, '[data-value="object-fit:cover"]');
+  click(document, '[data-value="border-radius:small"]');
+  assert.equal(image.style.objectFit, 'cover');
+  assert.equal(image.style.borderRadius, '8px');
+});
+
 test('reviews changes in plain language and prepares Agent handoff', () => {
   const { document } = bootFixture();
   annotateTarget(document);

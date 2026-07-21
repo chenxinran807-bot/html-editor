@@ -243,6 +243,10 @@
       "#ann-inspector .annotator-color-swatch[aria-pressed=true]{outline:2px solid var(--ann-accent);outline-offset:2px;}",
       "#ann-inspector .annotator-native-color{width:32px;height:32px;padding:2px;border:1px solid var(--ann-border);border-radius:7px;background:#fff;cursor:pointer;}",
       "#ann-inspector .annotator-eyedropper{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 9px;border:1px solid var(--ann-border);border-radius:7px;background:#fff;color:var(--ann-text);font:500 12px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;cursor:pointer;}",
+      "#ann-inspector .annotator-field-label{margin:9px 0 5px;font-size:11px;color:var(--ann-secondary);}",
+      "#ann-inspector .annotator-segmented{display:flex;gap:1px;padding:2px;border-radius:8px;background:rgba(0,0,0,.065);}",
+      "#ann-inspector .annotator-segmented button{flex:1;min-height:30px;padding:0 7px;border:0;border-radius:6px;background:transparent;color:var(--ann-text);font:500 11px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;cursor:pointer;}",
+      "#ann-inspector .annotator-segmented button[aria-pressed=true]{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.14);}",
       "#ann-inspector details.annotator-section summary{font-size:12px;font-weight:600;color:var(--ann-secondary);cursor:pointer;}",
       "#ann-inspector .annotator-actions{margin:0 8px;border:1px solid var(--ann-border);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.64);}",
       "#ann-inspector .annotator-action{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:0 11px;border:0;border-bottom:1px solid var(--ann-border);background:transparent;color:var(--ann-text);font:500 13px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;text-align:left;cursor:pointer;}",
@@ -650,6 +654,72 @@
     sectionNode.appendChild(grid);
   }
 
+  function fieldLabel(text) {
+    var label = document.createElement("div");
+    label.className = "annotator-field-label";
+    label.textContent = text;
+    return label;
+  }
+
+  function segmentedControl(sectionNode, label, property, choices, selectedKey, onSelect, showCurrent) {
+    sectionNode.appendChild(fieldLabel(label));
+    var row = document.createElement("div");
+    row.className = "annotator-segmented";
+    if (showCurrent) choices = [["current", "当前", null]].concat(choices);
+    choices.forEach(function (choice) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.textContent = choice[1];
+      button.setAttribute("data-value", property + ":" + choice[0]);
+      button.setAttribute("aria-pressed", choice[0] === selectedKey || (showCurrent && choice[0] === "current") ? "true" : "false");
+      button.onclick = function () {
+        if (choice[0] === "current") return;
+        var buttons = row.querySelectorAll("button");
+        for (var i = 0; i < buttons.length; i++) buttons[i].setAttribute("aria-pressed", buttons[i] === button ? "true" : "false");
+        onSelect(choice[0], choice[2]);
+      };
+      row.appendChild(button);
+    });
+    sectionNode.appendChild(row);
+    return row;
+  }
+
+  function lineHeightValue(el, preset) {
+    var size = parseFloat(getComputedStyle(el).fontSize) || 16;
+    var ratio = preset === "compact" ? 1.2 : preset === "wide" ? 1.8 : 1.5;
+    return Math.round(size * ratio * 10) / 10 + "px";
+  }
+
+  function renderRadiusControl(sectionNode, el, draft) {
+    var current = getComputedStyle(el).borderRadius || "0px";
+    var known = { "0px": "square", "8px": "small", "16px": "large", "999px": "pill" };
+    segmentedControl(sectionNode, "圆角", "border-radius", [
+      ["square", "直角", "0px"], ["small", "小圆角", "8px"],
+      ["large", "大圆角", "16px"], ["pill", "胶囊", "999px"]
+    ], known[current] || null, function (_key, value) {
+      previewStyle(draft, "appearance", "border-radius", value, "px");
+    }, !known[current]);
+  }
+
+  function renderAppearanceControls(sectionNode, el, draft) {
+    renderColorControl(sectionNode, el, draft, "background-color", "appearance");
+    renderRadiusControl(sectionNode, el, draft);
+    var borderWidth = getComputedStyle(el).borderTopWidth || "0px";
+    segmentedControl(sectionNode, "边框", "border-width", [
+      ["none", "无", "0px"], ["thin", "细", "1px"], ["thick", "粗", "2px"]
+    ], borderWidth === "1px" ? "thin" : borderWidth === "2px" ? "thick" : "none", function (_key, value) {
+      previewStyle(draft, "appearance", "border-width", value, "px");
+      if (value !== "0px" && getComputedStyle(el).borderStyle === "none") previewStyle(draft, "appearance", "border-style", "solid", null);
+    }, false);
+    segmentedControl(sectionNode, "阴影", "shadow", [
+      ["none", "无", "none"],
+      ["light", "轻", "0 2px 8px rgba(0,0,0,.12)"],
+      ["clear", "明显", "0 8px 24px rgba(0,0,0,.20)"]
+    ], "none", function (_key, value) {
+      previewStyle(draft, "appearance", "box-shadow", value, null);
+    }, false);
+  }
+
   function buildInputBox(labelText, presetNote, x, y, onSubmit, presetRefs, previewEl) {
     var box = document.createElement("div");
     box.id = "ann-inspector";
@@ -706,7 +776,15 @@
       contentInput.value = previewEl ? previewEl.textContent.trim() : "";
       contentInput.setAttribute("data-control", "text-content");
       contentInput.style.cssText = "box-sizing:border-box;width:100%;min-height:32px;border:1px solid var(--ann-border);border-radius:7px;padding:0 8px;background:#fff;color:var(--ann-text);";
+      contentInput.oninput = function () { previewText(previewDraft, contentInput.value); };
       sectionNodes["text-content"].appendChild(contentInput);
+      var decrease = document.createElement("button");
+      decrease.type = "button";
+      decrease.setAttribute("data-control", "font-size-decrease");
+      decrease.textContent = "−";
+      var sizeValue = document.createElement("span");
+      sizeValue.setAttribute("data-control", "font-size-value");
+      sizeValue.textContent = Math.round(parseFloat(getComputedStyle(previewEl).fontSize) || 16);
       var increase = document.createElement("button");
       increase.type = "button";
       increase.setAttribute("data-control", "font-size-increase");
@@ -714,14 +792,63 @@
       increase.onclick = function () {
         var current = parseFloat(getComputedStyle(previewEl).fontSize) || 16;
         previewStyle(previewDraft, "text", "font-size", (current + 1) + "px", "px");
+        sizeValue.textContent = Math.round(current + 1);
+      };
+      decrease.onclick = function () {
+        var current = parseFloat(getComputedStyle(previewEl).fontSize) || 16;
+        var next = Math.max(8, current - 1);
+        previewStyle(previewDraft, "text", "font-size", next + "px", "px");
+        sizeValue.textContent = Math.round(next);
       };
       var typeRow = document.createElement("div");
       typeRow.className = "annotator-control-row";
+      typeRow.appendChild(decrease);
+      typeRow.appendChild(sizeValue);
       typeRow.appendChild(increase);
       sectionNodes.typography.appendChild(typeRow);
+      segmentedControl(sectionNodes.typography, "字重", "font-weight", [
+        ["400", "常规", "400"], ["600", "中等", "600"], ["700", "加粗", "700"]
+      ], String(getComputedStyle(previewEl).fontWeight), function (_key, value) {
+        previewStyle(previewDraft, "text", "font-weight", value, null);
+      }, false);
+      segmentedControl(sectionNodes.typography, "行距", "line-height", [
+        ["compact", "紧凑", null], ["standard", "标准", null], ["wide", "宽松", null]
+      ], "standard", function (key) {
+        previewStyle(previewDraft, "text", "line-height", lineHeightValue(previewEl, key), "px");
+      }, false);
+      segmentedControl(sectionNodes.typography, "对齐", "text-align", [
+        ["left", "左", "left"], ["center", "中", "center"], ["right", "右", "right"]
+      ], getComputedStyle(previewEl).textAlign || "left", function (_key, value) {
+        previewStyle(previewDraft, "text", "text-align", value, null);
+      }, false);
       renderColorControl(sectionNodes["text-color"], previewEl, previewDraft, "color", "text");
+    } else if (kind === "image") {
+      var imageActions = document.createElement("div");
+      imageActions.className = "annotator-control-row";
+      var replaceImage = document.createElement("button");
+      replaceImage.type = "button";
+      replaceImage.setAttribute("data-control", "replace-image");
+      replaceImage.textContent = "选择替换图片";
+      replaceImage.onclick = function () {
+        appendNote("使用所附图片替换当前图片");
+        addRef();
+      };
+      var addImageReference = document.createElement("button");
+      addImageReference.type = "button";
+      addImageReference.setAttribute("data-control", "add-image-reference");
+      addImageReference.textContent = "添加参考图";
+      addImageReference.onclick = addRef;
+      imageActions.appendChild(replaceImage);
+      imageActions.appendChild(addImageReference);
+      sectionNodes.image.appendChild(imageActions);
+      segmentedControl(sectionNodes.image, "裁切方式", "object-fit", [
+        ["contain", "完整显示", "contain"], ["cover", "填满区域", "cover"]
+      ], getComputedStyle(previewEl).objectFit || "contain", function (_key, value) {
+        previewStyle(previewDraft, "image", "object-fit", value, null);
+      }, false);
+      renderRadiusControl(sectionNodes.appearance, previewEl, previewDraft);
     } else if (sectionNodes.appearance && previewEl) {
-      renderColorControl(sectionNodes.appearance, previewEl, previewDraft, "background-color", "appearance");
+      renderAppearanceControls(sectionNodes.appearance, previewEl, previewDraft);
     }
 
     var noteSection = inspectorSection("note", "补充说明", false);
@@ -854,7 +981,17 @@
   }
 
   function createDraft(el) {
-    return { el: el, originals: {}, before: {}, changes: [], committed: false };
+    return { el: el, originals: {}, before: {}, originalText: el ? el.textContent : "", changes: [], committed: false };
+  }
+
+  function previewText(draft, after) {
+    if (!draft || !draft.el) return;
+    draft.el.textContent = after;
+    draft.changes = draft.changes.filter(function (item) { return item.property !== "text-content"; });
+    draft.changes.push({
+      category: "text", property: "text-content", before: draft.originalText,
+      after: after, unit: null, direction: null
+    });
   }
 
   function previewStyle(draft, category, property, after, unit, direction) {
@@ -883,6 +1020,7 @@
       if (value) draft.el.style.setProperty(property, value);
       else draft.el.style.removeProperty(property);
     });
+    if (draft.changes.some(function (item) { return item.property === "text-content"; })) draft.el.textContent = draft.originalText;
   }
 
   function closeInput() {
