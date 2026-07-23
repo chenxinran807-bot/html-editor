@@ -1,0 +1,7 @@
+interface:
+  display_name: "HTML 可视化标注"
+  short_description: "给任意 HTML 注入点选、框选和结构化修改回传能力"
+  default_prompt: "使用 $html-editor 为当前 HTML 注入可视化标注层，并保留 workflow 身份。"
+
+policy:
+  allow_implicit_invocation: true
