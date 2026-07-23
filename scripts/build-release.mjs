@@ -7,17 +7,35 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
-const VERSION = '1.3.1';
+const VERSION = '1.4.0';
+const ARCHIVE_TIME = new Date(2000, 0, 1, 0, 0, 0);
 const ALLOWED = [
   'SKILL.md',
   'CHANGELOG.md',
   'agents/openai.yaml',
   'assets/annotator-inject.js',
+  'assets/streamlit-annotator.js',
+  'scripts/streamlit_adapter.py',
   'scripts/wrap_annotator.py'
 ];
 
 function checksum(filePath) {
   return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
+}
+
+function archiveEntries() {
+  const directories = new Set(['html-editor/']);
+  for (const relativePath of ALLOWED) {
+    let directory = path.posix.dirname(relativePath);
+    while (directory !== '.') {
+      directories.add(`html-editor/${directory}/`);
+      directory = path.posix.dirname(directory);
+    }
+  }
+  return [
+    ...[...directories].sort(),
+    ...[...ALLOWED].sort().map(relativePath => `html-editor/${relativePath}`)
+  ];
 }
 
 export function buildRelease(options = {}) {
@@ -32,6 +50,14 @@ export function buildRelease(options = {}) {
     const destinationPath = path.join(packageRoot, relativePath);
     fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
     fs.copyFileSync(sourcePath, destinationPath);
+    fs.chmodSync(destinationPath, 0o644);
+    fs.utimesSync(destinationPath, ARCHIVE_TIME, ARCHIVE_TIME);
+  }
+
+  for (const entry of archiveEntries().filter(entry => entry.endsWith('/'))) {
+    const directoryPath = path.join(temporaryRoot, entry);
+    fs.chmodSync(directoryPath, 0o755);
+    fs.utimesSync(directoryPath, ARCHIVE_TIME, ARCHIVE_TIME);
   }
 
   fs.mkdirSync(outputDirectory, { recursive: true });
@@ -39,8 +65,8 @@ export function buildRelease(options = {}) {
   const zipPath = path.join(outputDirectory, zipName);
   const checksumPath = `${zipPath}.sha256`;
   fs.rmSync(zipPath, { force: true });
-  execFileSync('/usr/bin/ditto', ['-c', '-k', '--norsrc', '--noextattr', '--keepParent', packageRoot, zipPath], {
-    env: { ...process.env, COPYFILE_DISABLE: '1' }
+  execFileSync('/usr/bin/zip', ['-X', '-q', zipPath, ...archiveEntries()], {
+    cwd: temporaryRoot
   });
   fs.writeFileSync(checksumPath, `${checksum(zipPath)}  ${zipName}\n`, 'utf8');
   fs.rmSync(temporaryRoot, { recursive: true, force: true });

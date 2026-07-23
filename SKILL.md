@@ -1,6 +1,6 @@
 ---
 name: html-editor
-description: 给任意 HTML 页面注入可视化标注层，让用户在 AI 生成的 HTML 预览里"指哪打哪"地反馈——直接在页面上点选元素、写批注，再导出成结构化文本粘回对话，AI 据此精确修改对应元素。**凡是涉及生成 HTML、网页、网页原型、产品原型、demo、页面、落地页、报告页的任务，都应默认启用本技能，在产出 HTML 时注入标注层，方便用户直接在页面上圈点反馈迭代。** 也适用于对已有的任意静态 HTML 收集可视化修改意见，或迭代打磨 AI 生成的 HTML/原型/Demo/报告/落地页。触发词：生成 html、生成网页、网页原型、html 原型、产品原型、原型、prototype、做个页面、做个 demo、demo、设计页面、设计、落地页、标注、框选标注、点选批注、可视化反馈、在页面上标记、annotate html、给 HTML 加批注。
+description: 给任意 HTML 页面或 Streamlit 应用注入可视化标注层，让用户在 AI 生成的预览里"指哪打哪"地反馈——直接在页面上点选元素、写批注，再导出成结构化文本粘回对话，AI 据此精确修改对应元素。**凡是涉及生成 HTML、网页、网页原型、产品原型、demo、页面、落地页、报告页的任务，都应默认启用本技能，在产出 HTML 时注入标注层，方便用户直接在页面上圈点反馈迭代。** 也适用于对已有的任意静态 HTML 或 Streamlit 应用收集可视化修改意见。触发词：生成 html、生成网页、网页原型、html 原型、产品原型、原型、prototype、做个页面、做个 demo、demo、设计页面、设计、落地页、Streamlit、启用 HTML Editor、标注、框选标注、点选批注、可视化反馈、在页面上标记、annotate html、给 HTML 加批注。
 ---
 
 # HTML Editor
@@ -14,6 +14,7 @@ description: 给任意 HTML 页面注入可视化标注层，让用户在 AI 生
 - 用户在迭代 AI 生成的 HTML（原型、Demo、报告、落地页等），希望**在页面上直接点选元素写意见**而不是打字描述位置。
 - 用户说"想要能标注的 HTML""让我在页面上圈一下""可视化反馈""点选批注"等。
 - 拿到任意静态 HTML，需要收集多人的可视化修改意见。
+- 用户要标注 Streamlit 应用，或明确说“启用 HTML Editor”。
 
 ## 核心设计（为什么这样做）
 
@@ -124,12 +125,46 @@ python3 scripts/wrap_annotator.py <input.html> -o <output.html> \
 
 解析每条标注：用 `选择器` 在原 HTML 里定位元素，按 `批注` 落实修改，逐条完成后输出**修改后的完整 HTML**。改完可再次注入标注层交付，进入下一轮闭环。
 
+## Streamlit 自动工作流（增量能力）
+
+Streamlit 使用运行时浏览器注入，不得修改用户源文件、页面组件或依赖声明；静态 HTML 主要流程保持不变，继续使用上面的包装器。每次执行浏览器操作前，以当前安装的 Browser control skill 作为 source of truth：按其方式定位插件根目录、初始化并选择浏览器、完整读取所选浏览器文档，再操作标签页。不要在本技能中硬编码插件版本路径。
+
+注入前从本技能目录读取 `assets/streamlit-annotator.js`。将配置写入 `window.__HTML_EDITOR_STREAMLIT_CONFIG__`，再把运行时代码注入活动的 Streamlit 标签页。注入前先检查 `window.__HTML_EDITOR_STREAMLIT__`；若 marker 已存在，不要再次注入。注入成功后按当前 Browser 文档支持的方式使浏览器和目标标签页可见、置于用户可操作状态。
+
+项目输入可以是项目目录或 `.zip`，Agent 对两者使用完全相同的 `inspect`、`launch` 命令，不在命令外手动解包。ZIP 会经过路径、文件类型、条目数、单文件大小、总展开大小和压缩比安全检查，再安全提取到私有临时目录；源归档保持不变。`inspect` 结束即清理临时目录，`launch` 在进程退出或发生错误时清理。遇到不安全或过大的归档时，原样报告 adapter 的明确错误，不得手动解压来绕过安全检查。
+
+`inspect` 和 launch metadata 都包含 `pythonExecutable`、`pythonSource`、`runtimeDigest`、`runtimeScope`。项目虚拟环境由 adapter 自动优先选择（`pythonSource: project-venv`），直接使用选定的 Python 可执行文件，不运行激活脚本，也不通过 shell 启动。找不到项目虚拟环境时回退到 `pythonSource: current-interpreter`、`runtimeScope: interpreter-only`；这个 interpreter-only scope 只覆盖解释器本体，运行时保证较低，应明确告知用户。缺少依赖时仍遵循下面的批准流程，不自动安装或改写依赖声明。
+
+### 路径 1：现有本地应用
+
+1. 使用当前 Browser skill 的标签页发现与检查流程，确认目标标签页是 Streamlit。若有多个候选且匹配不明确，列出候选并请用户选定，禁止猜测。
+2. 项目已知时，运行 `python3 scripts/streamlit_adapter.py inspect <project>`，读取项目名、入口与项目指纹；紧接注入前必须重新运行同一 inspect，并只使用这次 fresh inspect 的 `projectFingerprint`。出现项目指纹不匹配时停止并让用户确认目标。
+3. 用项目名与 `projectFingerprint` 配置 `__HTML_EDITOR_STREAMLIT_CONFIG__`，读取 adapter asset，注入 runtime，然后显示目标标签页。
+4. 如果只有正在运行的标签页、没有项目文件可供计算 fingerprint，明确使用 session-only identity（`session fingerprint`），不得编造项目身份：为每次会话生成新的加密安全随机值，格式必须为 `sha256:<64hex>`，并生成唯一的 session projectName；两者不得复用。此模式的源位置保证较低，只能在本次会话中辅助定位。因为 runtime 存储键包含 projectName/fingerprint，新会话不能恢复旧标注；残留 localStorage 对新身份不可访问。会话结束时可调用 adapter 的 `destroy()` 清理页面 overlay；它不会删除 localStorage，只有用户明确要求且当前 Browser workflow 允许时才清理已知旧存储键。
+
+### 路径 2：上传的完整项目或传入项目
+
+1. 对上传或传入的项目目录或 `.zip` 运行 `python3 scripts/streamlit_adapter.py inspect <project>`。检查 JSON 中的入口、候选入口、依赖声明、项目指纹和运行时身份；候选入口匹配不明确时请用户选择。
+2. 对目录或 `.zip` 都原样运行 `python3 scripts/streamlit_adapter.py launch <project> [--entry <file>] [--port <port>]`。解析首行 launch metadata 的 `url`、`projectFingerprint`、`pythonExecutable`、`pythonSource`、`runtimeDigest`、`runtimeScope`，并保留该命令所在进程；这行 metadata 只说明启动命令已发出，不代表服务可用。
+3. 对 metadata URL 执行 HTTP probe，要求成功响应，再按当前 Browser skill 工作流打开页面并确认存在 Streamlit root。只有 HTTP probe 和页面检查都成功后才能确认服务 ready；然后对同一个目录或 ZIP 重新运行 `python3 scripts/streamlit_adapter.py inspect <project>`。将 fresh inspect 的 `projectFingerprint`、`runtimeDigest`、`runtimeScope` 与 launch metadata 对应值逐一比较；三者全部一致才允许注入，任一不一致都说明项目内容或 runtime 已改变，必须停止。
+4. 使用这个经过比较的可信 fresh inspect 指纹配置项目，读取 `assets/streamlit-annotator.js`，检查 marker 后仅注入一次；显示标签页并保持进程运行，直到用户结束预览。
+
+### 失败处理
+
+- **缺少依赖**：报告缺少项和现有依赖文件；安装依赖属于外部变更，需要用户批准，且在批准前后都让项目的依赖声明保持不变，除非用户另行明确要求修改。
+- **启动错误**：保留退出码与精简错误输出，停止打开或注入，不把失败进程说成已就绪。即使 launch metadata 已经打印，metadata 之后发生启动失败也必须报告为失败。
+- **浏览器注入错误**：停止并报告注入阶段与浏览器错误；不得改写用户源码作为替代。
+- **匹配不明确**：无论是入口还是浏览器标签页，都让用户选择，不自动挑选。
+- **项目或运行时身份不匹配**：`projectFingerprint`、`runtimeDigest`、`runtimeScope` 任一不匹配都停止注入或消费标注，重新 inspect/核对项目；未经用户确认不得跨项目或 runtime 复用配置或标注。
+
 ## 文件说明
 
 - `scripts/wrap_annotator.py` — 注入包装脚本（把标注层贴进任意 HTML，支持 `--force` 更新老页面）。
+- `scripts/streamlit_adapter.py` — 只读检查并启动 Streamlit 项目，输出项目指纹与 launch metadata；是否可用仍由 HTTP probe 验证。
 - `assets/annotator-inject.js` — 标注交互层本体（纯前端 JS，自包含无依赖）。
+- `assets/streamlit-annotator.js` — 注入活动 Streamlit 标签页的运行时 adapter asset。
 
-两个文件完全自包含，不需要任何额外依赖。
+静态 HTML 的两个原有文件完全自包含，不需要任何额外依赖；Streamlit 增量流程使用项目自身已声明的 Python 环境。
 
 ## 后续可选增强（不作为运行前提）
 
