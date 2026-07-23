@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0 — Streamlit Adapter
+
+- 新增可选的浏览器端注入适配器，为 Streamlit 应用挂载 HTML Editor 标注能力。
+- 使用复合指纹稳定识别页面与组件，降低局部更新导致的目标漂移。
+- 支持 Streamlit rerun 后自动恢复标注会话与注入状态。
+- 本次能力为增量适配；现有静态 HTML 的包装、注入和标注行为保持不变。
+
 ## 1.3.1 — Non-blocking Inspector
 
 - 标注工具默认固定在页面右侧空白区域，不再横跨页面底部。
