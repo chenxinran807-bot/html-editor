@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
-const VERSION = '1.3.1';
+const VERSION = '1.3.2';
 const ALLOWED = [
   'SKILL.md',
   'CHANGELOG.md',

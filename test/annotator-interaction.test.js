@@ -42,11 +42,62 @@ function bootFixture(options = {}) {
     meta.dataset.prdFingerprint = options.workflowMeta.prdFingerprint;
     window.document.head.appendChild(meta);
   }
+  if (options.layout) {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: options.layout.viewport.width });
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: options.layout.viewport.height });
+    window.document.querySelector('main').getBoundingClientRect = () => options.layout.content;
+    window.document.querySelector('#target-title').getBoundingClientRect = () => options.layout.target;
+  }
   window.document.elementFromPoint = () => window.document.querySelector('#target-title');
   window.eval(source);
   window.document.dispatchEvent(new window.Event('DOMContentLoaded', { bubbles: true }));
   return { dom, window, document: window.document };
 }
+
+test('docks the inspector in a wide empty side lane instead of covering the prototype', () => {
+  const { document } = bootFixture({
+    layout: {
+      viewport: { width: 1440, height: 900 },
+      content: { left: 100, right: 900, top: 0, bottom: 900, width: 800, height: 900 },
+      target: { left: 180, right: 420, top: 80, bottom: 130, width: 240, height: 50 }
+    }
+  });
+
+  selectTarget(document);
+
+  const inspector = document.querySelector('#ann-inspector');
+  assert.equal(inspector.dataset.placement, 'right-empty-lane');
+  assert.ok(parseFloat(inspector.style.left) >= 916);
+});
+
+test('lets the user drag the inspector by its title bar', () => {
+  const { document } = bootFixture({
+    layout: {
+      viewport: { width: 1440, height: 900 },
+      content: { left: 100, right: 900, top: 0, bottom: 900, width: 800, height: 900 },
+      target: { left: 180, right: 420, top: 80, bottom: 130, width: 240, height: 50 }
+    }
+  });
+  selectTarget(document);
+  const inspector = document.querySelector('#ann-inspector');
+  const header = inspector.querySelector('.annotator-inspector-head');
+  const startLeft = parseFloat(inspector.style.left);
+  const startTop = parseFloat(inspector.style.top);
+
+  header.dispatchEvent(new document.defaultView.MouseEvent('pointerdown', {
+    bubbles: true, clientX: 1000, clientY: 100, button: 0
+  }));
+  document.dispatchEvent(new document.defaultView.MouseEvent('pointermove', {
+    bubbles: true, clientX: 1100, clientY: 180, button: 0
+  }));
+  document.dispatchEvent(new document.defaultView.MouseEvent('pointerup', {
+    bubbles: true, clientX: 1100, clientY: 180, button: 0
+  }));
+
+  assert.equal(parseFloat(inspector.style.left), startLeft + 100);
+  assert.equal(parseFloat(inspector.style.top), startTop + 80);
+  assert.equal(inspector.dataset.placement, 'user');
+});
 
 function click(document, selector) {
   const element = document.querySelector(selector);

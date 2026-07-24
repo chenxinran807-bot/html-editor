@@ -230,7 +230,8 @@
       "[data-annotator=\"true\"]{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;-webkit-font-smoothing:antialiased;}",
       "[data-annotator=\"true\"] svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;}",
       "#ann-inspector{position:fixed;z-index:2147483200;width:336px;box-sizing:border-box;padding:0;background:var(--ann-surface);border:1px solid var(--ann-border);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.24),0 1px 2px rgba(0,0,0,.08);overflow:hidden;color:var(--ann-text);backdrop-filter:blur(28px);}",
-      "#ann-inspector .annotator-inspector-head{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px;}",
+      "#ann-inspector .annotator-inspector-head{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px;cursor:grab;touch-action:none;user-select:none;}",
+      "#ann-inspector .annotator-inspector-head:active{cursor:grabbing;}",
       "#ann-inspector h2{margin:0;font-size:15px;line-height:20px;font-weight:650;}",
       "#ann-inspector .annotator-icon-button{display:grid;place-items:center;width:28px;height:28px;padding:0;border:0;border-radius:7px;background:transparent;color:var(--ann-secondary);cursor:pointer;}",
       "#ann-inspector .annotator-context{margin:0 14px 12px;padding:9px 10px;border-radius:8px;background:rgba(0,0,0,.045);font-size:12px;color:var(--ann-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}",
@@ -334,6 +335,134 @@
 
   function rectsOverlap(a, b) {
     return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(value, max));
+  }
+
+  function visibleContentRect() {
+    var preferred = document.querySelector("main,[role=main],#app,#root");
+    if (preferred && !isAnnotatorElement(preferred)) {
+      var preferredRect = preferred.getBoundingClientRect();
+      if (preferredRect.width > 0 && preferredRect.height > 0) return preferredRect;
+    }
+    var children = document.body ? document.body.children : [];
+    var bounds = null;
+    for (var i = 0; i < children.length; i++) {
+      var child = children[i];
+      if (isAnnotatorElement(child) || /^(SCRIPT|STYLE|LINK|META)$/.test(child.tagName)) continue;
+      var rect = child.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) continue;
+      if (!bounds) {
+        bounds = { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
+      } else {
+        bounds.left = Math.min(bounds.left, rect.left);
+        bounds.right = Math.max(bounds.right, rect.right);
+        bounds.top = Math.min(bounds.top, rect.top);
+        bounds.bottom = Math.max(bounds.bottom, rect.bottom);
+      }
+    }
+    if (!bounds) return { left: 0, right: window.innerWidth, top: 0, bottom: window.innerHeight };
+    bounds.width = bounds.right - bounds.left;
+    bounds.height = bounds.bottom - bounds.top;
+    return bounds;
+  }
+
+  function overlapArea(a, b) {
+    var width = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+    var height = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+    return width * height;
+  }
+
+  function placeInspectorAwayFromContent(box, targetEl, x, y) {
+    var margin = 16;
+    var viewportWidth = window.innerWidth;
+    var viewportHeight = window.innerHeight;
+    var width = Math.min(336, Math.max(280, viewportWidth - margin * 2));
+    var height = Math.min(Math.max(box.scrollHeight || 620, 360), viewportHeight - margin * 2);
+    var content = visibleContentRect();
+    var target = targetEl && targetEl.getBoundingClientRect
+      ? targetEl.getBoundingClientRect()
+      : { left: x, right: x, top: y, bottom: y };
+    var leftSpace = content.left;
+    var rightSpace = viewportWidth - content.right;
+    var left;
+    var top = clamp(target.top, margin, Math.max(margin, viewportHeight - height - margin));
+    var placement;
+
+    box.style.width = width + "px";
+    box.style.maxHeight = Math.max(320, viewportHeight - margin * 2) + "px";
+
+    if (rightSpace >= width + margin * 2) {
+      left = content.right + margin;
+      placement = "right-empty-lane";
+    } else if (leftSpace >= width + margin * 2) {
+      left = content.left - width - margin;
+      placement = "left-empty-lane";
+    } else {
+      var candidates = [
+        { name: "right-of-selection", left: target.right + margin, top: target.top },
+        { name: "left-of-selection", left: target.left - width - margin, top: target.top },
+        { name: "below-selection", left: target.left, top: target.bottom + margin },
+        { name: "above-selection", left: target.left, top: target.top - height - margin }
+      ];
+      var best = null;
+      for (var i = 0; i < candidates.length; i++) {
+        var candidate = candidates[i];
+        candidate.left = clamp(candidate.left, margin, Math.max(margin, viewportWidth - width - margin));
+        candidate.top = clamp(candidate.top, margin, Math.max(margin, viewportHeight - height - margin));
+        var candidateRect = {
+          left: candidate.left, right: candidate.left + width,
+          top: candidate.top, bottom: candidate.top + height
+        };
+        candidate.score = overlapArea(candidateRect, target) * 1000 + overlapArea(candidateRect, content);
+        if (!best || candidate.score < best.score) best = candidate;
+      }
+      left = best.left;
+      top = best.top;
+      placement = best.name;
+    }
+
+    box.style.left = clamp(left, margin, Math.max(margin, viewportWidth - width - margin)) + "px";
+    box.style.top = top + "px";
+    box.style.right = "auto";
+    box.style.bottom = "auto";
+    box.setAttribute("data-placement", placement);
+  }
+
+  function enableInspectorDrag(box, handle) {
+    var dragState = null;
+    handle.addEventListener("pointerdown", function (event) {
+      if (event.button !== 0) return;
+      if (event.target && event.target.closest && event.target.closest("button,input,textarea,select,a")) return;
+      event.preventDefault();
+      dragState = {
+        x: event.clientX,
+        y: event.clientY,
+        left: parseFloat(box.style.left) || 0,
+        top: parseFloat(box.style.top) || 0
+      };
+    });
+    document.addEventListener("pointermove", function (event) {
+      if (!dragState || !box.parentNode) return;
+      var width = box.offsetWidth || parseFloat(box.style.width) || 336;
+      var height = box.offsetHeight || Math.min(box.scrollHeight || 620, window.innerHeight - 32);
+      box.style.left = clamp(
+        dragState.left + event.clientX - dragState.x,
+        8,
+        Math.max(8, window.innerWidth - width - 8)
+      ) + "px";
+      box.style.top = clamp(
+        dragState.top + event.clientY - dragState.y,
+        8,
+        Math.max(8, window.innerHeight - height - 8)
+      ) + "px";
+      box.setAttribute("data-placement", "user");
+    });
+    document.addEventListener("pointerup", function () {
+      dragState = null;
+    });
   }
 
   function placeToolbarAwayFromInteractiveElements() {
@@ -1122,12 +1251,9 @@
     box.appendChild(fileInput);
     box.appendChild(footer);
     document.body.appendChild(box);
-
-    var vw = window.innerWidth, vh = window.innerHeight;
-    var left = Math.min(x + 12, vw - 352);
-    var top = Math.min(y + 12, vh - 480);
-    box.style.left = Math.max(8, left) + "px";
-    box.style.top = Math.max(8, top) + "px";
+    if (bar) bar.style.visibility = "hidden";
+    placeInspectorAwayFromContent(box, previewEl, x, y);
+    enableInspectorDrag(box, head);
     if (presetNote) {
       ta.focus();
       ta.select();
@@ -1235,6 +1361,7 @@
     previewDraft = null;
     if (inputBox && inputBox.parentNode) inputBox.parentNode.removeChild(inputBox);
     inputBox = null;
+    if (bar) bar.style.visibility = "";
     if (toggleBtn && typeof toggleBtn.focus === "function") toggleBtn.focus();
   }
 

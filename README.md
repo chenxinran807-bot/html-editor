@@ -4,11 +4,11 @@
 
 ## 当前版本
 
-`1.3.1`
+`1.3.2`
 
 ## 主要能力
 
-- macOS 原生 Inspector 风格，面板尽量避开页面内容；
+- macOS 原生 Inspector 风格，优先停靠页面空白栏，并支持拖动标题栏自由调整位置；
 - 点选元素或拖拽框选区域；
 - 文字、颜色、圆角、边框、阴影、图片与间距的可视化调整；
 - 页面常用颜色、系统取色器与浏览器屏幕吸色；
@@ -35,4 +35,4 @@ npm test
 node scripts/build-release.mjs
 ```
 
-安装包位于 `dist/html-editor-1.3.1.zip`。
+安装包位于 `dist/html-editor-1.3.2.zip`。
