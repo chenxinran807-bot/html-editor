@@ -318,6 +318,28 @@ test('drags the selected edge to change external spacing with a live guide', () 
   assert.match(document.querySelector('[data-spacing-readout]').textContent, /12/);
 });
 
+test('continues changing spacing when the starting value is already 160px', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-button');
+  target.style.marginRight = '160px';
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  click(document, '[data-spacing-mode="external"]');
+  drag(document, '[data-spacing-handle="right"]', { x: 200, y: 120 }, { x: 224, y: 120 });
+  assert.equal(target.style.marginRight, '184px');
+  assert.match(document.querySelector('[data-spacing-readout]').textContent, /184/);
+});
+
+test('moves the selected element with the dedicated drag handle', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-button');
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  drag(document, '[data-move-handle="true"]', { x: 160, y: 80 }, { x: 184, y: 92 });
+  assert.equal(target.style.translate, '24px 12px');
+  assert.match(document.querySelector('[data-spacing-readout]').textContent, /移动/);
+});
+
 test('drags the selected edge to change internal spacing', () => {
   const { document, window } = bootFixture();
   const target = document.querySelector('#target-button');

@@ -34,6 +34,7 @@
   var previewDraft = null;
   var spacingOverlay = null;
   var spacingDragState = null;
+  var elementMoveDragState = null;
   var dragging = false;
   var startX = 0, startY = 0;
   var dragBox = null;
@@ -257,6 +258,8 @@
       ".annotator-spacing-handle[data-spacing-handle=right]{right:-10px;top:calc(50% - 9px);}",
       ".annotator-spacing-handle[data-spacing-handle=top]{top:-10px;left:calc(50% - 9px);cursor:ns-resize;}",
       ".annotator-spacing-handle[data-spacing-handle=bottom]{bottom:-10px;left:calc(50% - 9px);cursor:ns-resize;}",
+      ".annotator-move-handle{position:absolute;left:10px;top:-38px;display:grid;place-items:center;width:30px;height:30px;padding:0;border:2px solid #fff;border-radius:9px;background:var(--ann-accent);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.28);pointer-events:auto;cursor:grab;touch-action:none;}",
+      ".annotator-move-handle:active{cursor:grabbing;}",
       ".annotator-spacing-readout{position:absolute;left:50%;top:-34px;transform:translateX(-50%);min-width:44px;padding:4px 7px;border-radius:6px;background:#1d1d1f;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;text-align:center;white-space:nowrap;}",
       "#ann-inspector details.annotator-section summary{font-size:12px;font-weight:600;color:var(--ann-secondary);cursor:pointer;}",
       "#ann-inspector .annotator-actions{margin:0 8px;border:1px solid var(--ann-border);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.64);}",
@@ -891,6 +894,7 @@
 
   function destroySpacingOverlay() {
     spacingDragState = null;
+    elementMoveDragState = null;
     if (spacingOverlay && spacingOverlay.parentNode) spacingOverlay.parentNode.removeChild(spacingOverlay);
     spacingOverlay = null;
   }
@@ -905,6 +909,30 @@
     readout.setAttribute("data-spacing-readout", "true");
     readout.textContent = "拖动边缘";
     spacingOverlay.appendChild(readout);
+    var moveHandle = document.createElement("button");
+    moveHandle.type = "button";
+    moveHandle.className = "annotator-move-handle";
+    moveHandle.setAttribute("data-move-handle", "true");
+    moveHandle.setAttribute("aria-label", "拖动移动选中元素");
+    moveHandle.innerHTML = iconSvg("resize");
+    moveHandle.addEventListener("pointerdown", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      var current = String(el.style.translate || "0px 0px").match(/-?\d+(?:\.\d+)?/g) || ["0", "0"];
+      elementMoveDragState = {
+        el: el,
+        draft: draft,
+        startX: event.clientX,
+        startY: event.clientY,
+        translateX: parseFloat(current[0]) || 0,
+        translateY: parseFloat(current[1]) || 0,
+        readout: readout
+      };
+      if (moveHandle.setPointerCapture && event.pointerId !== undefined) {
+        moveHandle.setPointerCapture(event.pointerId);
+      }
+    });
+    spacingOverlay.appendChild(moveHandle);
     ["top", "right", "bottom", "left"].forEach(function (direction) {
       var handle = document.createElement("button");
       handle.type = "button";
@@ -931,7 +959,7 @@
         var outwardKey = direction === "left" ? "ArrowLeft" : direction === "right" ? "ArrowRight" : direction === "top" ? "ArrowUp" : "ArrowDown";
         var delta = event.shiftKey ? 8 : 1;
         if (event.key !== outwardKey) delta = -delta;
-        var value = Math.max(0, Math.min(160, current + delta));
+        var value = Math.max(0, Math.min(640, current + delta));
         previewStyle(draft, mode === "internal" ? "internal-spacing" : "external-spacing", property.replace(/[A-Z]/g, function (c) { return "-" + c.toLowerCase(); }), value + "px", "px", direction);
         readout.textContent = value + " px";
         positionSpacingOverlay(el);
@@ -959,9 +987,19 @@
   }
 
   function onSpacingPointerMove(event) {
+    if (elementMoveDragState) {
+      var moveState = elementMoveDragState;
+      var translateX = Math.round(moveState.translateX + event.clientX - moveState.startX);
+      var translateY = Math.round(moveState.translateY + event.clientY - moveState.startY);
+      previewStyle(moveState.draft, "position", "translate", translateX + "px " + translateY + "px", "px");
+      moveState.readout.textContent = "移动 " + translateX + ", " + translateY + " px";
+      positionSpacingOverlay(moveState.el);
+      event.preventDefault();
+      return;
+    }
     if (!spacingDragState) return;
     var state = spacingDragState;
-    var value = Math.max(0, Math.min(160, Math.round(state.startValue + spacingDelta(state, event))));
+    var value = Math.max(0, Math.min(640, Math.round(state.startValue + spacingDelta(state, event))));
     previewStyle(state.draft, state.mode === "internal" ? "internal-spacing" : "external-spacing", state.property.replace(/[A-Z]/g, function (c) { return "-" + c.toLowerCase(); }), value + "px", "px", state.direction);
     state.readout.textContent = value + " px";
     positionSpacingOverlay(state.el);
@@ -970,6 +1008,7 @@
 
   function onSpacingPointerUp() {
     spacingDragState = null;
+    elementMoveDragState = null;
   }
 
   function hasAdjacentContent(el) {
