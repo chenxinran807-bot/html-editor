@@ -7,6 +7,11 @@ const source = fs.readFileSync(
   path.join(__dirname, '..', 'assets', 'annotator-inject.js'),
   'utf8'
 );
+const packageVersion = require('../package.json').version;
+
+test('runtime banner matches the published package version', () => {
+  assert.ok(source.includes(`* v${packageVersion}：`));
+});
 
 test('keeps the established machine-readable export protocol', () => {
   for (const token of ['页面:', '选择器:', '片段:', '批注:', '[[[IMG:', '[[[/IMG]]]']) {
