@@ -237,7 +237,7 @@ test('shows appearance and spacing controls for a container selection', () => {
   window.document.elementFromPoint = () => document.querySelector('main');
   selectTarget(document);
   const names = [...document.querySelectorAll('#ann-inspector [data-section]')].map(element => element.dataset.section);
-  assert.deepEqual(names, ['spacing', 'appearance', 'note', 'advanced']);
+  assert.deepEqual(names, ['geometry', 'spacing', 'appearance', 'note', 'advanced']);
   assert.equal(names.includes('text-content'), false);
 });
 
@@ -338,6 +338,41 @@ test('moves the selected element with the dedicated drag handle', () => {
   drag(document, '[data-move-handle="true"]', { x: 160, y: 80 }, { x: 184, y: 92 });
   assert.equal(target.style.translate, '24px 12px');
   assert.match(document.querySelector('[data-spacing-readout]').textContent, /移动/);
+});
+
+test('resizes the selected element by dragging a corner handle', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-button');
+  target.style.width = '120px';
+  target.style.height = '80px';
+  target.getBoundingClientRect = () => ({
+    left: 40, right: 160, top: 30, bottom: 110, width: 120, height: 80
+  });
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  drag(document, '[data-resize-handle="bottom-right"]', { x: 160, y: 110 }, { x: 200, y: 150 });
+  assert.equal(target.style.width, '160px');
+  assert.equal(target.style.height, '120px');
+  assert.match(document.querySelector('[data-spacing-readout]').textContent, /160 × 120/);
+});
+
+test('makes the selected element square and snaps it to the parent top right', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-button');
+  const parent = target.parentElement;
+  target.getBoundingClientRect = () => ({
+    left: 20, right: 140, top: 30, bottom: 110, width: 120, height: 80
+  });
+  parent.getBoundingClientRect = () => ({
+    left: 0, right: 300, top: 0, bottom: 200, width: 300, height: 200
+  });
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  click(document, '[data-action="make-square"]');
+  click(document, '[data-snap-position="top-right"]');
+  assert.equal(target.style.width, '120px');
+  assert.equal(target.style.height, '120px');
+  assert.equal(target.style.translate, '160px -30px');
 });
 
 test('drags the selected edge to change internal spacing', () => {

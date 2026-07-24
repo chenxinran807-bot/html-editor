@@ -5,7 +5,7 @@
  * 设计目标：让用户在任意 HTML 预览里点选元素 / 拖拽框选区域 + 写批注，
  * 导出成 AI 可解析的结构化文本。
  *
- * v1.3.3：
+ * v1.3.4：
  *  - 拖拽框选区域（rubber-band）：框住一片区域，自动识别区域内元素 + 公共容器
  *  - 移动端触摸支持：Pointer 事件统一鼠标/触摸/手写笔
  * v1.1.0：
@@ -35,6 +35,7 @@
   var spacingOverlay = null;
   var spacingDragState = null;
   var elementMoveDragState = null;
+  var elementResizeDragState = null;
   var dragging = false;
   var startX = 0, startY = 0;
   var dragBox = null;
@@ -260,6 +261,11 @@
       ".annotator-spacing-handle[data-spacing-handle=bottom]{bottom:-10px;left:calc(50% - 9px);cursor:ns-resize;}",
       ".annotator-move-handle{position:absolute;left:10px;top:-38px;display:grid;place-items:center;width:30px;height:30px;padding:0;border:2px solid #fff;border-radius:9px;background:var(--ann-accent);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.28);pointer-events:auto;cursor:grab;touch-action:none;}",
       ".annotator-move-handle:active{cursor:grabbing;}",
+      ".annotator-resize-handle{position:absolute;width:14px;height:14px;padding:0;border:2px solid #fff;border-radius:4px;background:var(--ann-accent);box-shadow:0 1px 5px rgba(0,0,0,.28);pointer-events:auto;touch-action:none;}",
+      ".annotator-resize-handle[data-resize-handle=top-left]{left:-8px;top:-8px;cursor:nwse-resize;}",
+      ".annotator-resize-handle[data-resize-handle=top-right]{right:-8px;top:-8px;cursor:nesw-resize;}",
+      ".annotator-resize-handle[data-resize-handle=bottom-left]{left:-8px;bottom:-8px;cursor:nesw-resize;}",
+      ".annotator-resize-handle[data-resize-handle=bottom-right]{right:-8px;bottom:-8px;cursor:nwse-resize;}",
       ".annotator-spacing-readout{position:absolute;left:50%;top:-34px;transform:translateX(-50%);min-width:44px;padding:4px 7px;border-radius:6px;background:#1d1d1f;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;text-align:center;white-space:nowrap;}",
       "#ann-inspector details.annotator-section summary{font-size:12px;font-weight:600;color:var(--ann-secondary);cursor:pointer;}",
       "#ann-inspector .annotator-actions{margin:0 8px;border:1px solid var(--ann-border);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.64);}",
@@ -895,6 +901,7 @@
   function destroySpacingOverlay() {
     spacingDragState = null;
     elementMoveDragState = null;
+    elementResizeDragState = null;
     if (spacingOverlay && spacingOverlay.parentNode) spacingOverlay.parentNode.removeChild(spacingOverlay);
     spacingOverlay = null;
   }
@@ -933,6 +940,31 @@
       }
     });
     spacingOverlay.appendChild(moveHandle);
+    ["top-left", "top-right", "bottom-left", "bottom-right"].forEach(function (corner) {
+      var resizeHandle = document.createElement("button");
+      resizeHandle.type = "button";
+      resizeHandle.className = "annotator-resize-handle";
+      resizeHandle.setAttribute("data-resize-handle", corner);
+      resizeHandle.setAttribute("aria-label", "拖动" + corner + "角调整大小");
+      resizeHandle.addEventListener("pointerdown", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var rect = el.getBoundingClientRect();
+        var current = String(el.style.translate || "0px 0px").match(/-?\d+(?:\.\d+)?/g) || ["0", "0"];
+        elementResizeDragState = {
+          el: el, draft: draft, corner: corner,
+          startX: event.clientX, startY: event.clientY,
+          width: rect.width, height: rect.height,
+          translateX: parseFloat(current[0]) || 0,
+          translateY: parseFloat(current[1]) || 0,
+          readout: readout
+        };
+        if (resizeHandle.setPointerCapture && event.pointerId !== undefined) {
+          resizeHandle.setPointerCapture(event.pointerId);
+        }
+      });
+      spacingOverlay.appendChild(resizeHandle);
+    });
     ["top", "right", "bottom", "left"].forEach(function (direction) {
       var handle = document.createElement("button");
       handle.type = "button";
@@ -997,6 +1029,26 @@
       event.preventDefault();
       return;
     }
+    if (elementResizeDragState) {
+      var resizeState = elementResizeDragState;
+      var dx = event.clientX - resizeState.startX;
+      var dy = event.clientY - resizeState.startY;
+      var fromLeft = resizeState.corner.indexOf("left") !== -1;
+      var fromTop = resizeState.corner.indexOf("top") !== -1;
+      var width = Math.max(24, Math.round(resizeState.width + (fromLeft ? -dx : dx)));
+      var height = Math.max(24, Math.round(resizeState.height + (fromTop ? -dy : dy)));
+      previewStyle(resizeState.draft, "size", "width", width + "px", "px");
+      previewStyle(resizeState.draft, "size", "height", height + "px", "px");
+      if (fromLeft || fromTop) {
+        var translatedX = resizeState.translateX + (fromLeft ? resizeState.width - width : 0);
+        var translatedY = resizeState.translateY + (fromTop ? resizeState.height - height : 0);
+        previewStyle(resizeState.draft, "position", "translate", translatedX + "px " + translatedY + "px", "px");
+      }
+      resizeState.readout.textContent = width + " × " + height + " px";
+      positionSpacingOverlay(resizeState.el);
+      event.preventDefault();
+      return;
+    }
     if (!spacingDragState) return;
     var state = spacingDragState;
     var value = Math.max(0, Math.min(640, Math.round(state.startValue + spacingDelta(state, event))));
@@ -1009,6 +1061,7 @@
   function onSpacingPointerUp() {
     spacingDragState = null;
     elementMoveDragState = null;
+    elementResizeDragState = null;
   }
 
   function hasAdjacentContent(el) {
@@ -1054,6 +1107,51 @@
       sectionNode.appendChild(warning);
     }
     createSpacingOverlay(el, draft, function () { return mode; });
+  }
+
+  function renderGeometryControls(sectionNode, el, draft) {
+    var squareButton = document.createElement("button");
+    squareButton.type = "button";
+    squareButton.setAttribute("data-action", "make-square");
+    squareButton.textContent = "设为正方形";
+    squareButton.onclick = function () {
+      var rect = el.getBoundingClientRect();
+      var size = Math.max(24, Math.round(Math.max(rect.width, rect.height)));
+      previewStyle(draft, "size", "width", size + "px", "px");
+      previewStyle(draft, "size", "height", size + "px", "px");
+      positionSpacingOverlay(el);
+    };
+    sectionNode.appendChild(squareButton);
+    sectionNode.appendChild(fieldLabel("吸附到当前容器"));
+    var snapRow = document.createElement("div");
+    snapRow.className = "annotator-segmented";
+    [
+      ["top-left", "左上"], ["top-right", "右上"],
+      ["bottom-left", "左下"], ["bottom-right", "右下"]
+    ].forEach(function (item) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.textContent = item[1];
+      button.setAttribute("data-snap-position", item[0]);
+      button.onclick = function () {
+        var parent = el.parentElement;
+        if (!parent) return;
+        var parentRect = parent.getBoundingClientRect();
+        var rect = el.getBoundingClientRect();
+        var right = item[0].indexOf("right") !== -1;
+        var bottom = item[0].indexOf("bottom") !== -1;
+        var translateX = Math.round((right ? parentRect.right - rect.right : parentRect.left - rect.left));
+        var translateY = Math.round((bottom ? parentRect.bottom - rect.bottom : parentRect.top - rect.top));
+        previewStyle(draft, "position", "translate", translateX + "px " + translateY + "px", "px");
+        positionSpacingOverlay(el);
+      };
+      snapRow.appendChild(button);
+    });
+    sectionNode.appendChild(snapRow);
+    var help = document.createElement("div");
+    help.className = "annotator-field-label";
+    help.textContent = "拖角点改大小，拖蓝色移动图标自由移动";
+    sectionNode.appendChild(help);
   }
 
   function renderRadiusControl(sectionNode, el, draft) {
@@ -1129,7 +1227,7 @@
       ? [["text-content", "文字内容"], ["typography", "文字样式"], ["text-color", "文字颜色"]]
       : kind === "image"
         ? [["image", "图片"], ["appearance", "外观"]]
-        : [["spacing", "间距"], ["appearance", "外观"]];
+        : [["geometry", "尺寸与位置"], ["spacing", "间距"], ["appearance", "外观"]];
     var sectionNodes = {};
     sectionNames.forEach(function (item) {
       sectionNodes[item[0]] = inspectorSection(item[0], item[1], false);
@@ -1214,6 +1312,7 @@
       }, false);
       renderRadiusControl(sectionNodes.appearance, previewEl, previewDraft);
     } else if (sectionNodes.appearance && previewEl) {
+      renderGeometryControls(sectionNodes.geometry, previewEl, previewDraft);
       renderSpacingControls(sectionNodes.spacing, previewEl, previewDraft);
       renderAppearanceControls(sectionNodes.appearance, previewEl, previewDraft);
     }

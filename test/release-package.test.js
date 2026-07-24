@@ -23,5 +23,5 @@ test('release ZIP contains only Skill runtime and documentation files', async ()
     .filter(entry => !entry.endsWith('/'))
     .sort();
   assert.deepEqual(entries, expected);
-  assert.match(fs.readFileSync(result.checksumPath, 'utf8'), /^[a-f0-9]{64}  html-editor-1\.3\.3\.zip\n$/);
+  assert.match(fs.readFileSync(result.checksumPath, 'utf8'), /^[a-f0-9]{64}  html-editor-1\.3\.4\.zip\n$/);
 });
