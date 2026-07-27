@@ -1,0 +1,40 @@
+# html-editor
+
+为任意静态 HTML 注入轻量、可视化的标注面板，让用户直接点选页面内容、描述修改要求，再把结构化标注交给 Agent 精确回改。
+
+## 当前版本
+
+`1.3.4`
+
+## 主要能力
+
+- macOS 原生 Inspector 风格，优先停靠页面空白栏，并支持拖动标题栏自由调整位置；
+- 蓝色边缘控制点支持连续调整间距，不再卡在 160 px；选中框左上角提供独立移动图标，可直接拖动元素；
+- 新增四个角点自由缩放、“设为正方形”以及容器四角吸附，可完成“改成正方形并移到右上角”等布局修改；
+- 点选元素或拖拽框选区域；
+- 文字、颜色、圆角、边框、阴影、图片与间距的可视化调整；
+- 页面常用颜色、系统取色器与浏览器屏幕吸色；
+- 标注本地持久化、复核、删除和结构化导出；
+- 与 `prd-demo` 的任务、会话和需求条款绑定；
+- 零运行时网络依赖。
+
+## 使用
+
+```bash
+python3 scripts/wrap_annotator.py input.html -o output.html
+```
+
+更新已经注入旧版标注层的页面：
+
+```bash
+python3 scripts/wrap_annotator.py input.html -o input.html --force
+```
+
+## 验证
+
+```bash
+npm test
+node scripts/build-release.mjs
+```
+
+安装包位于 `dist/html-editor-1.3.4.zip`。

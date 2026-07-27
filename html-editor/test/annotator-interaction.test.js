@@ -42,11 +42,62 @@ function bootFixture(options = {}) {
     meta.dataset.prdFingerprint = options.workflowMeta.prdFingerprint;
     window.document.head.appendChild(meta);
   }
+  if (options.layout) {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: options.layout.viewport.width });
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: options.layout.viewport.height });
+    window.document.querySelector('main').getBoundingClientRect = () => options.layout.content;
+    window.document.querySelector('#target-title').getBoundingClientRect = () => options.layout.target;
+  }
   window.document.elementFromPoint = () => window.document.querySelector('#target-title');
   window.eval(source);
   window.document.dispatchEvent(new window.Event('DOMContentLoaded', { bubbles: true }));
   return { dom, window, document: window.document };
 }
+
+test('docks the inspector in a wide empty side lane instead of covering the prototype', () => {
+  const { document } = bootFixture({
+    layout: {
+      viewport: { width: 1440, height: 900 },
+      content: { left: 100, right: 900, top: 0, bottom: 900, width: 800, height: 900 },
+      target: { left: 180, right: 420, top: 80, bottom: 130, width: 240, height: 50 }
+    }
+  });
+
+  selectTarget(document);
+
+  const inspector = document.querySelector('#ann-inspector');
+  assert.equal(inspector.dataset.placement, 'right-empty-lane');
+  assert.ok(parseFloat(inspector.style.left) >= 916);
+});
+
+test('lets the user drag the inspector by its title bar', () => {
+  const { document } = bootFixture({
+    layout: {
+      viewport: { width: 1440, height: 900 },
+      content: { left: 100, right: 900, top: 0, bottom: 900, width: 800, height: 900 },
+      target: { left: 180, right: 420, top: 80, bottom: 130, width: 240, height: 50 }
+    }
+  });
+  selectTarget(document);
+  const inspector = document.querySelector('#ann-inspector');
+  const header = inspector.querySelector('.annotator-inspector-head');
+  const startLeft = parseFloat(inspector.style.left);
+  const startTop = parseFloat(inspector.style.top);
+
+  header.dispatchEvent(new document.defaultView.MouseEvent('pointerdown', {
+    bubbles: true, clientX: 1000, clientY: 100, button: 0
+  }));
+  document.dispatchEvent(new document.defaultView.MouseEvent('pointermove', {
+    bubbles: true, clientX: 1100, clientY: 180, button: 0
+  }));
+  document.dispatchEvent(new document.defaultView.MouseEvent('pointerup', {
+    bubbles: true, clientX: 1100, clientY: 180, button: 0
+  }));
+
+  assert.equal(parseFloat(inspector.style.left), startLeft + 100);
+  assert.equal(parseFloat(inspector.style.top), startTop + 80);
+  assert.equal(inspector.dataset.placement, 'user');
+});
 
 function click(document, selector) {
   const element = document.querySelector(selector);
@@ -186,7 +237,7 @@ test('shows appearance and spacing controls for a container selection', () => {
   window.document.elementFromPoint = () => document.querySelector('main');
   selectTarget(document);
   const names = [...document.querySelectorAll('#ann-inspector [data-section]')].map(element => element.dataset.section);
-  assert.deepEqual(names, ['spacing', 'appearance', 'note', 'advanced']);
+  assert.deepEqual(names, ['geometry', 'spacing', 'appearance', 'note', 'advanced']);
   assert.equal(names.includes('text-content'), false);
 });
 
@@ -265,6 +316,63 @@ test('drags the selected edge to change external spacing with a live guide', () 
   drag(document, '[data-spacing-handle="right"]', { x: 200, y: 120 }, { x: 212, y: 120 });
   assert.equal(target.style.marginRight, '12px');
   assert.match(document.querySelector('[data-spacing-readout]').textContent, /12/);
+});
+
+test('continues changing spacing when the starting value is already 160px', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-button');
+  target.style.marginRight = '160px';
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  click(document, '[data-spacing-mode="external"]');
+  drag(document, '[data-spacing-handle="right"]', { x: 200, y: 120 }, { x: 224, y: 120 });
+  assert.equal(target.style.marginRight, '184px');
+  assert.match(document.querySelector('[data-spacing-readout]').textContent, /184/);
+});
+
+test('moves the selected element with the dedicated drag handle', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-button');
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  drag(document, '[data-move-handle="true"]', { x: 160, y: 80 }, { x: 184, y: 92 });
+  assert.equal(target.style.translate, '24px 12px');
+  assert.match(document.querySelector('[data-spacing-readout]').textContent, /移动/);
+});
+
+test('resizes the selected element by dragging a corner handle', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-button');
+  target.style.width = '120px';
+  target.style.height = '80px';
+  target.getBoundingClientRect = () => ({
+    left: 40, right: 160, top: 30, bottom: 110, width: 120, height: 80
+  });
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  drag(document, '[data-resize-handle="bottom-right"]', { x: 160, y: 110 }, { x: 200, y: 150 });
+  assert.equal(target.style.width, '160px');
+  assert.equal(target.style.height, '120px');
+  assert.match(document.querySelector('[data-spacing-readout]').textContent, /160 × 120/);
+});
+
+test('makes the selected element square and snaps it to the parent top right', () => {
+  const { document, window } = bootFixture();
+  const target = document.querySelector('#target-button');
+  const parent = target.parentElement;
+  target.getBoundingClientRect = () => ({
+    left: 20, right: 140, top: 30, bottom: 110, width: 120, height: 80
+  });
+  parent.getBoundingClientRect = () => ({
+    left: 0, right: 300, top: 0, bottom: 200, width: 300, height: 200
+  });
+  window.document.elementFromPoint = () => target;
+  selectTarget(document);
+  click(document, '[data-action="make-square"]');
+  click(document, '[data-snap-position="top-right"]');
+  assert.equal(target.style.width, '120px');
+  assert.equal(target.style.height, '120px');
+  assert.equal(target.style.translate, '160px -30px');
 });
 
 test('drags the selected edge to change internal spacing', () => {

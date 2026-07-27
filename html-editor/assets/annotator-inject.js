@@ -5,7 +5,7 @@
  * 设计目标：让用户在任意 HTML 预览里点选元素 / 拖拽框选区域 + 写批注，
  * 导出成 AI 可解析的结构化文本。
  *
- * v1.3.0：
+ * v1.3.4：
  *  - 拖拽框选区域（rubber-band）：框住一片区域，自动识别区域内元素 + 公共容器
  *  - 移动端触摸支持：Pointer 事件统一鼠标/触摸/手写笔
  * v1.1.0：
@@ -34,6 +34,8 @@
   var previewDraft = null;
   var spacingOverlay = null;
   var spacingDragState = null;
+  var elementMoveDragState = null;
+  var elementResizeDragState = null;
   var dragging = false;
   var startX = 0, startY = 0;
   var dragBox = null;
@@ -230,7 +232,8 @@
       "[data-annotator=\"true\"]{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;-webkit-font-smoothing:antialiased;}",
       "[data-annotator=\"true\"] svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;}",
       "#ann-inspector{position:fixed;z-index:2147483200;width:336px;box-sizing:border-box;padding:0;background:var(--ann-surface);border:1px solid var(--ann-border);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.24),0 1px 2px rgba(0,0,0,.08);overflow:hidden;color:var(--ann-text);backdrop-filter:blur(28px);}",
-      "#ann-inspector .annotator-inspector-head{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px;}",
+      "#ann-inspector .annotator-inspector-head{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px;cursor:grab;touch-action:none;user-select:none;}",
+      "#ann-inspector .annotator-inspector-head:active{cursor:grabbing;}",
       "#ann-inspector h2{margin:0;font-size:15px;line-height:20px;font-weight:650;}",
       "#ann-inspector .annotator-icon-button{display:grid;place-items:center;width:28px;height:28px;padding:0;border:0;border-radius:7px;background:transparent;color:var(--ann-secondary);cursor:pointer;}",
       "#ann-inspector .annotator-context{margin:0 14px 12px;padding:9px 10px;border-radius:8px;background:rgba(0,0,0,.045);font-size:12px;color:var(--ann-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}",
@@ -256,6 +259,13 @@
       ".annotator-spacing-handle[data-spacing-handle=right]{right:-10px;top:calc(50% - 9px);}",
       ".annotator-spacing-handle[data-spacing-handle=top]{top:-10px;left:calc(50% - 9px);cursor:ns-resize;}",
       ".annotator-spacing-handle[data-spacing-handle=bottom]{bottom:-10px;left:calc(50% - 9px);cursor:ns-resize;}",
+      ".annotator-move-handle{position:absolute;left:10px;top:-38px;display:grid;place-items:center;width:30px;height:30px;padding:0;border:2px solid #fff;border-radius:9px;background:var(--ann-accent);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.28);pointer-events:auto;cursor:grab;touch-action:none;}",
+      ".annotator-move-handle:active{cursor:grabbing;}",
+      ".annotator-resize-handle{position:absolute;width:14px;height:14px;padding:0;border:2px solid #fff;border-radius:4px;background:var(--ann-accent);box-shadow:0 1px 5px rgba(0,0,0,.28);pointer-events:auto;touch-action:none;}",
+      ".annotator-resize-handle[data-resize-handle=top-left]{left:-8px;top:-8px;cursor:nwse-resize;}",
+      ".annotator-resize-handle[data-resize-handle=top-right]{right:-8px;top:-8px;cursor:nesw-resize;}",
+      ".annotator-resize-handle[data-resize-handle=bottom-left]{left:-8px;bottom:-8px;cursor:nesw-resize;}",
+      ".annotator-resize-handle[data-resize-handle=bottom-right]{right:-8px;bottom:-8px;cursor:nwse-resize;}",
       ".annotator-spacing-readout{position:absolute;left:50%;top:-34px;transform:translateX(-50%);min-width:44px;padding:4px 7px;border-radius:6px;background:#1d1d1f;color:#fff;font:600 11px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;text-align:center;white-space:nowrap;}",
       "#ann-inspector details.annotator-section summary{font-size:12px;font-weight:600;color:var(--ann-secondary);cursor:pointer;}",
       "#ann-inspector .annotator-actions{margin:0 8px;border:1px solid var(--ann-border);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.64);}",
@@ -274,10 +284,10 @@
       "#ann-inspector .annotator-inspector-foot button{min-height:32px;padding:0 12px;border:0;border-radius:8px;font:500 13px -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;cursor:pointer;}",
       "#ann-inspector [data-action=cancel]{background:rgba(0,0,0,.065);color:var(--ann-text);}",
       "#ann-inspector [data-action=save]{background:var(--ann-accent);color:#fff;}",
-      "@media(max-width:640px){#ann-inspector{left:8px!important;right:8px!important;top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom));width:auto;max-height:72vh;overflow:auto;}#ann-inspector button{min-height:44px!important;}#ann-toolbar{bottom:calc(8px + env(safe-area-inset-bottom));gap:1px;padding:4px;}#ann-toolbar button{gap:4px;padding:0 7px;font-size:11px;}#ann-toolbar svg{width:15px;height:15px;}}",
+      "@media(max-width:640px){#ann-inspector{left:8px!important;right:8px!important;top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom));width:auto;max-height:72vh;overflow:auto;}#ann-inspector button{min-height:44px!important;}#ann-toolbar{gap:1px;padding:4px;}#ann-toolbar button{gap:4px;padding:0 7px;font-size:11px;}#ann-toolbar svg{width:15px;height:15px;}}",
       ".annotator-hl{outline:2px solid #2f7fff!important;outline-offset:1px!important;cursor:crosshair!important;}",
       "html.annotator-grabbing{touch-action:none!important;}",
-      "#ann-toolbar{position:fixed;left:50%;bottom:18px;z-index:2147483000;display:flex;align-items:center;gap:4px;transform:translateX(-50%);padding:5px;background:var(--ann-surface);border:1px solid var(--ann-border);border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.08);backdrop-filter:blur(24px);}",
+      "#ann-toolbar{position:fixed;right:12px;top:50%;z-index:2147483000;display:flex;flex-direction:column;align-items:stretch;gap:4px;transform:translateY(-50%);padding:5px;background:var(--ann-surface);border:1px solid var(--ann-border);border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.08);backdrop-filter:blur(24px);}",
       "#ann-toolbar button{appearance:none;display:flex;align-items:center;gap:7px;min-height:38px;padding:0 12px;border:0;border-radius:9px;background:transparent;color:var(--ann-text);font:500 13px/1 -apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;cursor:pointer;white-space:nowrap;}",
       "#ann-toolbar button:hover{background:rgba(0,0,0,.055);}",
       "#ann-toolbar [data-action=mark][aria-pressed=true]{background:rgba(10,132,255,.12);color:var(--ann-accent);}",
@@ -332,6 +342,179 @@
   // ---------- 顶层容器与工具条 ----------
   var bar, toggleBtn, listBtn, exportBtn, listPanel, inputBox;
 
+  function rectsOverlap(a, b) {
+    return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(value, max));
+  }
+
+  function visibleContentRect() {
+    var preferred = document.querySelector("main,[role=main],#app,#root");
+    if (preferred && !isAnnotatorElement(preferred)) {
+      var preferredRect = preferred.getBoundingClientRect();
+      if (preferredRect.width > 0 && preferredRect.height > 0) return preferredRect;
+    }
+    var children = document.body ? document.body.children : [];
+    var bounds = null;
+    for (var i = 0; i < children.length; i++) {
+      var child = children[i];
+      if (isAnnotatorElement(child) || /^(SCRIPT|STYLE|LINK|META)$/.test(child.tagName)) continue;
+      var rect = child.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) continue;
+      if (!bounds) {
+        bounds = { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
+      } else {
+        bounds.left = Math.min(bounds.left, rect.left);
+        bounds.right = Math.max(bounds.right, rect.right);
+        bounds.top = Math.min(bounds.top, rect.top);
+        bounds.bottom = Math.max(bounds.bottom, rect.bottom);
+      }
+    }
+    if (!bounds) return { left: 0, right: window.innerWidth, top: 0, bottom: window.innerHeight };
+    bounds.width = bounds.right - bounds.left;
+    bounds.height = bounds.bottom - bounds.top;
+    return bounds;
+  }
+
+  function overlapArea(a, b) {
+    var width = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+    var height = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+    return width * height;
+  }
+
+  function placeInspectorAwayFromContent(box, targetEl, x, y) {
+    var margin = 16;
+    var viewportWidth = window.innerWidth;
+    var viewportHeight = window.innerHeight;
+    var width = Math.min(336, Math.max(280, viewportWidth - margin * 2));
+    var height = Math.min(Math.max(box.scrollHeight || 620, 360), viewportHeight - margin * 2);
+    var content = visibleContentRect();
+    var target = targetEl && targetEl.getBoundingClientRect
+      ? targetEl.getBoundingClientRect()
+      : { left: x, right: x, top: y, bottom: y };
+    var leftSpace = content.left;
+    var rightSpace = viewportWidth - content.right;
+    var left;
+    var top = clamp(target.top, margin, Math.max(margin, viewportHeight - height - margin));
+    var placement;
+
+    box.style.width = width + "px";
+    box.style.maxHeight = Math.max(320, viewportHeight - margin * 2) + "px";
+
+    if (rightSpace >= width + margin * 2) {
+      left = content.right + margin;
+      placement = "right-empty-lane";
+    } else if (leftSpace >= width + margin * 2) {
+      left = content.left - width - margin;
+      placement = "left-empty-lane";
+    } else {
+      var candidates = [
+        { name: "right-of-selection", left: target.right + margin, top: target.top },
+        { name: "left-of-selection", left: target.left - width - margin, top: target.top },
+        { name: "below-selection", left: target.left, top: target.bottom + margin },
+        { name: "above-selection", left: target.left, top: target.top - height - margin }
+      ];
+      var best = null;
+      for (var i = 0; i < candidates.length; i++) {
+        var candidate = candidates[i];
+        candidate.left = clamp(candidate.left, margin, Math.max(margin, viewportWidth - width - margin));
+        candidate.top = clamp(candidate.top, margin, Math.max(margin, viewportHeight - height - margin));
+        var candidateRect = {
+          left: candidate.left, right: candidate.left + width,
+          top: candidate.top, bottom: candidate.top + height
+        };
+        candidate.score = overlapArea(candidateRect, target) * 1000 + overlapArea(candidateRect, content);
+        if (!best || candidate.score < best.score) best = candidate;
+      }
+      left = best.left;
+      top = best.top;
+      placement = best.name;
+    }
+
+    box.style.left = clamp(left, margin, Math.max(margin, viewportWidth - width - margin)) + "px";
+    box.style.top = top + "px";
+    box.style.right = "auto";
+    box.style.bottom = "auto";
+    box.setAttribute("data-placement", placement);
+  }
+
+  function enableInspectorDrag(box, handle) {
+    var dragState = null;
+    handle.addEventListener("pointerdown", function (event) {
+      if (event.button !== 0) return;
+      if (event.target && event.target.closest && event.target.closest("button,input,textarea,select,a")) return;
+      event.preventDefault();
+      dragState = {
+        x: event.clientX,
+        y: event.clientY,
+        left: parseFloat(box.style.left) || 0,
+        top: parseFloat(box.style.top) || 0
+      };
+    });
+    document.addEventListener("pointermove", function (event) {
+      if (!dragState || !box.parentNode) return;
+      var width = box.offsetWidth || parseFloat(box.style.width) || 336;
+      var height = box.offsetHeight || Math.min(box.scrollHeight || 620, window.innerHeight - 32);
+      box.style.left = clamp(
+        dragState.left + event.clientX - dragState.x,
+        8,
+        Math.max(8, window.innerWidth - width - 8)
+      ) + "px";
+      box.style.top = clamp(
+        dragState.top + event.clientY - dragState.y,
+        8,
+        Math.max(8, window.innerHeight - height - 8)
+      ) + "px";
+      box.setAttribute("data-placement", "user");
+    });
+    document.addEventListener("pointerup", function () {
+      dragState = null;
+    });
+  }
+
+  function placeToolbarAwayFromInteractiveElements() {
+    if (!bar || !bar.getBoundingClientRect) return;
+    var controls = document.querySelectorAll(
+      'button, a[href], input, select, textarea, [role="button"], [role="radio"], [role="checkbox"], [tabindex]'
+    );
+    var candidates = [
+      { right: "12px", top: "50%", left: "auto", bottom: "auto", transform: "translateY(-50%)" },
+      { left: "12px", top: "50%", right: "auto", bottom: "auto", transform: "translateY(-50%)" },
+      { left: "50%", top: "12px", right: "auto", bottom: "auto", transform: "translateX(-50%)" },
+      { left: "50%", bottom: "12px", right: "auto", top: "auto", transform: "translateX(-50%)" }
+    ];
+    var best = candidates[0];
+    var bestOverlap = Infinity;
+    for (var i = 0; i < candidates.length; i++) {
+      var candidate = candidates[i];
+      bar.style.left = candidate.left || "auto";
+      bar.style.right = candidate.right || "auto";
+      bar.style.top = candidate.top || "auto";
+      bar.style.bottom = candidate.bottom || "auto";
+      bar.style.transform = candidate.transform;
+      var toolbarRect = bar.getBoundingClientRect();
+      var overlap = 0;
+      for (var j = 0; j < controls.length; j++) {
+        if (isAnnotatorElement(controls[j])) continue;
+        var controlRect = controls[j].getBoundingClientRect();
+        if (rectsOverlap(toolbarRect, controlRect)) overlap++;
+      }
+      if (overlap < bestOverlap) {
+        bestOverlap = overlap;
+        best = candidate;
+      }
+      if (overlap === 0) break;
+    }
+    bar.style.left = best.left || "auto";
+    bar.style.right = best.right || "auto";
+    bar.style.top = best.top || "auto";
+    bar.style.bottom = best.bottom || "auto";
+    bar.style.transform = best.transform;
+    bar.setAttribute("data-overlap-count", String(bestOverlap));
+  }
+
   function buildUI() {
     bar = document.createElement("div");
     bar.id = "ann-toolbar";
@@ -360,6 +543,7 @@
     bar.appendChild(listBtn);
     bar.appendChild(exportBtn);
     document.body.appendChild(bar);
+    placeToolbarAwayFromInteractiveElements();
 
     listPanel = document.createElement("div");
     listPanel.id = "ann-list";
@@ -716,6 +900,8 @@
 
   function destroySpacingOverlay() {
     spacingDragState = null;
+    elementMoveDragState = null;
+    elementResizeDragState = null;
     if (spacingOverlay && spacingOverlay.parentNode) spacingOverlay.parentNode.removeChild(spacingOverlay);
     spacingOverlay = null;
   }
@@ -730,6 +916,55 @@
     readout.setAttribute("data-spacing-readout", "true");
     readout.textContent = "拖动边缘";
     spacingOverlay.appendChild(readout);
+    var moveHandle = document.createElement("button");
+    moveHandle.type = "button";
+    moveHandle.className = "annotator-move-handle";
+    moveHandle.setAttribute("data-move-handle", "true");
+    moveHandle.setAttribute("aria-label", "拖动移动选中元素");
+    moveHandle.innerHTML = iconSvg("resize");
+    moveHandle.addEventListener("pointerdown", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      var current = String(el.style.translate || "0px 0px").match(/-?\d+(?:\.\d+)?/g) || ["0", "0"];
+      elementMoveDragState = {
+        el: el,
+        draft: draft,
+        startX: event.clientX,
+        startY: event.clientY,
+        translateX: parseFloat(current[0]) || 0,
+        translateY: parseFloat(current[1]) || 0,
+        readout: readout
+      };
+      if (moveHandle.setPointerCapture && event.pointerId !== undefined) {
+        moveHandle.setPointerCapture(event.pointerId);
+      }
+    });
+    spacingOverlay.appendChild(moveHandle);
+    ["top-left", "top-right", "bottom-left", "bottom-right"].forEach(function (corner) {
+      var resizeHandle = document.createElement("button");
+      resizeHandle.type = "button";
+      resizeHandle.className = "annotator-resize-handle";
+      resizeHandle.setAttribute("data-resize-handle", corner);
+      resizeHandle.setAttribute("aria-label", "拖动" + corner + "角调整大小");
+      resizeHandle.addEventListener("pointerdown", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var rect = el.getBoundingClientRect();
+        var current = String(el.style.translate || "0px 0px").match(/-?\d+(?:\.\d+)?/g) || ["0", "0"];
+        elementResizeDragState = {
+          el: el, draft: draft, corner: corner,
+          startX: event.clientX, startY: event.clientY,
+          width: rect.width, height: rect.height,
+          translateX: parseFloat(current[0]) || 0,
+          translateY: parseFloat(current[1]) || 0,
+          readout: readout
+        };
+        if (resizeHandle.setPointerCapture && event.pointerId !== undefined) {
+          resizeHandle.setPointerCapture(event.pointerId);
+        }
+      });
+      spacingOverlay.appendChild(resizeHandle);
+    });
     ["top", "right", "bottom", "left"].forEach(function (direction) {
       var handle = document.createElement("button");
       handle.type = "button";
@@ -756,7 +991,7 @@
         var outwardKey = direction === "left" ? "ArrowLeft" : direction === "right" ? "ArrowRight" : direction === "top" ? "ArrowUp" : "ArrowDown";
         var delta = event.shiftKey ? 8 : 1;
         if (event.key !== outwardKey) delta = -delta;
-        var value = Math.max(0, Math.min(160, current + delta));
+        var value = Math.max(0, Math.min(640, current + delta));
         previewStyle(draft, mode === "internal" ? "internal-spacing" : "external-spacing", property.replace(/[A-Z]/g, function (c) { return "-" + c.toLowerCase(); }), value + "px", "px", direction);
         readout.textContent = value + " px";
         positionSpacingOverlay(el);
@@ -784,9 +1019,39 @@
   }
 
   function onSpacingPointerMove(event) {
+    if (elementMoveDragState) {
+      var moveState = elementMoveDragState;
+      var translateX = Math.round(moveState.translateX + event.clientX - moveState.startX);
+      var translateY = Math.round(moveState.translateY + event.clientY - moveState.startY);
+      previewStyle(moveState.draft, "position", "translate", translateX + "px " + translateY + "px", "px");
+      moveState.readout.textContent = "移动 " + translateX + ", " + translateY + " px";
+      positionSpacingOverlay(moveState.el);
+      event.preventDefault();
+      return;
+    }
+    if (elementResizeDragState) {
+      var resizeState = elementResizeDragState;
+      var dx = event.clientX - resizeState.startX;
+      var dy = event.clientY - resizeState.startY;
+      var fromLeft = resizeState.corner.indexOf("left") !== -1;
+      var fromTop = resizeState.corner.indexOf("top") !== -1;
+      var width = Math.max(24, Math.round(resizeState.width + (fromLeft ? -dx : dx)));
+      var height = Math.max(24, Math.round(resizeState.height + (fromTop ? -dy : dy)));
+      previewStyle(resizeState.draft, "size", "width", width + "px", "px");
+      previewStyle(resizeState.draft, "size", "height", height + "px", "px");
+      if (fromLeft || fromTop) {
+        var translatedX = resizeState.translateX + (fromLeft ? resizeState.width - width : 0);
+        var translatedY = resizeState.translateY + (fromTop ? resizeState.height - height : 0);
+        previewStyle(resizeState.draft, "position", "translate", translatedX + "px " + translatedY + "px", "px");
+      }
+      resizeState.readout.textContent = width + " × " + height + " px";
+      positionSpacingOverlay(resizeState.el);
+      event.preventDefault();
+      return;
+    }
     if (!spacingDragState) return;
     var state = spacingDragState;
-    var value = Math.max(0, Math.min(160, Math.round(state.startValue + spacingDelta(state, event))));
+    var value = Math.max(0, Math.min(640, Math.round(state.startValue + spacingDelta(state, event))));
     previewStyle(state.draft, state.mode === "internal" ? "internal-spacing" : "external-spacing", state.property.replace(/[A-Z]/g, function (c) { return "-" + c.toLowerCase(); }), value + "px", "px", state.direction);
     state.readout.textContent = value + " px";
     positionSpacingOverlay(state.el);
@@ -795,6 +1060,8 @@
 
   function onSpacingPointerUp() {
     spacingDragState = null;
+    elementMoveDragState = null;
+    elementResizeDragState = null;
   }
 
   function hasAdjacentContent(el) {
@@ -840,6 +1107,51 @@
       sectionNode.appendChild(warning);
     }
     createSpacingOverlay(el, draft, function () { return mode; });
+  }
+
+  function renderGeometryControls(sectionNode, el, draft) {
+    var squareButton = document.createElement("button");
+    squareButton.type = "button";
+    squareButton.setAttribute("data-action", "make-square");
+    squareButton.textContent = "设为正方形";
+    squareButton.onclick = function () {
+      var rect = el.getBoundingClientRect();
+      var size = Math.max(24, Math.round(Math.max(rect.width, rect.height)));
+      previewStyle(draft, "size", "width", size + "px", "px");
+      previewStyle(draft, "size", "height", size + "px", "px");
+      positionSpacingOverlay(el);
+    };
+    sectionNode.appendChild(squareButton);
+    sectionNode.appendChild(fieldLabel("吸附到当前容器"));
+    var snapRow = document.createElement("div");
+    snapRow.className = "annotator-segmented";
+    [
+      ["top-left", "左上"], ["top-right", "右上"],
+      ["bottom-left", "左下"], ["bottom-right", "右下"]
+    ].forEach(function (item) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.textContent = item[1];
+      button.setAttribute("data-snap-position", item[0]);
+      button.onclick = function () {
+        var parent = el.parentElement;
+        if (!parent) return;
+        var parentRect = parent.getBoundingClientRect();
+        var rect = el.getBoundingClientRect();
+        var right = item[0].indexOf("right") !== -1;
+        var bottom = item[0].indexOf("bottom") !== -1;
+        var translateX = Math.round((right ? parentRect.right - rect.right : parentRect.left - rect.left));
+        var translateY = Math.round((bottom ? parentRect.bottom - rect.bottom : parentRect.top - rect.top));
+        previewStyle(draft, "position", "translate", translateX + "px " + translateY + "px", "px");
+        positionSpacingOverlay(el);
+      };
+      snapRow.appendChild(button);
+    });
+    sectionNode.appendChild(snapRow);
+    var help = document.createElement("div");
+    help.className = "annotator-field-label";
+    help.textContent = "拖角点改大小，拖蓝色移动图标自由移动";
+    sectionNode.appendChild(help);
   }
 
   function renderRadiusControl(sectionNode, el, draft) {
@@ -915,7 +1227,7 @@
       ? [["text-content", "文字内容"], ["typography", "文字样式"], ["text-color", "文字颜色"]]
       : kind === "image"
         ? [["image", "图片"], ["appearance", "外观"]]
-        : [["spacing", "间距"], ["appearance", "外观"]];
+        : [["geometry", "尺寸与位置"], ["spacing", "间距"], ["appearance", "外观"]];
     var sectionNodes = {};
     sectionNames.forEach(function (item) {
       sectionNodes[item[0]] = inspectorSection(item[0], item[1], false);
@@ -1000,6 +1312,7 @@
       }, false);
       renderRadiusControl(sectionNodes.appearance, previewEl, previewDraft);
     } else if (sectionNodes.appearance && previewEl) {
+      renderGeometryControls(sectionNodes.geometry, previewEl, previewDraft);
       renderSpacingControls(sectionNodes.spacing, previewEl, previewDraft);
       renderAppearanceControls(sectionNodes.appearance, previewEl, previewDraft);
     }
@@ -1076,12 +1389,9 @@
     box.appendChild(fileInput);
     box.appendChild(footer);
     document.body.appendChild(box);
-
-    var vw = window.innerWidth, vh = window.innerHeight;
-    var left = Math.min(x + 12, vw - 352);
-    var top = Math.min(y + 12, vh - 480);
-    box.style.left = Math.max(8, left) + "px";
-    box.style.top = Math.max(8, top) + "px";
+    if (bar) bar.style.visibility = "hidden";
+    placeInspectorAwayFromContent(box, previewEl, x, y);
+    enableInspectorDrag(box, head);
     if (presetNote) {
       ta.focus();
       ta.select();
@@ -1189,6 +1499,7 @@
     previewDraft = null;
     if (inputBox && inputBox.parentNode) inputBox.parentNode.removeChild(inputBox);
     inputBox = null;
+    if (bar) bar.style.visibility = "";
     if (toggleBtn && typeof toggleBtn.focus === "function") toggleBtn.focus();
   }
 
@@ -1807,8 +2118,14 @@
       document.addEventListener("mouseup", onPointerUp, true);
     }
 
-    window.addEventListener("scroll", renderPins, true);
-    window.addEventListener("resize", renderPins);
+    window.addEventListener("scroll", function () {
+      renderPins();
+      placeToolbarAwayFromInteractiveElements();
+    }, true);
+    window.addEventListener("resize", function () {
+      renderPins();
+      placeToolbarAwayFromInteractiveElements();
+    });
     watchPages();
   }
 

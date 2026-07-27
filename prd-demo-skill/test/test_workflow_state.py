@@ -39,6 +39,36 @@ class WorkflowStateTest(unittest.TestCase):
         )
         return state
 
+    def ready_to_generate_state(self):
+        state = self.fully_confirmed_state()
+        state.confirm_visual_direction("reference-led", {"reference": "home.png"})
+        state.confirm_flow(
+            {
+                "schemaVersion": "1.0",
+                "presentation": {
+                    "type": "visual-flow",
+                    "artifact": "flow/flow.html",
+                    "layout": "left-to-right",
+                },
+                "nodes": [
+                    {
+                        "id": "home",
+                        "title": "首页",
+                        "thumbnail": "flow/home.png",
+                        "confirmation": "confirmed",
+                        "visualBindings": [
+                            {"target": "page-shell", "reference": "home.png"}
+                        ],
+                    }
+                ],
+                "edges": [],
+                "confirmationEvents": [
+                    {"nodeId": "home", "userMessageId": "message-1"}
+                ],
+            }
+        )
+        return state
+
     def test_prd_fingerprint_is_stable_across_line_endings_and_trailing_space(self):
         windows = "标题\r\n正文  \r\n"
         unix = "标题\n正文\n"
@@ -88,7 +118,40 @@ class WorkflowStateTest(unittest.TestCase):
         state.confirm("frameBindings", [])
         self.assertEqual("emptyState", state.next_question())
         state.confirm("emptyState", "采用设计稿")
-        self.assertEqual("ready-to-generate", state.phase)
+        self.assertEqual("ready-for-visual", state.phase)
+
+    def test_visual_direction_and_confirmed_flow_are_generation_gates(self):
+        state = self.fully_confirmed_state()
+        self.assertEqual("ready-for-visual", state.phase)
+        with self.assertRaisesRegex(ValueError, "视觉方向"):
+            state.mark_generated()
+        state.confirm_visual_direction("reference-led", {"reference": "home.png"})
+        self.assertEqual("ready-for-flow", state.phase)
+        with self.assertRaisesRegex(ValueError, "用户动线"):
+            state.mark_generated()
+        with self.assertRaisesRegex(ValueError, "尚未确认"):
+            state.confirm_flow(
+                {
+                    "schemaVersion": "1.0",
+                    "presentation": {
+                        "type": "visual-flow",
+                        "artifact": "flow/flow.html",
+                        "layout": "left-to-right",
+                    },
+                    "nodes": [
+                        {
+                            "id": "home",
+                            "thumbnail": "flow/home.png",
+                            "confirmation": "pending",
+                            "visualBindings": [{"target": "page", "reference": "home.png"}],
+                        }
+                    ],
+                    "edges": [],
+                    "confirmationEvents": [],
+                }
+            )
+        ready = self.ready_to_generate_state()
+        self.assertEqual("ready-to-generate", ready.phase)
 
     def test_prd_change_invalidates_only_declared_decisions(self):
         state = self.fully_confirmed_state()
@@ -113,7 +176,7 @@ class WorkflowStateTest(unittest.TestCase):
             state.mark_generated()
 
     def test_receipt_requires_generated_state_and_preserves_decisions(self):
-        state = self.fully_confirmed_state()
+        state = self.ready_to_generate_state()
         with self.assertRaisesRegex(ValueError, "尚未生成"):
             build_receipt(
                 state,
@@ -131,6 +194,8 @@ class WorkflowStateTest(unittest.TestCase):
         self.assertEqual(state.sessionId, receipt["sessionId"])
         self.assertEqual(state.prdFingerprint, receipt["prdFingerprint"])
         self.assertEqual(state.answers["frameBindings"], receipt["decisions"]["frameBindings"])
+        self.assertEqual("reference-led", receipt["decisions"]["visualDirection"]["strategy"])
+        self.assertEqual("home", receipt["decisions"]["flow"]["nodes"][0]["id"])
         state.mark_receipt_written()
         self.assertEqual("receipt-written", state.phase)
 

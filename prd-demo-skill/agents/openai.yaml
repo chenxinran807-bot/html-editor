@@ -1,7 +1,7 @@
 interface:
   display_name: "PRD 高保真交互 Demo"
-  short_description: "从 PRD 与刚采集的设计生成可标注回改的交互 Demo"
-  default_prompt: "使用 $prd-demo，根据当前 PRD 和刚采集的设计生成高保真交互 Demo。"
+  short_description: "从需求确认、视觉方向到自动 QA 的高保真交互 Demo"
+  default_prompt: "使用 $prd-demo，根据当前 PRD 先逐项确认并确定视觉方向与用户动线，再生成高保真交互 Demo 并自动 QA。"
 
 policy:
   allow_implicit_invocation: true

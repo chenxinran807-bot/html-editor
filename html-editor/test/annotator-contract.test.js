@@ -7,6 +7,11 @@ const source = fs.readFileSync(
   path.join(__dirname, '..', 'assets', 'annotator-inject.js'),
   'utf8'
 );
+const packageVersion = require('../package.json').version;
+
+test('runtime banner matches the published package version', () => {
+  assert.ok(source.includes(`* v${packageVersion}：`));
+});
 
 test('keeps the established machine-readable export protocol', () => {
   for (const token of ['页面:', '选择器:', '片段:', '批注:', '[[[IMG:', '[[[/IMG]]]']) {
@@ -25,6 +30,15 @@ test('uses one inline SVG icon factory and macOS visual tokens', () => {
 test('keeps action labels visible on narrow screens', () => {
   assert.doesNotMatch(source, /#ann-toolbar button span:not\([^)]*\)\{display:none/);
   assert.match(source, /@media\(max-width:640px\).*#ann-toolbar button\{[^}]*font-size:11px/s);
+});
+
+test('places the toolbar away from page controls instead of pinning it over the primary action', () => {
+  assert.match(source, /function placeToolbarAwayFromInteractiveElements\(\)/);
+  assert.match(source, /button,\s*a\[href\],\s*input,\s*select,\s*textarea,\s*\[role="button"\],\s*\[role="radio"\]/);
+  assert.doesNotMatch(
+    source,
+    /#ann-toolbar\{position:fixed;left:50%;bottom:18px[^}]*translateX\(-50%\)/
+  );
 });
 
 test('reads workflow metadata for structured handoff', () => {

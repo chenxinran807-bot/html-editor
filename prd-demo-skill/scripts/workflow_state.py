@@ -10,9 +10,18 @@ import uuid
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
+from prototype_pipeline import validate_flow
+
 
 CORE_QUESTIONS = ("pageScope", "primaryFlow", "frameBindings")
-PHASES = {"confirming", "ready-to-generate", "generated", "receipt-written"}
+PHASES = {
+    "confirming",
+    "ready-for-visual",
+    "ready-for-flow",
+    "ready-to-generate",
+    "generated",
+    "receipt-written",
+}
 
 
 class Conflict(ValueError):
@@ -42,6 +51,8 @@ class WorkflowState:
     prdFingerprint: str
     answers: dict = field(default_factory=dict)
     additionalQuestions: list = field(default_factory=list)
+    visualDirection: dict = field(default_factory=dict)
+    flow: dict = field(default_factory=dict)
     phase: str = "confirming"
 
     def __post_init__(self):
@@ -95,7 +106,7 @@ class WorkflowState:
         if key not in self.answers and key != expected:
             raise ValueError(f"当前必须先确认 {expected}")
         self.answers[key] = copy.deepcopy(value)
-        self.phase = "ready-to-generate" if self.next_question() is None else "confirming"
+        self.phase = "ready-for-visual" if self.next_question() is None else "confirming"
 
     def add_question(self, key, prompt, evidence):
         if key in CORE_QUESTIONS or any(item["key"] == key for item in self.additionalQuestions):
@@ -104,6 +115,25 @@ class WorkflowState:
             raise ValueError("追加问题必须包含 key、prompt 和 evidence")
         self.additionalQuestions.append({"key": key, "prompt": prompt, "evidence": evidence})
         self.phase = "confirming"
+
+    def confirm_visual_direction(self, strategy, selection):
+        if self.phase != "ready-for-visual":
+            raise ValueError("核心确认未完成，不能确认视觉方向")
+        if strategy not in {"reference-led", "explore"}:
+            raise ValueError("未知视觉方向策略")
+        if not selection:
+            raise ValueError("视觉方向缺少用户确认结果")
+        self.visualDirection = {
+            "strategy": strategy,
+            "selection": copy.deepcopy(selection),
+        }
+        self.phase = "ready-for-flow"
+
+    def confirm_flow(self, flow):
+        if self.phase != "ready-for-flow":
+            raise ValueError("视觉方向尚未确认，不能确认用户动线")
+        self.flow = copy.deepcopy(validate_flow(flow))
+        self.phase = "ready-to-generate"
 
     def change_prd(self, new_fingerprint, affected):
         _validate_prd_fingerprint(new_fingerprint)
@@ -114,9 +144,15 @@ class WorkflowState:
         self.prdFingerprint = new_fingerprint
         for key in affected:
             self.answers.pop(key, None)
-        self.phase = "confirming" if self.next_question() else "ready-to-generate"
+        self.visualDirection = {}
+        self.flow = {}
+        self.phase = "confirming" if self.next_question() else "ready-for-visual"
 
     def mark_generated(self):
+        if self.phase == "ready-for-visual":
+            raise ValueError("视觉方向尚未确认，不能生成")
+        if self.phase == "ready-for-flow":
+            raise ValueError("用户动线尚未确认，不能生成")
         if self.phase != "ready-to-generate":
             raise ValueError("核心确认未完成，不能生成")
         self.phase = "generated"
@@ -144,5 +180,7 @@ def build_receipt(state, agent_user_open_id, result, consumed_at):
             "pageScope": copy.deepcopy(state.answers["pageScope"]),
             "primaryFlow": copy.deepcopy(state.answers["primaryFlow"]),
             "frameBindings": copy.deepcopy(state.answers["frameBindings"]),
+            "visualDirection": copy.deepcopy(state.visualDirection),
+            "flow": copy.deepcopy(state.flow),
         },
     }

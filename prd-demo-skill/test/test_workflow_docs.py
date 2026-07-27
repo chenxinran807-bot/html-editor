@@ -29,12 +29,100 @@ class WorkflowDocsTest(unittest.TestCase):
             "pageScope",
             "primaryFlow",
             "frameBindings",
+            "### 4. 确定视觉方向",
+            "### 5. 生成并确认用户动线图",
             "3–5 行",
-            "html-editor",
+            "### 7. 自动执行三层 QA",
+            "### 8. 自动注入标注层",
             "consumption/{sessionId}.json",
         ]
         positions = [text.index(value) for value in ordered]
         self.assertEqual(positions, sorted(positions))
+
+    def test_visual_exploration_is_conditional_and_exactly_three(self):
+        text = self.read("references/visual-exploration.md")
+        self.assertIn("明确视觉目标", text)
+        self.assertIn("不得强制探索", text)
+        self.assertIn("恰好 3 个", text)
+        self.assertIn("全部校验通过", text)
+        self.assertIn("不得凭声明尺寸", text)
+        self.assertIn("validate-visual", text)
+
+    def test_flow_is_single_confirmation_surface_with_embedded_bindings(self):
+        text = self.read("references/flow-confirmation.md")
+        for required in (
+            "flow.json",
+            "visualBindings",
+            "不得另建",
+            "确认前不得生成完整原型",
+            "visual-flow",
+            "flow/flow.html",
+            "不得只展示表格",
+            "confirmationEvents",
+            "一条用户消息只能确认一个节点",
+            "confirm-flow",
+            "validate-flow",
+            "nextNode",
+        ):
+            self.assertIn(required, text)
+
+    def test_qa_is_three_layered_bounded_and_hidden_from_default_ui(self):
+        text = self.read("references/automatic-qa.md")
+        for required in (
+            "visual-fidelity",
+            "requirements-fidelity",
+            "interaction-flow",
+            "最多 3 轮",
+            "P0",
+            "P1",
+            "qa/qa-result.json",
+            "不默认生成",
+            "check-browser",
+            "不得临时安装",
+            "jsdom",
+        ):
+            self.assertIn(required, text)
+
+    def test_user_facing_messages_hide_internal_implementation_names(self):
+        text = self.read("SKILL.md")
+        for required in (
+            "对用户隐藏内部实现",
+            "不得展示脚本名",
+            "不得展示命令名",
+            "不得展示内部状态键",
+            "只说用户正在确认什么、系统正在完成什么、下一步需要什么",
+        ):
+            self.assertIn(required, text)
+
+    def test_confirmation_phase_cannot_preflight_later_qa_runtime(self):
+        text = self.read("SKILL.md")
+        for required in (
+            "确认阶段禁止提前准备后续环节",
+            "不得检查浏览器",
+            "不得探测 QA 环境",
+            "不得读取生成、验收或标注阶段的实现文件",
+            "先提出当前唯一需要用户确认的问题",
+        ):
+            self.assertIn(required, text)
+
+    def test_missing_visual_target_cannot_offer_to_skip_exploration(self):
+        text = self.read("SKILL.md")
+        for required in (
+            "没有明确视觉目标时不得提供跳过三个视觉方向的选项",
+            "只确认三个方向采用哪一个或如何组合",
+        ):
+            self.assertIn(required, text)
+
+    def test_browser_probe_is_single_attempt_and_cannot_search_for_variants(self):
+        text = self.read("SKILL.md")
+        for required in (
+            "浏览器探测只允许一次",
+            "不得继续寻找其他 Chromium",
+            "不得尝试 LD_LIBRARY_PATH",
+            "不得搜索已有系统库",
+            "立即停止验收并报告环境不可用",
+        ):
+            self.assertIn(required, text)
 
     def test_three_core_questions_are_always_confirmed_one_at_a_time(self):
         text = self.read("references/clarification.md")
