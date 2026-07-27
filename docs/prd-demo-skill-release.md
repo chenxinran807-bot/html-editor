@@ -13,6 +13,6 @@
 5. 在 Mira 的 `Skills & Bots → My Skill → prd-demo → Replace` 上传同一 ZIP。
 6. 新建 Mira 会话回归；旧会话不用于判断新 Skill 是否生效。
 
-当前已验证平台版本：`1.0.13`（2026-07-23）。
+当前已验证 AgentBuddy 版本：`1.0.14`（2026-07-27）。
 
-当前待发布包 SHA-256：`9626fc6016ab7b7689c808f960ac5eba742756761a1c1505edb081a7a1c63be3`。
+当前发布包 SHA-256：`9626fc6016ab7b7689c808f960ac5eba742756761a1c1505edb081a7a1c63be3`。
